@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>office-elf — 工具總覽</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,'Microsoft JhengHei',sans-serif;background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ── HEADER ── */
+  header{background:#0f172a;padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:50;}
+  .logo{color:#f8fafc;font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px;}
+  .logo span{color:#818cf8;}
+  .header-right{color:#475569;font-size:12px;}
+
+  /* ── HORIZONTAL TAB BAR ── */
+  .tab-bar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 32px;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;position:sticky;top:56px;z-index:40;}
+  .tab-bar::-webkit-scrollbar{display:none;}
+  .tab-btn{flex-shrink:0;padding:14px 16px;font-size:13px;font-weight:600;color:#64748b;border:none;background:transparent;cursor:pointer;border-bottom:2.5px solid transparent;transition:all .18s;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .tab-btn:hover{color:#334155;}
+  .tab-btn.active{color:#4f46e5;border-bottom-color:#4f46e5;}
+  .tab-btn .tab-icon{font-size:15px;}
+  .tab-count{font-size:10px;background:#e0e7ff;color:#4f46e5;padding:1px 6px;border-radius:20px;font-weight:700;}
+  .tab-count.gray{background:#f1f5f9;color:#94a3b8;}
+
+  /* ── MAIN ── */
+  main{flex:1;max-width:1100px;margin:0 auto;padding:32px 24px;width:100%;}
+
+  .section{display:none;}
+  .section.active{display:block;}
+
+  .section-header{margin-bottom:24px;}
+  .section-header h2{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px;}
+  .section-header p{font-size:13px;color:#64748b;}
+
+  /* ── GRID ── */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;}
+
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:22px 20px;text-decoration:none;display:flex;flex-direction:column;gap:10px;transition:box-shadow .18s,border-color .18s,transform .15s;cursor:pointer;}
+  .card:hover{box-shadow:0 6px 24px rgba(79,70,229,.1);border-color:#c7d2fe;transform:translateY(-2px);}
+  .card.disabled{opacity:.4;pointer-events:none;}
+
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;}
+  .card-icon{font-size:26px;line-height:1;}
+  .badge{font-size:10.5px;padding:3px 9px;border-radius:20px;font-weight:700;}
+  .badge-green{background:#dcfce7;color:#16a34a;}
+  .badge-indigo{background:#e0e7ff;color:#4338ca;}
+  .badge-orange{background:#fff7ed;color:#c2410c;}
+  .badge-gray{background:#f1f5f9;color:#94a3b8;}
+
+  .card-title{font-size:14.5px;font-weight:800;color:#0f172a;}
+  .card-desc{font-size:12.5px;color:#64748b;line-height:1.7;flex:1;}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid #f1f5f9;margin-top:4px;}
+  .card-tag{font-size:11px;color:#94a3b8;display:flex;align-items:center;gap:4px;}
+  .card-arrow{color:#a5b4fc;font-size:13px;font-weight:700;}
+  .card:hover .card-arrow{color:#4f46e5;}
+
+  /* ── EMPTY ── */
+  .empty{text-align:center;padding:64px 24px;color:#94a3b8;}
+  .empty .empty-icon{font-size:40px;margin-bottom:12px;}
+  .empty p{font-size:13px;}
+
+  footer{text-align:center;padding:18px;color:#94a3b8;font-size:11px;border-top:1px solid #e2e8f0;background:#fff;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🧝 office<span>-elf</span></div>
+  <div class="header-right">內部工具平台 ・ v1.0</div>
+</header>
+
+<!-- ── TAB BAR ── -->
+<nav class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="all" onclick="switchTab(this,'all')">
+    <span class="tab-icon">🗂️</span> 全部 <span class="tab-count" id="cnt-all">6</span>
+  </button>
+  <button class="tab-btn" data-tab="edm" onclick="switchTab(this,'edm')">
+    <span class="tab-icon">📧</span> EDM 電郵 <span class="tab-count" id="cnt-edm">2</span>
+  </button>
+  <button class="tab-btn" data-tab="school" onclick="switchTab(this,'school')">
+    <span class="tab-icon">🎓</span> 校務管理 <span class="tab-count" id="cnt-school">2</span>
+  </button>
+  <button class="tab-btn" data-tab="sales" onclick="switchTab(this,'sales')">
+    <span class="tab-icon">💼</span> 銷售工具 <span class="tab-count" id="cnt-sales">1</span>
+  </button>
+  <button class="tab-btn" data-tab="system" onclick="switchTab(this,'system')">
+    <span class="tab-icon">⚙️</span> 系統工具 <span class="tab-count" id="cnt-system">1</span>
+  </button>
+</nav>
+
+<main>
+
+  <!-- ALL -->
+  <div class="section active" id="tab-all">
+    <div class="section-header">
+      <h2>所有工具</h2>
+      <p>office-elf 全部內部小程序，點擊直接使用</p>
+    </div>
+    <div class="grid" id="grid-all"></div>
+  </div>
+
+  <!-- EDM -->
+  <div class="section" id="tab-edm">
+    <div class="section-header">
+      <h2>📧 EDM 電郵工具</h2>
+      <p>電子郵件行銷模板編輯、導出與管理</p>
+    </div>
+    <div class="grid" id="grid-edm"></div>
+  </div>
+
+  <!-- SCHOOL -->
+  <div class="section" id="tab-school">
+    <div class="section-header">
+      <h2>🎓 校務管理工具</h2>
+      <p>校內點名、學生管理及校務相關系統</p>
+    </div>
+    <div class="grid" id="grid-school"></div>
+  </div>
+
+  <!-- SALES -->
+  <div class="section" id="tab-sales">
+    <div class="section-header">
+      <h2>💼 銷售工具</h2>
+      <p>銷售簡報、展會文件及報價相關工具</p>
+    </div>
+    <div class="grid" id="grid-sales"></div>
+  </div>
+
+  <!-- SYSTEM -->
+  <div class="section" id="tab-system">
+    <div class="section-header">
+      <h2>⚙️ 系統工具</h2>
+      <p>開發測試、設定與維護用途工具</p>
+    </div>
+    <div class="grid" id="grid-system"></div>
+  </div>
+
+</main>
+
+<footer>🧝 office-elf Internal Tools ・ © 2026</footer>
+
+<script>
+  /* ── TOOLS DATA ── */
+  const tools = [
+    {
+      icon: "🛠️",
+      title: "EDM Builder",
+      desc: "視覺化編輯 EDM 電郵內容，支援多節日範本切換，一鍵導出 Shopify Liquid 相容 HTML。",
+      tag: "EDM / EDMBuilder.html",
+      href: "EDM/EDMBuilder.html",
+      badge: "badge-green",
+      badgeText: "可用",
+      category: "edm"
+    },
+    {
+      icon: "🗂️",
+      title: "EDM 範本管理庫",
+      desc: "集中管理所有節日及產品電郵範本，快速複製、比較及版本控制。",
+      tag: "EDM / TemplateManager.html",
+      href: "#",
+      badge: "badge-gray",
+      badgeText: "即將推出",
+      category: "edm",
+      disabled: true
+    },
+    {
+      icon: "✅",
+      title: "課堂點名系統",
+      desc: "掃描 / 手動點名，即時顯示出席狀況，支援匯出報表與缺席通知。",
+      tag: "School / Attendance.html",
+      href: "#",
+      badge: "badge-indigo",
+      badgeText: "開發中",
+      category: "school",
+      disabled: true
+    },
+    {
+      icon: "👩‍🎓",
+      title: "學生資料管理",
+      desc: "快速查閱、編輯學生基本資料，支援班別篩選與批量更新。",
+      tag: "School / Students.html",
+      href: "#",
+      badge: "badge-gray",
+      badgeText: "即將推出",
+      category: "school",
+      disabled: true
+    },
+    {
+      icon: "📊",
+      title: "展會貨量表",
+      desc: "展會現場銷售記錄、貨量追蹤，含「如全部賣出可得金額」預算欄位。",
+      tag: "Sales / ExhibitionSheet.html",
+      href: "#",
+      badge: "badge-orange",
+      badgeText: "Beta",
+      category: "sales",
+      disabled: true
+    },
+    {
+      icon: "🔧",
+      title: "系統設定",
+      desc: "管理平台基本設定、用戶權限及 API 連接狀態。",
+      tag: "System / Settings.html",
+      href: "#",
+      badge: "badge-gray",
+      badgeText: "即將推出",
+      category: "system",
+      disabled: true
+    },
+  ];
+
+  /* ── RENDER ── */
+  function renderCard(tool) {
+    return `
+      <a class="card${tool.disabled ? ' disabled' : ''}" href="${tool.href}">
+        <div class="card-top">
+          <div class="card-icon">${tool.icon}</div>
+          <span class="badge ${tool.badge}">${tool.badgeText}</span>
+        </div>
+        <div class="card-title">${tool.title}</div>
+        <div class="card-desc">${tool.desc}</div>
+        <div class="card-footer">
+          <div class="card-tag">📁 ${tool.tag}</div>
+          <div class="card-arrow">→</div>
+        </div>
+      </a>`;
+  }
+
+  function buildGrids() {
+    const categories = ["all", "edm", "school", "sales", "system"];
+    categories.forEach(cat => {
+      const list = cat === "all" ? tools : tools.filter(t => t.category === cat);
+      const grid = document.getElementById(`grid-${cat}`);
+      if (!grid) return;
+      grid.innerHTML = list.length
+        ? list.map(renderCard).join("")
+        : `<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><p>此分類暫無工具</p></div>`;
+
+      // update count badge
+      const cnt = document.getElementById(`cnt-${cat}`);
+      const active = list.filter(t => !t.disabled).length;
+      if (cnt) {
+        cnt.textContent = active || list.length;
+        if (!active) cnt.className = "tab-count gray";
+      }
+    });
+  }
+
+  buildGrids();
+
+  /* ── TAB SWITCH ── */
+  function switchTab(btn, tabId) {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(`tab-${tabId}`).classList.add("active");
+  }
+</script>
+</body>
+</html>
