@@ -340,7 +340,7 @@ function gFinalCta(fc){return`<div style="background:linear-gradient(145deg,${fc
 
 function gFooter(ft){
  const ls=ft.links.map(l=>`<a href="${q(l.link)}" style="color:${ft.linkColor};font-size:12px;text-decoration:none;margin:0 9px;">${q(l.text)}</a>`).join("");
- return`<div style="background:${ft.bg};padding:32px 40px;text-align:center;"><div style="color:${ft.logoColor};font-weight:800;font-size:15px;margin-bottom:8px;">${q(ft.logoText)}</div><div style="color:${ft.descColor};font-size:12.5px;margin-bottom:14px;line-height:1.7;">${qb(ft.desc)}</div><div style="color:${ft.contactColor};font-size:12px;margin-bottom:18px;line-height:1.9;">查詢電郵：${q(ft.email)}<br>官方網站：${q(ft.website)}</div><div style="margin-bottom:16px;">${ls}</div><div style="color:${ft.copyrightColor};font-size:11px;margin-bottom:12px;">${q(ft.copyright)}</div><div style="font-size:11px;color:#9CA3AF;">{{ unsubscribe_link }}</div></div></div>`;
+ return`<div style="background:${ft.bg};padding:32px 40px;text-align:center;"><div style="color:${ft.logoColor};font-weight:800;font-size:15px;margin-bottom:8px;">${q(ft.logoText)}</div><div style="color:${ft.descColor};font-size:12.5px;margin-bottom:14px;line-height:1.7;">${qb(ft.desc)}</div><div style="color:${ft.contactColor};font-size:12px;margin-bottom:18px;line-height:1.9;">查詢電郵：${q(ft.email)}<br>官方網站：${q(ft.website)}</div><div style="margin-bottom:16px;">${ls}</div><div style="color:${ft.copyrightColor};font-size:11px;margin-bottom:12px;">${q(ft.copyright)}</div><div style="font-size:11px;color:#9CA3AF;">{{ unsubscribe_link }}</div></div>`;
 }
 
 // ═══════════════════════════════════════
