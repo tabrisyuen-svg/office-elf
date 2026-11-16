@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OmniStompboxs School｜校務管理系統</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f0f2f5; color: #333; }
+    .email-wrapper { max-width: 640px; margin: 0 auto; background: #ffffff; }
+
+    /* ─── NAV ─── */
+    .nav {
+      background: #111827;
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-logo { color: #ffffff; font-weight: 700; font-size: 15px; text-decoration: none; letter-spacing: 0.3px; }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { color: #9ca3af; text-decoration: none; font-size: 13px; }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: linear-gradient(145deg, #111827 0%, #1e3a5f 100%);
+      padding: 56px 40px 48px;
+      text-align: center;
+    }
+    .hero-eyebrow { color: #60a5fa; font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 18px; font-weight: 600; }
+    .hero h1 { color: #ffffff; font-size: 26px; font-weight: 800; line-height: 1.5; margin-bottom: 18px; }
+    .hero h1 span { color: #60a5fa; }
+    .hero p { color: #94a3b8; font-size: 14.5px; line-height: 1.8; max-width: 460px; margin: 0 auto 24px; }
+    .hero-tags { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 32px; }
+    .tag { background: rgba(96,165,250,0.12); color: #93c5fd; padding: 5px 14px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(96,165,250,0.25); }
+    .hero-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+    /* ─── BUTTONS ─── */
+    .btn-primary { display: inline-block; background: #2563eb; color: #ffffff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 14px; }
+    .btn-outline { display: inline-block; background: transparent; color: #60a5fa; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; border: 1.5px solid #3b82f6; }
+    .btn-sm { display: inline-block; background: #2563eb; color: #fff; padding: 10px 22px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 700; }
+    .btn-sm-line { display: inline-block; background: transparent; color: #2563eb; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: 600; border: 1.5px solid #2563eb; }
+    .btn-white { display: inline-block; background: #ffffff; color: #1e3a5f; padding: 13px 32px; border-radius: 6px; text-decoration: none; font-weight: 800; font-size: 14px; }
+
+    /* ─── INTRO ─── */
+    .intro { padding: 36px 40px 28px; text-align: center; border-bottom: 1px solid #e5e7eb; }
+    .intro p { color: #555; font-size: 14.5px; line-height: 1.85; }
+    .intro p + p { margin-top: 14px; }
+    .intro .brand { color: #1d4ed8; font-weight: 700; }
+    .intro-cta { margin-top: 22px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+    /* ─── SECTION HEADER (shared) ─── */
+    .section-header { text-align: center; margin-bottom: 28px; }
+    .section-header h2 { font-size: 18px; color: #111827; font-weight: 800; margin-bottom: 6px; }
+    .section-header p { color: #6b7280; font-size: 13.5px; }
+
+    /* ─── FEATURES ─── */
+    .features { padding: 44px 40px 36px; }
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .feature-card {
+      border: 1px solid #e5e7eb;
+      border-top: 3px solid #2563eb;
+      border-radius: 10px;
+      padding: 22px 20px;
+      background: #f9fafb;
+    }
+    .feature-icon { font-size: 22px; margin-bottom: 10px; }
+    .feature-card h3 { color: #111827; font-size: 14px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .feature-card p { color: #6b7280; font-size: 13px; line-height: 1.75; }
+    .feature-link { display: inline-block; color: #2563eb; font-size: 12.5px; font-weight: 600; margin-top: 10px; text-decoration: none; }
+
+    /* ─── SECURITY ─── */
+    .security { padding: 44px 40px 36px; background: #f8faff; border-top: 1px solid #e0e9ff; border-bottom: 1px solid #e0e9ff; }
+    .sec-intro { text-align: center; color: #4b5563; font-size: 13.5px; line-height: 1.8; max-width: 480px; margin: 0 auto 26px; }
+    .security-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .security-card { border: 1px solid #c7d9f8; border-radius: 10px; padding: 22px 20px; background: #ffffff; }
+    .security-card .sec-icon { font-size: 22px; margin-bottom: 10px; }
+    .security-card h3 { color: #1e3a5f; font-size: 14px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; }
+    .security-card p { color: #6b7280; font-size: 13px; line-height: 1.75; }
+    .security-note { text-align: center; margin-top: 22px; padding: 16px 20px; background: #eff6ff; border-radius: 8px; border: 1px solid #bfdbfe; }
+    .security-note p { color: #1e40af; font-size: 13px; line-height: 1.75; }
+    .security-note a { color: #1d4ed8; font-weight: 700; text-decoration: none; }
+
+    /* ─── MID CTA ─── */
+    .mid-cta { background: #eff6ff; padding: 36px 40px; text-align: center; border-top: 1px solid #dbeafe; border-bottom: 1px solid #dbeafe; }
+    .mid-cta .highlight { display: block; color: #1e40af; font-weight: 800; font-size: 17px; margin-bottom: 14px; line-height: 1.5; }
+    .mid-cta p { color: #374151; font-size: 14px; line-height: 1.8; max-width: 480px; margin: 0 auto 22px; }
+
+    /* ─── SERVICES ─── */
+    .services { padding: 44px 40px 36px; }
+    .service-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .service-item { text-align: center; flex: 1; min-width: 140px; max-width: 175px; }
+    .service-item .icon { font-size: 26px; margin-bottom: 10px; }
+    .service-item h4 { color: #111827; font-size: 13.5px; font-weight: 700; margin-bottom: 6px; }
+    .service-item p { color: #6b7280; font-size: 12.5px; line-height: 1.6; }
+    .service-note { text-align: center; color: #9ca3af; font-size: 12px; margin-top: 20px; }
+
+    /* ─── FINAL CTA ─── */
+    .final-cta { background: linear-gradient(145deg, #111827 0%, #1e3a5f 100%); padding: 48px 40px; text-align: center; }
+    .final-cta h2 { color: #ffffff; font-size: 21px; font-weight: 800; margin-bottom: 14px; line-height: 1.4; }
+    .final-cta p { color: #94a3b8; font-size: 14px; line-height: 1.8; max-width: 460px; margin: 0 auto 26px; }
+
+    /* ─── FOOTER ─── */
+    .footer { background: #0f172a; padding: 32px 40px; text-align: center; }
+    .footer-logo { color: #f1f5f9; font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+    .footer-desc { color: #64748b; font-size: 12.5px; margin-bottom: 14px; line-height: 1.7; }
+    .footer-contact { color: #64748b; font-size: 12px; margin-bottom: 18px; line-height: 1.9; }
+    .footer-links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+    .footer-links a { color: #475569; font-size: 12px; text-decoration: none; }
+    .footer-copy { color: #334155; font-size: 11px; }
+    .unsub { color: #475569; font-size: 11px; margin-top: 12px; }
+    .unsub a { color: #475569; text-decoration: underline; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 520px) {
+      .nav { padding: 12px 20px; }
+      .nav-links { gap: 12px; }
+      .nav-links a { font-size: 12px; }
+      .hero { padding: 40px 24px 36px; }
+      .hero h1 { font-size: 22px; }
+      .intro { padding: 28px 24px; }
+      .features, .security, .services { padding-left: 24px; padding-right: 24px; }
+      .features-grid, .security-grid { grid-template-columns: 1fr; }
+      .mid-cta, .final-cta { padding-left: 24px; padding-right: 24px; }
+      .footer { padding: 28px 24px; }
+      .service-item { min-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+
+  {{ open_tracking_block }}
+
+  <div class="email-wrapper">
+
+    <!-- ─── NAV ─── -->
+    <div class="nav">
+      <a href="https://omnistompboxs.myshopify.com/" class="nav-logo">OmniStompboxs</a>
+      <div class="nav-links">
+        <a href="https://omnistompboxs.myshopify.com/">官方網站</a>
+        <a href="https://omnistompboxs.myshopify.com/pages/contact">聯絡我們</a>
+        <a href="https://omnistompboxs.myshopify.com/pages/about">關於我們</a>
+      </div>
+    </div>
+
+    <!-- ─── HERO ─── -->
+    <div class="hero">
+      <div class="hero-eyebrow">OmniStompboxs School</div>
+      <h1>點名要整理，回條要追，<br>學生資料<span>分散各處？</span></h1>
+      <p>每天點名要整理，活動回條要追收，學生資料又分散在不同表格——把這些整合到同一個平台，讓老師多花時間在學生身上。</p>
+      <div class="hero-tags">
+        <span class="tag">#電子點名</span>
+        <span class="tag">#電子回條</span>
+        <span class="tag">#家校溝通</span>
+        <span class="tag">#校務自動化</span>
+      </div>
+      <div class="hero-btns">
+        <a href="https://omnistompboxs.myshopify.com/pages/highlights" class="btn-primary">瀏覽校務功能</a>
+        <a href="https://omnistompboxs.myshopify.com/pages/contact" class="btn-outline">預約示範</a>
+      </div>
+    </div>
+
+    <!-- ─── INTRO ─── -->
+    <div class="intro">
+      <p>當教職員花太多時間找資料、重複輸入和逐一跟進，真正需要關注的學生與教學工作，往往被行政瑣事擠走。</p>
+      <p><span class="brand">OmniStompboxs School</span> 將校務管理、教學支援與家校溝通集中在同一個雲端平台，以可視化、自動化及多方協作，協助學校理順日常工作。若您有功能查詢、訂閱方案或示範安排，歡迎聯絡我們！</p>
+      <div class="intro-cta">
+        <a href="https://omnistompboxs.myshopify.com/pages/highlights" class="btn-sm">瀏覽產品</a>
+        <a href="https://omnistompboxs.myshopify.com/pages/contact" class="btn-sm-line">聯絡在線客服</a>
+      </div>
+    </div>
+
+    <!-- ─── FEATURES ─── -->
+    <div class="features">
+      <div class="section-header">
+        <h2>六大功能，覆蓋校務日常</h2>
+        <p>從點名、回條到家校溝通，一個平台集中處理。</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>電子點名<br>異常更易跟進</h3>
+          <p>集中查看出席記錄，配合異常通知，減少人手整理，協助教職員掌握需要跟進的情況。</p>
+          <a href="https://omnistompboxs.myshopify.com/pages/school-attendance" class="feature-link">了解更多 →</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📬</div>
+          <h3>活動與電子回條<br>進度一眼看清</h3>
+          <p>由活動安排到家長回覆，集中管理相關記錄，減少紙本收發及逐一核對。</p>
+          <a href="https://omnistompboxs.myshopify.com/pages/parent-portal" class="feature-link">了解更多 →</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗂️</div>
+          <h3>學生資料集中<br>支援更有連貫</h3>
+          <p>整合學生檔案、學習及出席記錄，讓獲授權的教職員更方便查閱，接續跟進學生需要。</p>
+          <a href="https://omnistompboxs.myshopify.com/pages/school-reports" class="feature-link">了解更多 →</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h3>教學資源與課堂安排<br>有序管理</h3>
+          <p>集中整理教材、課堂及教學資源，減少分散儲存與重複查找，方便教職員協作。</p>
+          <a href="https://omnistompboxs.myshopify.com/pages/teaching-resources" class="feature-link">了解更多 →</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧑‍💻</div>
+          <h3>學生自主練習<br>教師持續跟進</h3>
+          <p>透過學生專屬入口，配合錯題複習、口語練習及學習記錄，支援課後自主學習。</p>
+          <a href="https://omnistompboxs.myshopify.com/pages/student-portal" class="feature-link">了解更多 →</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">👨‍👩‍👧</div>
+          <h3>家長專屬入口<br>家校溝通更直接</h3>
+          <p>讓家長查看相關資訊及處理電子回條，學校亦更容易掌握回覆與跟進進度。</p>
+          <a href="https://omnistompboxs.myshopify.com/pages/parent-portal" class="feature-link">了解更多 →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── SECURITY ─── -->
+    <div class="security">
+      <div class="section-header">
+        <h2>校務資料，按角色妥善管理</h2>
+        <p>登入驗證・存取規則・操作記錄</p>
+      </div>
+      <p class="sec-intro">學生檔案、健康記錄與家長聯絡資料，需要清晰的存取界線。OmniStompboxs School 透過角色權限及資料存取控制，協助學校管理敏感資訊。</p>
+      <div class="security-grid">
+        <div class="security-card">
+          <div class="sec-icon">🔐</div>
+          <h3>不同崗位，設定不同權限</h3>
+          <p>按教師、校務人員及管理員的工作需要，設定可查閱與操作的資料範圍。</p>
+        </div>
+        <div class="security-card">
+          <div class="sec-icon">🏥</div>
+          <h3>敏感健康資料，分級存取</h3>
+          <p>健康及醫療記錄按職務設定存取權限，讓獲授權人員查閱相關資訊，減少不必要的資料接觸。</p>
+        </div>
+        <div class="security-card">
+          <div class="sec-icon">🗄️</div>
+          <h3>資料庫層面的權限控制</h3>
+          <p>配合行級安全策略（RLS），在資料庫層限制不同帳號可存取的記錄，而不只是在畫面上隱藏內容。</p>
+        </div>
+        <div class="security-card">
+          <div class="sec-icon">📝</div>
+          <h3>重要操作，保留跟進線索</h3>
+          <p>透過敏感資料的查閱與修改記錄，協助管理員追查操作及跟進異常情況。</p>
+        </div>
+      </div>
+      <div class="security-note">
+        <p>安全不只是一項功能，而是日常校務管理的一部分。<br>
+        歡迎<a href="https://omnistompboxs.myshopify.com/pages/contact">預約示範</a>，查看不同角色的權限設定與資料存取流程。</p>
+      </div>
+    </div>
+
+    <!-- ─── MID CTA ─── -->
+    <div class="mid-cta">
+      <span class="highlight">不是再多一套工具，<br>而是讓日常工作更有條理。</span>
+      <p>校長及管理層看清整體，教職員專注工作，學生與家長透過各自入口參與。系統可按學校需要配置，並按角色設定資料存取權限。</p>
+      <a href="https://omnistompboxs.myshopify.com/pages/plans" class="btn-sm">查看訂閱計劃</a>
+    </div>
+
+    <!-- ─── SERVICES ─── -->
+    <div class="services">
+      <div class="section-header">
+        <h2>我們能為學校提供什麼</h2>
+      </div>
+      <div class="service-row">
+        <div class="service-item">
+          <div class="icon">🧑‍🏫</div>
+          <h4>預約到校示範</h4>
+          <p>安排專人示範，即場體驗完整操作流程</p>
+        </div>
+        <div class="service-item">
+          <div class="icon">📐</div>
+          <h4>按校需要配置</h4>
+          <p>系統可按學校流程與架構靈活配置</p>
+        </div>
+        <div class="service-item">
+          <div class="icon">📋</div>
+          <h4>靈活訂閱方案</h4>
+          <p>按需要選擇功能模組，只付用得着的部份</p>
+        </div>
+      </div>
+      <p class="service-note">可依校務需求提供年級分層與功能建議。</p>
+    </div>
+
+    <!-- ─── FINAL CTA ─── -->
+    <div class="final-cta">
+      <h2>從學校最想改善的<br>一項流程開始</h2>
+      <p>歡迎預約示範，看看 OmniStompboxs School 如何配合你們的日常運作。可依校務需求提供年級分層與功能建議。</p>
+      <a href="https://omnistompboxs.myshopify.com/pages/contact" class="btn-white">預約校務系統示範</a>
+    </div>
+
+    <!-- ─── FOOTER ─── -->
+    <div class="footer">
+      <div class="footer-logo">OmniStompboxs</div>
+      <div class="footer-desc">企業雲端 ERP 及學校管理系統<br>專注於可視化、自動化、多方協作</div>
+      <div class="footer-contact">
+        查詢電郵：omnistompboxsystem@gmail.com<br>
+        官方網站：omnistompboxs.myshopify.com
+      </div>
+      <div class="footer-links">
+        <a href="https://omnistompboxs.myshopify.com/pages/about">關於我們</a>
+        <a href="https://omnistompboxs.myshopify.com/pages/privacy">私隱政策</a>
+        <a href="https://omnistompboxs.myshopify.com/pages/terms">服務條款</a>
+      </div>
+      <div class="footer-copy">© 2026 OmniStompboxs. All rights reserved.</div>
+      <div class="unsub"><a href="{{ unsubscribe_link }}">取消訂閱</a></div>
+    </div>
+
+  </div>
+</body>
+</html>
