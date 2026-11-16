@@ -3,189 +3,241 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>客服回應生成器 Pro</title>
+<title>客服 & Blog 生成器 Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: 'Arial', 'Microsoft JhengHei', sans-serif; }
-  .dot-bg { background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); background-size: 28px 28px; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-  .fi { animation: fadeIn .2s ease forwards; }
-  ::-webkit-scrollbar { width:4px; height:4px; }
-  ::-webkit-scrollbar-track { background:#f1f5f9; }
-  ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
-  .tag-b { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-  select option { background:white; color:#1f2937; }
-  .chip-btn { transition: all .15s ease; }
+body{font-family:'Arial','Microsoft JhengHei',sans-serif}
+.dot-bg{background-image:radial-gradient(circle,#cbd5e1 1px,transparent 1px);background-size:28px 28px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fi{animation:fadeIn .2s ease forwards}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:#f1f5f9}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+.tag-b{display:inline-flex;align-items:center;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
+select option{background:white;color:#1f2937}
+.chip-btn{transition:all .15s ease}
+.ph{display:inline;background:#fef9c3;color:#92400e;border-radius:3px;padding:1px 4px;font-style:italic;font-size:.85em;border:1px dashed #fcd34d}
+.blog-sec{font-weight:700;color:#1e293b;border-left:3px solid #3b82f6;padding-left:7px;display:block;margin:4px 0 2px}
+.blog-sec-org{border-left-color:#f97316}
+.blog-dateline{color:#94a3b8;font-size:11px}
+.blog-field-label{display:block;font-size:11px;color:#64748b;margin-bottom:3px;margin-top:9px;font-weight:600}
+.blog-inp{width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:7px 11px;font-size:13px;color:#374151;background:white;outline:none;transition:all .15s;box-sizing:border-box}
+.blog-inp:focus{border-color:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.1)}
+.blog-inp.maint:focus{border-color:#fb923c;box-shadow:0 0 0 3px rgba(251,146,60,.1)}
+.blog-ta{width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:7px 11px;font-size:13px;color:#374151;background:white;outline:none;transition:all .15s;resize:vertical;font-family:inherit;line-height:1.6;box-sizing:border-box}
+.blog-ta:focus{border-color:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.1)}
+.blog-ta.maint:focus{border-color:#fb923c;box-shadow:0 0 0 3px rgba(251,146,60,.1)}
 </style>
 </head>
 <body class="bg-slate-50 overflow-hidden h-screen">
 <div class="fixed inset-0 dot-bg opacity-20 pointer-events-none z-0"></div>
 
 <!-- HEADER -->
-<header class="relative z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-5 py-3 flex items-center gap-3 shadow-sm h-14">
-  <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<header class="relative z-20 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-4 py-2.5 flex items-center gap-3 shadow-sm" style="height:52px">
+  <div class="w-7 h-7 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
   </div>
-  <div class="min-w-0">
-    <span class="font-bold text-slate-900 tracking-tight">客服回應生成器 Pro</span>
-    <span class="hidden sm:inline text-xs text-slate-400 ml-2">ERP / 校務系統 · 多場景模板</span>
+  <span class="font-bold text-slate-900 tracking-tight text-sm hidden sm:block">客服回應生成器 Pro</span>
+  <div class="mx-auto flex bg-slate-100 rounded-xl p-0.5 gap-0.5">
+    <button id="mode-cs" onclick="setMode('cs')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-sm">💬 客服回應</button>
+    <button id="mode-blog" onclick="setMode('blog')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all">📝 Blog 內容</button>
   </div>
-  <div class="ml-auto flex items-center gap-2 flex-shrink-0">
-    <span class="text-xs font-mono bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full font-semibold">
-      <span id="total-count">0</span> 個情況模板
-    </span>
-  </div>
+  <span id="hdr-count" class="text-xs font-mono bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded-full font-semibold hidden sm:block flex-shrink-0"><span id="total-count">0</span> 模板</span>
 </header>
 
-<div class="relative z-10 flex h-[calc(100vh-56px)] overflow-hidden">
-
-  <!-- LEFT PANEL -->
-  <div class="w-[42%] min-w-[260px] max-w-[380px] bg-white border-r border-slate-200 flex flex-col overflow-hidden shadow-sm">
+<!-- ═══════════ CS MODE ═══════════ -->
+<div id="cs-container" class="relative z-10 flex overflow-hidden" style="height:calc(100vh - 52px)">
+  <div class="w-5/12 min-w-64 max-w-sm bg-white border-r border-slate-200 flex flex-col overflow-hidden shadow-sm">
     <div class="flex-1 overflow-y-auto p-4 space-y-4">
-
-      <!-- Brand -->
       <div>
         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">品牌 / 負責人</p>
         <div class="space-y-2">
-          <input id="brand" type="text" placeholder="品牌名稱，例：BizCore ERP" value="BizCore ERP" oninput="update()"
-            class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
-          <input id="agent" type="text" placeholder="負責人 / 客服名稱（選填）" oninput="update()"
-            class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+          <input id="brand" type="text" placeholder="品牌名稱" value="OmniStompboxs" oninput="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+          <input id="agent" type="text" placeholder="負責人 / 客服名稱（選填）" oninput="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
           <div class="grid grid-cols-2 gap-2">
-            <input id="co-email" type="text" placeholder="cs@example.com" oninput="update()"
-              class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-600 font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
-            <input id="co-wa" type="text" placeholder="+852 XXXX XXXX" oninput="update()"
-              class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-600 font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+            <input id="co-email" type="text" placeholder="cs@example.com" oninput="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-600 font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+            <input id="co-wa" type="text" placeholder="+852 XXXX XXXX" oninput="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-600 font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
           </div>
         </div>
       </div>
-
       <hr class="border-slate-100">
-
-      <!-- Customer -->
       <div>
         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">客戶資料</p>
         <div class="space-y-2">
-          <input id="cname" type="text" placeholder="客戶稱呼，例：陳先生 / ABC公司 李經理" oninput="update()"
-            class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
-          <input id="ref" type="text" placeholder="參考編號 / 日期（選填）" oninput="update()"
-            class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-600 font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1.5">客戶類型</label>
-            <div id="ctype-chips" class="flex flex-wrap gap-1.5"></div>
-          </div>
+          <input id="cname" type="text" placeholder="客戶稱呼，例：陳先生 / ABC公司 李經理" oninput="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+          <input id="ref" type="text" placeholder="參考編號 / 日期（選填）" oninput="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-600 font-mono bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+          <div><label class="block text-xs text-slate-400 mb-1.5">客戶類型</label><div id="ctype-chips" class="flex flex-wrap gap-1.5"></div></div>
         </div>
       </div>
-
       <hr class="border-slate-100">
-
-      <!-- Category -->
       <div>
         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">情況類別</p>
         <div class="space-y-2">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">主要類別</label>
-            <select id="cat" onchange="onCatChange()"
-              class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition cursor-pointer"></select>
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1">細分情況</label>
-            <select id="subcat" onchange="update()"
-              class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition cursor-pointer"></select>
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1.5">處理狀態</label>
-            <div id="status-chips" class="flex flex-wrap gap-1.5"></div>
-          </div>
+          <div><label class="block text-xs text-slate-400 mb-1">主要類別</label><select id="cat" onchange="onCatChange()" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition cursor-pointer"></select></div>
+          <div><label class="block text-xs text-slate-400 mb-1">細分情況</label><select id="subcat" onchange="update()" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition cursor-pointer"></select></div>
+          <div><label class="block text-xs text-slate-400 mb-1.5">處理狀態</label><div id="status-chips" class="flex flex-wrap gap-1.5"></div></div>
         </div>
       </div>
-
       <hr class="border-slate-100">
-
-      <!-- Style -->
       <div>
         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">語氣風格</p>
         <div class="space-y-2.5">
-          <div>
-            <label class="block text-xs text-slate-400 mb-1.5">態度語氣</label>
-            <div id="tone-chips" class="flex flex-wrap gap-1.5"></div>
-          </div>
-          <div>
-            <label class="block text-xs text-slate-400 mb-1.5">語言風格</label>
-            <div id="style-chips" class="flex flex-wrap gap-1.5"></div>
-          </div>
+          <div><label class="block text-xs text-slate-400 mb-1.5">態度語氣</label><div id="tone-chips" class="flex flex-wrap gap-1.5"></div></div>
+          <div><label class="block text-xs text-slate-400 mb-1.5">語言風格</label><div id="style-chips" class="flex flex-wrap gap-1.5"></div></div>
         </div>
       </div>
-
       <hr class="border-slate-100">
-
-      <!-- Optional -->
       <div>
         <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2.5">附加選項</p>
         <div class="space-y-2">
-          <label class="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer">
-            <input type="checkbox" id="opt-contact" checked onchange="ST.addContact=this.checked;refreshPreview()" class="w-4 h-4 cursor-pointer accent-blue-600">
-            附加聯絡方式（電郵 / WhatsApp）
-          </label>
-          <label class="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer">
-            <input type="checkbox" id="opt-sign" checked onchange="ST.addSign=this.checked;refreshPreview()" class="w-4 h-4 cursor-pointer accent-blue-600">
-            附加署名落款
-          </label>
+          <label class="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer"><input type="checkbox" id="opt-contact" checked onchange="ST.addContact=this.checked;refreshPreview()" class="w-4 h-4 cursor-pointer accent-blue-600">附加聯絡方式（電郵 / WhatsApp）</label>
+          <label class="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer"><input type="checkbox" id="opt-sign" checked onchange="ST.addSign=this.checked;refreshPreview()" class="w-4 h-4 cursor-pointer accent-blue-600">附加署名落款</label>
         </div>
       </div>
-
       <div class="h-4"></div>
     </div>
   </div>
-
-  <!-- RIGHT PANEL -->
   <div class="flex-1 flex flex-col overflow-hidden bg-slate-50/80">
-
-    <!-- Right Toolbar -->
     <div class="bg-white border-b border-slate-200 px-5 py-3 flex items-center gap-3 flex-shrink-0 shadow-sm">
       <span class="text-sm font-bold text-slate-700 hidden sm:block">預覽</span>
       <div class="flex bg-slate-100 rounded-xl p-0.5 gap-0.5">
-        <button id="btn-email" onclick="setChannel('email')"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-blue-600 text-white shadow-sm">
-          ✉️ 電郵
-        </button>
-        <button id="btn-wa" onclick="setChannel('whatsapp')"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200">
-          💬 WhatsApp
-        </button>
+        <button id="btn-email" onclick="setChannel('email')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-sm">✉️ 電郵</button>
+        <button id="btn-wa" onclick="setChannel('whatsapp')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all">💬 WhatsApp</button>
       </div>
       <div class="ml-auto flex items-center gap-2">
         <span id="ch-badge" class="text-xs font-mono text-slate-400 hidden sm:block"></span>
-        <button id="copy-btn" onclick="copyMsg()"
-          class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all active:scale-95 shadow-sm">
-          📋 複製
-        </button>
+        <button id="copy-btn" onclick="copyMsg()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all active:scale-95 shadow-sm">📋 複製</button>
       </div>
     </div>
-
-    <!-- Preview Content -->
     <div class="flex-1 overflow-y-auto p-5">
       <div class="max-w-xl mx-auto space-y-3 fi">
         <div id="tag-row" class="flex flex-wrap gap-1.5 min-h-6"></div>
-
-        <!-- Subject (email) -->
-        <div id="subject-box" class="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">電郵主旨</span>
-          <p id="subject-text" class="text-sm font-semibold text-slate-800 mt-1"></p>
-        </div>
-
-        <!-- Body -->
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-          <div id="msg-body" class="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap font-sans"></div>
-        </div>
-
+        <div id="subject-box" class="bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm"><span class="text-xs font-bold text-slate-400 uppercase tracking-wider">電郵主旨</span><p id="subject-text" class="text-sm font-semibold text-slate-800 mt-1"></p></div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm"><div id="msg-body" class="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap font-sans"></div></div>
         <div id="ch-hint" class="text-center text-xs text-slate-400 pb-2"></div>
       </div>
     </div>
+    <div class="bg-white border-t border-slate-100 px-5 py-2 text-center text-xs text-slate-400 flex-shrink-0">created by Tabris Yuen @2026</div>
+  </div>
+</div>
 
-    <div class="bg-white border-t border-slate-100 px-5 py-2 text-center text-xs text-slate-400 flex-shrink-0">
-      created by Tabris Yuen @2026
+<!-- ═══════════ BLOG MODE ═══════════ -->
+<div id="blog-container" class="relative z-10 flex overflow-hidden" style="height:calc(100vh - 52px);display:none">
+  <!-- Blog Left Panel -->
+  <div class="w-5/12 min-w-64 max-w-96 bg-white border-r border-slate-200 flex flex-col overflow-hidden shadow-sm">
+    <div class="flex-1 overflow-y-auto p-4">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">內容類型</p>
+      <div id="blog-type-chips" class="flex flex-wrap gap-1.5 mb-3"></div>
+      <hr class="border-slate-100 mb-3">
+
+      <!-- ─── 系統更新 FORM ─── -->
+      <div id="blog-update-form">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">📋 文章設定</p>
+        <label class="blog-field-label">系統名稱</label><input id="b-sysName" type="text" placeholder="例：OmniStompboxs ERP" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">更新重點（標題用）</label><input id="b-updateKey" type="text" placeholder="例：批量發票匯出功能" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">功能名稱</label><input id="b-funcName" type="text" placeholder="例：批量匯出功能" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">功能模組</label><input id="b-funcModule" type="text" placeholder="例：財務管理模組" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">更新日期</label><input id="b-updateDate" type="text" placeholder="例：2026 年 11 月 16 日" oninput="blogUpdate()" class="blog-inp" style="font-family:monospace">
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">📄 摘要資料</p>
+        <label class="blog-field-label">使用角色</label><input id="b-userRole" type="text" placeholder="例：財務人員" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">工作情境</label><input id="b-workContext" type="text" placeholder="例：每月結算及發票處理" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">實際改善</label><input id="b-improvement" type="text" placeholder="例：一次過匯出多張發票，節省重複操作" oninput="blogUpdate()" class="blog-inp">
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">✍️ 更新描述</p>
+        <label class="blog-field-label">原有做法或困難</label><textarea id="b-oldMethod" rows="2" placeholder="例：逐張開啟發票、個別下載 PDF" oninput="blogUpdate()" class="blog-ta"></textarea>
+        <label class="blog-field-label">更新名稱</label><input id="b-updateTitle" type="text" placeholder="例：批量 PDF 匯出功能" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">已確認的改善</label><input id="b-confirmedImprove" type="text" placeholder="例：用戶可在一個頁面同時選取多張發票並匯出" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">新增或調整功能說明（詳細）</label><textarea id="b-whatChanged" rows="3" placeholder="寫清楚實際行為，以及與原有版本的分別" oninput="blogUpdate()" class="blog-ta"></textarea>
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">🎯 適用對象</p>
+        <label class="blog-field-label">適用角色</label><input id="b-targetRole" type="text" placeholder="例：財務人員、管理員" oninput="blogUpdate()" class="blog-inp">
+        <label class="blog-field-label">用途（如何利用此更新）</label><textarea id="b-usage" rows="2" placeholder="例：批量匯出指定月份的所有客戶發票" oninput="blogUpdate()" class="blog-ta"></textarea>
+        <label class="blog-field-label">減少的重複工作或問題</label><input id="b-reduceWork" type="text" placeholder="例：逐張下載的時間及出錯機會" oninput="blogUpdate()" class="blog-inp">
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">📖 使用指引</p>
+        <label class="blog-field-label">操作步驟一</label><textarea id="b-step1" rows="2" placeholder="例：進入「財務管理」→「發票列表」" oninput="blogUpdate()" class="blog-ta"></textarea>
+        <label class="blog-field-label">操作步驟二</label><textarea id="b-step2" rows="2" placeholder="例：勾選所需發票，點擊「批量匯出」→選擇格式（PDF / Excel）" oninput="blogUpdate()" class="blog-ta"></textarea>
+        <label class="blog-field-label">完成後會看到的結果</label><input id="b-afterResult" type="text" placeholder="例：系統自動打包壓縮並下載至本機" oninput="blogUpdate()" class="blog-inp">
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">⚠️ 適用範圍與注意事項</p>
+        <textarea id="b-scope" rows="3" placeholder="適用系統、模組、帳戶角色、是否需要啟用，以及已知限制。只填已確認資料。" oninput="blogUpdate()" class="blog-ta" style="margin-top:4px"></textarea>
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">🚀 下一步</p>
+        <label class="blog-field-label">已使用客戶應做甚麼</label><textarea id="b-nextExisting" rows="2" placeholder="例：已訂閱 ERP 財務模組的客戶，功能已自動更新，直接使用即可" oninput="blogUpdate()" class="blog-ta"></textarea>
+        <label class="blog-field-label">功能頁連結</label><input id="b-pageLink" type="text" placeholder="https://..." oninput="blogUpdate()" class="blog-inp" style="font-family:monospace">
+      </div>
+
+      <!-- ─── 維護通知 FORM ─── -->
+      <div id="blog-maint-form" style="display:none">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">🏷 基本資料</p>
+        <label class="blog-field-label">系統名稱</label><input id="b-maintSysName" type="text" placeholder="例：OmniStompboxs ERP" oninput="blogUpdate()" class="blog-inp maint">
+        <label class="blog-field-label">維護日期（標題用）</label><input id="b-maintDate" type="text" placeholder="例：2026 年 11 月 20 日" oninput="blogUpdate()" class="blog-inp maint" style="font-family:monospace">
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">🕐 維護時間</p>
+        <label class="blog-field-label">開始日期及時間</label><input id="b-startTime" type="text" placeholder="例：2026 年 11 月 20 日 凌晨 02:00" oninput="blogUpdate()" class="blog-inp maint" style="font-family:monospace">
+        <label class="blog-field-label">預計結束日期及時間</label><input id="b-endTime" type="text" placeholder="例：2026 年 11 月 20 日 凌晨 05:00" oninput="blogUpdate()" class="blog-inp maint" style="font-family:monospace">
+        <label class="blog-field-label">時區</label><input id="b-timezone" type="text" placeholder="HKT (UTC+8)" value="HKT (UTC+8)" oninput="blogUpdate()" class="blog-inp maint" style="font-family:monospace">
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">⚡ 影響說明</p>
+        <label class="blog-field-label">受影響服務（摘要用）</label><input id="b-affectedService" type="text" placeholder="例：所有系統功能" oninput="blogUpdate()" class="blog-inp maint">
+        <label class="blog-field-label">暫停方式</label>
+        <div id="stop-type-chips" class="flex gap-1.5 mt-1 mb-1 flex-wrap"></div>
+        <label class="blog-field-label">維護目的</label><input id="b-maintPurpose" type="text" placeholder="例：系統版本升級及資料庫優化" oninput="blogUpdate()" class="blog-inp maint">
+        <label class="blog-field-label">受影響範圍詳細說明</label><textarea id="b-affectedDetail" rows="3" placeholder="受影響的系統、模組、用戶及操作" oninput="blogUpdate()" class="blog-ta maint"></textarea>
+        <label class="blog-field-label">未受影響服務（如已確認）</label><textarea id="b-unaffectedDetail" rows="2" placeholder="例：只讀報表功能在前半段維護時間仍可正常使用" oninput="blogUpdate()" class="blog-ta maint"></textarea>
+        <hr class="border-slate-100 my-3">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">📋 注意事項與聯絡</p>
+        <label class="blog-field-label">維護前需要完成的操作</label><textarea id="b-beforeNote" rows="2" placeholder="例：請確保所有進行中的匯出任務已完成，並儲存草稿" oninput="blogUpdate()" class="blog-ta maint"></textarea>
+        <label class="blog-field-label">完成後通知渠道</label><input id="b-notifyChannel" type="text" placeholder="例：本頁面及電郵通知" oninput="blogUpdate()" class="blog-inp maint">
+        <label class="blog-field-label">查詢聯絡方式</label><input id="b-contactMethod" type="text" placeholder="例：cs@OmniStompboxs.com / WhatsApp +852 XXXX XXXX" oninput="blogUpdate()" class="blog-inp maint">
+      </div>
+      <div class="h-6"></div>
     </div>
+  </div>
+
+  <!-- Blog Right Panel -->
+  <div class="flex-1 flex flex-col overflow-hidden bg-slate-50/80">
+    <div class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center gap-2 flex-shrink-0 shadow-sm">
+      <span class="text-sm font-bold text-slate-700 hidden sm:block flex-shrink-0">Blog 預覽</span>
+      <div class="flex bg-slate-100 rounded-xl p-0.5 gap-0.5 ml-2">
+        <button onclick="copyBlogSection('title')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all">標題</button>
+        <button onclick="copyBlogSection('summary')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all">摘要</button>
+        <button onclick="copyBlogSection('body')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all">內文</button>
+      </div>
+      <div class="ml-auto flex items-center gap-2">
+        <span id="blog-total-count" class="text-xs font-mono text-slate-400 hidden sm:block"></span>
+        <button id="copy-blog-all-btn" onclick="copyBlogSection('all')" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all active:scale-95 shadow-sm">📋 複製全文</button>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5">
+      <div class="max-w-xl mx-auto space-y-3 fi">
+        <div id="blog-tag-row" class="flex flex-wrap gap-1.5 min-h-6"></div>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">文章標題</span>
+            <span id="blog-title-count" class="text-xs font-mono text-slate-300">—</span>
+          </div>
+          <div id="blog-title-preview" class="px-4 py-3 text-sm font-bold text-slate-800 leading-snug min-h-8"></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">文章摘要</span>
+            <span id="blog-summary-count" class="text-xs font-mono text-slate-300">—</span>
+          </div>
+          <div id="blog-summary-preview" class="px-4 py-3 text-sm text-slate-700 leading-relaxed min-h-12"></div>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">文章內文</span>
+            <span id="blog-body-count" class="text-xs font-mono text-slate-300">—</span>
+          </div>
+          <div id="blog-body-preview" class="px-4 py-4 text-sm text-slate-700 leading-relaxed min-h-32"></div>
+        </div>
+        <p class="text-center text-xs text-slate-400 pb-2">未填寫欄位以 <span class="ph">{{佔位符}}</span> 顯示，複製後可直接替換</p>
+      </div>
+    </div>
+    <div class="bg-white border-t border-slate-100 px-5 py-2 text-center text-xs text-slate-400 flex-shrink-0">created by Tabris Yuen @2026</div>
   </div>
 </div>
 
@@ -194,96 +246,95 @@
 // DATA
 // ═══════════════════════════════════════════
 const CATS = {
-  '售前查詢':     ['首次查詢','服務總覽','ERP 功能介紹','校務功能介紹','網頁設計介紹','按角色推薦功能','按痛點推薦模組','現有系統比較','系統適用性','技術架構','語言支援','裝置支援','整合可行性','訂製可行性'],
-  '需求收集':     ['一般需求問卷','公司／學校背景','使用人數與角色','現有流程','主要痛點','現有系統及資料格式','渠道與倉庫數量','整合需求','訂製需求','預算與期望時間','資料不足補問'],
-  '示範安排':     ['邀請預約','收集時段','確認預約','示範前準備','會議提醒','提供會議連結','改期','取消','客戶缺席','示範後摘要','發送專屬簡報','示範後跟進'],
-  '報價與方案':   ['報價前補充資料','發送報價','解釋模組組合','解釋費用項目','解釋訂製範圍','解釋第三方費用','報價修訂','報價到期提醒','報價跟進','議價回應','超出預算','暫未決定','接受報價','未能承接'],
-  '合作啟動':     ['確認合作','歡迎加入','介紹負責人','項目啟動會議','確認範圍','確認分工','確認里程碑','收集品牌素材','收集帳戶及整合資料','提醒使用安全渠道交付敏感資料'],
-  '系統導入':     ['導入計劃','資料匯入指引','提供匯入範本','資料缺漏','格式錯誤','重複資料','資料核對','匯入完成','帳戶建立','角色權限確認','測試環境準備','測試邀請','測試結果跟進','上線確認','上線後跟進'],
-  '教學與操作':   ['預約培訓','培訓確認','培訓提醒','發送教學資料','培訓後摘要','操作步驟','常見問題','功能位置查詢','提供示例','補充說明','確認是否解決'],
-  '帳戶與權限':   ['登入困難','忘記密碼','收不到驗證電郵','帳戶未啟用','帳戶被停用','新增使用者','更改角色','無權查看資料','離職人員停權','轉交管理員','身份核實'],
-  '技術支援':     ['收到問題確認','收集重現步驟','索取錯誤截圖','收集裝置及瀏覽器資料','無法重現','已重現','排查中','提供暫時處理方法','升級技術團隊','進度更新','修正待測','修正完成','客戶驗證','問題復發','結案','重新開啟個案'],
-  '資料與報表':   ['資料未顯示','數字不一致','報表篩選說明','匯出失敗','資料更新延遲','資料修正申請','誤刪資料求助','備份及還原查詢','操作記錄查詢'],
-  'API 與整合':   ['整合前評估','授權指引','授權失效','重新授權','同步失敗','部分資料未同步','欄位對應問題','重複同步','第三方服務異常','接口限制','接口版本更新','整合測試完成'],
-  '功能與訂製':   ['接收建議','澄清使用情境','現有功能可處理','提供替代做法','需要訂製','可行性評估中','需要額外報價','變更範圍確認','暫不支援','未有推出日期','功能已推出'],
-  '項目管理':     ['定期進度更新','等待客戶資料','資料提交提醒','等待客戶確認','範圍變更','時間安排調整','延誤通知','階段交付','驗收提醒','驗收完成','項目交接'],
-  '帳單與付款':   ['發票發送','付款指引','付款到期提醒','逾期跟進','已收款確認','付款記錄待核對','重複付款查詢','付款失敗','帳單資料更正','費用爭議','退款申請已收到','退款進度','轉交財務'],
-  '計劃與續約':   ['目前計劃查詢','已包含模組查詢','使用人數調整','升級','降級','加購模組','續約提醒','續約報價','續約確認','到期通知','暫停服務申請','取消申請','離場及資料交接'],
+  '售前查詢':['首次查詢','服務總覽','ERP 功能介紹','校務功能介紹','網頁設計介紹','按角色推薦功能','按痛點推薦模組','現有系統比較','系統適用性','技術架構','語言支援','裝置支援','整合可行性','訂製可行性'],
+  '需求收集':['一般需求問卷','公司／學校背景','使用人數與角色','現有流程','主要痛點','現有系統及資料格式','渠道與倉庫數量','整合需求','訂製需求','預算與期望時間','資料不足補問'],
+  '示範安排':['邀請預約','收集時段','確認預約','示範前準備','會議提醒','提供會議連結','改期','取消','客戶缺席','示範後摘要','發送專屬簡報','示範後跟進'],
+  '報價與方案':['報價前補充資料','發送報價','解釋模組組合','解釋費用項目','解釋訂製範圍','解釋第三方費用','報價修訂','報價到期提醒','報價跟進','議價回應','超出預算','暫未決定','接受報價','未能承接'],
+  '合作啟動':['確認合作','歡迎加入','介紹負責人','項目啟動會議','確認範圍','確認分工','確認里程碑','收集品牌素材','收集帳戶及整合資料','提醒使用安全渠道交付敏感資料'],
+  '系統導入':['導入計劃','資料匯入指引','提供匯入範本','資料缺漏','格式錯誤','重複資料','資料核對','匯入完成','帳戶建立','角色權限確認','測試環境準備','測試邀請','測試結果跟進','上線確認','上線後跟進'],
+  '教學與操作':['預約培訓','培訓確認','培訓提醒','發送教學資料','培訓後摘要','操作步驟','常見問題','功能位置查詢','提供示例','補充說明','確認是否解決'],
+  '帳戶與權限':['登入困難','忘記密碼','收不到驗證電郵','帳戶未啟用','帳戶被停用','新增使用者','更改角色','無權查看資料','離職人員停權','轉交管理員','身份核實'],
+  '技術支援':['收到問題確認','收集重現步驟','索取錯誤截圖','收集裝置及瀏覽器資料','無法重現','已重現','排查中','提供暫時處理方法','升級技術團隊','進度更新','修正待測','修正完成','客戶驗證','問題復發','結案','重新開啟個案'],
+  '資料與報表':['資料未顯示','數字不一致','報表篩選說明','匯出失敗','資料更新延遲','資料修正申請','誤刪資料求助','備份及還原查詢','操作記錄查詢'],
+  'API 與整合':['整合前評估','授權指引','授權失效','重新授權','同步失敗','部分資料未同步','欄位對應問題','重複同步','第三方服務異常','接口限制','接口版本更新','整合測試完成'],
+  '功能與訂製':['接收建議','澄清使用情境','現有功能可處理','提供替代做法','需要訂製','可行性評估中','需要額外報價','變更範圍確認','暫不支援','未有推出日期','功能已推出'],
+  '項目管理':['定期進度更新','等待客戶資料','資料提交提醒','等待客戶確認','範圍變更','時間安排調整','延誤通知','階段交付','驗收提醒','驗收完成','項目交接'],
+  '帳單與付款':['發票發送','付款指引','付款到期提醒','逾期跟進','已收款確認','付款記錄待核對','重複付款查詢','付款失敗','帳單資料更正','費用爭議','退款申請已收到','退款進度','轉交財務'],
+  '計劃與續約':['目前計劃查詢','已包含模組查詢','使用人數調整','升級','降級','加購模組','續約提醒','續約報價','續約確認','到期通知','暫停服務申請','取消申請','離場及資料交接'],
   '維護與服務異常':['預定維護','維護前提醒','維護開始','維護延期','維護完成','服務異常首次通知','影響範圍更新','處理進度','服務恢復','事件摘要','後續改善'],
-  '投訴與補救':   ['接收投訴','致歉及確認影響','澄清問題','指定負責人','處理方案','等待調查','客戶不同意方案','要求主管跟進','承諾未達成','處理結果','滿意度跟進'],
-  '安全與資料':   ['安全查詢','權限查詢','可疑登入通報','疑似資料外洩通報','要求停止傳送敏感資料','轉交安全負責人','資料存取／更正／刪除要求已收到','身份核實','處理進度','轉交專責人員'],
-  '客戶關係':     ['新客戶關懷','使用情況跟進','低使用率關懷','滿意度調查','邀請提供意見','邀請評價','邀請案例分享','轉介邀請','舊客戶重新聯絡','感謝合作'],
-  '通用對話':     ['非辦公時間回覆','已收到訊息','需要更多時間','等待其他部門','轉交同事','重複查詢合併','無法理解問題','要求轉用電郵','附件遺漏','連結失效','禮貌提醒','結束對話'],
-  '零售／網店':   ['訂單確認','修改／取消訂單','付款查詢','缺貨','補貨','預購','出貨','物流追蹤','延誤','派送失敗','遺失','錯貨','漏貨','損壞','退換貨','退款','保養','優惠碼及會員查詢'],
+  '投訴與補救':['接收投訴','致歉及確認影響','澄清問題','指定負責人','處理方案','等待調查','客戶不同意方案','要求主管跟進','承諾未達成','處理結果','滿意度跟進'],
+  '安全與資料':['安全查詢','權限查詢','可疑登入通報','疑似資料外洩通報','要求停止傳送敏感資料','轉交安全負責人','資料存取／更正／刪除要求已收到','身份核實','處理進度','轉交專責人員'],
+  '客戶關係':['新客戶關懷','使用情況跟進','低使用率關懷','滿意度調查','邀請提供意見','邀請評價','邀請案例分享','轉介邀請','舊客戶重新聯絡','感謝合作'],
+  '通用對話':['非辦公時間回覆','已收到訊息','需要更多時間','等待其他部門','轉交同事','重複查詢合併','無法理解問題','要求轉用電郵','附件遺漏','連結失效','禮貌提醒','結束對話'],
+  '零售／網店':['訂單確認','修改／取消訂單','付款查詢','缺貨','補貨','預購','出貨','物流追蹤','延誤','派送失敗','遺失','錯貨','漏貨','損壞','退換貨','退款','保養','優惠碼及會員查詢'],
 };
 
-// e = email body · w = whatsapp body · {brand}{name}{ref}{agent} = placeholders
 const BODY = {
  '售前查詢':{
   '首次查詢':{e:`感謝您對 {brand} 的查詢。我們專注提供企業管理系統解決方案，包括 ERP 系統及校務管理平台，協助企業與機構提升運作效率、減少人手操作。\n\n如您方便，歡迎簡單介紹貴機構的業務性質及主要管理需要，讓我們能為您安排針對性的介紹或線上示範。`,w:`感謝查詢 {brand}！我們提供 ERP 及校務管理系統方案。請問主要想了解哪方面？可以為您安排示範 😊`},
-  '服務總覽':{e:`{brand} 提供以下核心服務：\n\n• ERP 企業管理系統：涵蓋銷售、採購、庫存、財務及人力資源管理\n• 校務管理平台：學生資料、課程編排、出勤、成績及家校通訊\n• 網頁設計及開發：企業官網、電商平台、客製化功能頁面\n\n所有系統均支援多語言介面、多裝置存取，並可按業務需要進行功能訂製。`,w:`{brand} 服務範疇：ERP 系統（銷售/採購/庫存/財務）、校務管理平台、網頁設計開發，全部支援多語言多裝置 ✅ 想了解哪方面？`},
-  'ERP 功能介紹':{e:`{brand} ERP 系統涵蓋以下主要功能模組：\n\n• 銷售管理：訂單處理、客戶管理、銷售報表\n• 採購管理：採購申請、供應商管理、收貨核對\n• 庫存管理：即時庫存、批次管理、多倉支援\n• 財務管理：應收帳款、應付帳款、損益報表\n• 人力資源：員工資料、出勤記錄、薪酬計算\n\n各模組可靈活組合，按業務規模逐步擴展。`,w:`ERP 主要模組：銷售/採購/庫存/財務/人力資源，可靈活組合，按需導入。想了解哪個模組？可以安排 demo 👍`},
-  '校務功能介紹':{e:`{brand} 校務管理系統為學校提供全面數碼化管理方案，主要功能包括：\n\n• 學生資料管理：學籍記錄、家長聯絡資料\n• 課程編排：自動課表生成、科目設定\n• 出勤管理：每日點名記錄、缺席跟進\n• 成績管理：成績輸入、報告書自動生成\n• 家校通訊：即時通知推送、批量訊息發送\n\n系統符合本港學校資訊管理要求，介面簡潔，老師可快速上手。`,w:`校務系統功能：學生資料、課表、出勤、成績、家校通訊等，符合香港學校管理要求。有興趣安排 demo？`},
-  '網頁設計介紹':{e:`{brand} 網頁設計服務提供由設計至上線的一站式方案，服務範圍包括：\n\n• 企業官方網站\n• 電商網站及購物平台\n• 學校及機構官方網站\n• 系統管理後台介面設計\n\n我們注重實用性與視覺美感，確保網站在各裝置上均有良好顯示效果。如有需要，可整合至現有 ERP 或校務系統。`,w:`網頁設計服務包括企業官網、電商、學校網站等，支援多裝置顯示，可與 ERP/校務系統整合。想了解報價流程嗎？`},
-  '按角色推薦功能':{e:`感謝告知貴機構的使用需求。根據不同使用角色，我們建議以下功能配置：\n\n• 管理層：數據儀表板、業務報表、多層級審批流程\n• 前線員工：訂單/課表查閱、日常操作介面\n• 財務人員：帳款管理、發票生成、財務報告\n• IT 管理員：用戶權限管理、系統設定、稽核記錄\n\n請進一步告知貴機構主要使用角色及預計人數，我們可提供更精準的配置建議。`,w:`可以按角色推薦功能！管理層（報表/審批）、前線（操作介面）、財務（帳款）、IT（權限管理）各有對應模組。告知主要角色及人數？`},
-  '按痛點推薦模組':{e:`感謝您分享目前的業務挑戰。針對您所描述的情況，建議安排一次簡短的線上諮詢（約 30 分鐘），讓我們更深入了解業務流程及現有痛點，確保推薦方案切合實際需要，而非過度採購不必要的功能。`,w:`明白您的業務痛點！建議安排 30 分鐘線上諮詢，了解清楚後幫您配對最合適的模組，不建議不需要的功能 ✅ 方便約個時間嗎？`},
-  '現有系統比較':{e:`感謝您的查詢。就 {brand} 與現有系統的比較，以下是主要優勢：\n\n• 功能整合：一體化平台，減少多系統切換及資料重複輸入\n• 本地化支援：針對香港業務環境設計，提供中英文介面\n• 客製彈性：可按業務需要調整功能及流程\n• 本地客服：本地團隊提供即時支援，溝通更有效率\n\n如您希望進行詳細功能對比，歡迎提供現有系統的主要功能列表，我們可為您出具對比分析。`,w:`{brand} 優勢：功能整合（減少切換）、本地化支援、靈活訂製、本地客服。想做詳細功能比較？告知現有系統名稱，我們幫您分析 📊`},
-  '系統適用性':{e:`感謝您的查詢。{brand} 適用於不同規模的企業及機構，從初創到中大型企業均有成功案例。\n\n為提供準確的適用性評估，建議安排需求收集會議，了解：\n• 公司／機構規模及業務類型\n• 現有系統及使用流程\n• 主要管理需求及痛點\n\n完成初步了解後，我們可為您提供具體的適用性評估及建議方案。`,w:`{brand} 適用於不同規模企業及學校！建議先安排簡短需求收集，了解清楚後給您更準確的評估 ✅ 方便約個時間嗎？`},
-  '技術架構':{e:`就 {brand} 的技術架構，主要說明如下：\n\n• 部署方式：雲端 SaaS 或本地伺服器部署（可按需求選擇）\n• 安全認證：SSL/TLS 加密傳輸，支援雙重驗證（2FA）\n• 資料備份：每日自動備份，異地備援儲存\n• API 支援：提供 RESTful API，方便與第三方系統整合\n\n如需深入了解技術規格，歡迎安排技術討論會議，我們的技術團隊將詳細說明。`,w:`{brand} 技術重點：雲端/本地部署皆可、SSL+2FA 安全認證、每日自動備份、RESTful API。需要更多技術細節可安排技術討論 🔧`},
+  '服務總覽':{e:`{brand} 提供以下核心服務：\n\n• ERP 企業管理系統：涵蓋銷售、採購、庫存、財務及人力資源管理\n• 校務管理平台：學生資料、課程編排、出勤、成績及家校通訊\n• 網頁設計及開發：企業官網、電商平台、客製化功能頁面\n\n所有系統均支援多語言介面、多裝置存取，並可按業務需要進行功能訂製。`,w:`{brand} 服務：ERP 系統（銷售/採購/庫存/財務）、校務管理平台、網頁設計開發，全部支援多語言多裝置 ✅`},
+  'ERP 功能介紹':{e:`{brand} ERP 系統涵蓋以下主要功能模組：\n\n• 銷售管理：訂單處理、客戶管理、銷售報表\n• 採購管理：採購申請、供應商管理、收貨核對\n• 庫存管理：即時庫存、批次管理、多倉支援\n• 財務管理：應收帳款、應付帳款、損益報表\n• 人力資源：員工資料、出勤記錄、薪酬計算\n\n各模組可靈活組合，按業務規模逐步擴展。`,w:`ERP 主要模組：銷售/採購/庫存/財務/人力資源，可靈活組合，按需導入。想了解哪個模組可以安排 demo 👍`},
+  '校務功能介紹':{e:`{brand} 校務管理系統主要功能：\n\n• 學生資料管理：學籍記錄、家長聯絡資料\n• 課程編排：自動課表生成、科目設定\n• 出勤管理：每日點名記錄、缺席跟進\n• 成績管理：成績輸入、報告書自動生成\n• 家校通訊：即時通知推送、批量訊息發送\n\n系統符合本港學校資訊管理要求，介面簡潔，老師可快速上手。`,w:`校務系統功能：學生資料、課表、出勤、成績、家校通訊，符合香港學校管理要求。有興趣安排 demo？`},
+  '網頁設計介紹':{e:`{brand} 網頁設計服務範圍包括：\n\n• 企業官方網站\n• 電商網站及購物平台\n• 學校及機構官方網站\n• 系統管理後台介面設計\n\n注重實用性與視覺美感，確保各裝置均有良好顯示效果，如有需要可整合至現有 ERP 或校務系統。`,w:`網頁設計服務包括企業官網、電商、學校網站等，支援多裝置顯示，可與 ERP/校務系統整合。想了解報價流程嗎？`},
+  '按角色推薦功能':{e:`根據不同使用角色，建議以下功能配置：\n\n• 管理層：數據儀表板、業務報表、多層級審批流程\n• 前線員工：訂單/課表查閱、日常操作介面\n• 財務人員：帳款管理、發票生成、財務報告\n• IT 管理員：用戶權限管理、系統設定、稽核記錄\n\n請進一步告知貴機構主要使用角色及預計人數，我們可提供更精準的配置建議。`,w:`可以按角色推薦功能！管理層（報表/審批）、前線（操作介面）、財務（帳款）、IT（權限管理）各有對應模組。告知主要角色及人數？`},
+  '按痛點推薦模組':{e:`感謝您分享目前的業務挑戰。針對您所描述的情況，建議安排一次簡短的線上諮詢（約 30 分鐘），讓我們更深入了解業務流程及現有痛點，確保推薦方案切合實際需要。`,w:`明白您的業務痛點！建議安排 30 分鐘線上諮詢，了解清楚後幫您配對最合適的模組，不建議不需要的功能 ✅`},
+  '現有系統比較':{e:`就 {brand} 與現有系統的比較，以下是主要優勢：\n\n• 功能整合：一體化平台，減少多系統切換及資料重複輸入\n• 本地化支援：針對香港業務環境設計，提供中英文介面\n• 客製彈性：可按業務需要調整功能及流程\n• 本地客服：本地團隊提供即時支援\n\n如您希望進行詳細功能對比，歡迎提供現有系統的主要功能列表，我們可為您出具對比分析。`,w:`{brand} 優勢：功能整合（減少切換）、本地化支援、靈活訂製、本地客服。想做詳細功能比較？告知現有系統名稱，我們幫您分析 📊`},
+  '系統適用性':{e:`{brand} 適用於不同規模的企業及機構，從初創到中大型企業均有成功案例。\n\n為提供準確的適用性評估，建議安排需求收集會議，了解：\n• 公司／機構規模及業務類型\n• 現有系統及使用流程\n• 主要管理需求及痛點`,w:`{brand} 適用於不同規模企業及學校！建議先安排簡短需求收集，了解清楚後給您更準確的評估 ✅`},
+  '技術架構':{e:`就 {brand} 的技術架構，主要說明如下：\n\n• 部署方式：雲端 SaaS 或本地伺服器部署（可按需求選擇）\n• 安全認證：SSL/TLS 加密傳輸，支援雙重驗證（2FA）\n• 資料備份：每日自動備份，異地備援儲存\n• API 支援：提供 RESTful API，方便與第三方系統整合\n\n如需深入了解技術規格，歡迎安排技術討論會議。`,w:`{brand} 技術重點：雲端/本地部署皆可、SSL+2FA 安全認證、每日自動備份、RESTful API。需要更多技術細節可安排技術討論 🔧`},
   '語言支援':{e:`{brand} 系統全面支援多語言介面：\n\n• 繁體中文、简体中文、English\n• 用戶可在個人設定中切換介面語言\n• 資料輸入及報表輸出均支援中英文\n• 客服支援：本地客服團隊提供廣東話、普通話及英文支援`,w:`{brand} 支援繁中/簡中/英文介面，用戶可自行切換語言偏好，資料輸入及報表輸出均支援中英文 ✅`},
-  '裝置支援':{e:`{brand} 系統支援多種裝置存取：\n\n• 電腦：Chrome、Safari、Firefox、Edge 等主流瀏覽器\n• 平板：iPad 及 Android 平板\n• 手機：iOS 及 Android 裝置\n\n系統以網頁為基礎，毋需安裝額外軟件，開啟瀏覽器即可登入使用。介面採用響應式設計，自動配合螢幕大小調整顯示。`,w:`{brand} 支援電腦、平板、手機（iOS/Android），網頁版毋需安裝 App，所有主流瀏覽器均可使用 📱💻`},
-  '整合可行性':{e:`就整合可行性，{brand} 支援多種第三方系統整合，包括 API、Webhook 及資料匯入匯出。\n\n評估整合可行性需要了解以下資料：\n• 現有系統名稱及版本\n• 整合所需的資料類型及方向\n• 是否有現成 API 或 Webhook 支援\n\n我們的技術團隊可在了解詳情後，為您提供整合評估報告及相關時間與費用估算。`,w:`{brand} 支援第三方系統整合（API/Webhook）！麻煩告知目前使用什麼系統，技術團隊可評估整合可行性 🔗`},
-  '訂製可行性':{e:`就功能訂製可行性，{brand} 提供彈性的客製化服務，可按業務需要調整系統功能及流程。\n\n訂製評估需要了解：\n• 具體功能需求描述\n• 預期完成時間\n• 預算範圍\n\n收到需求後，技術及產品團隊將提供可行性評估、開發時間估算及相關報價。部分需求或可透過現有功能配置實現，毋需額外開發費用。`,w:`{brand} 提供功能訂製服務！請描述具體需求，技術團隊會評估可行性及報價，部分需求可能用現有功能直接解決 ✍️`},
+  '裝置支援':{e:`{brand} 系統支援多種裝置存取：\n\n• 電腦：Chrome、Safari、Firefox、Edge 等主流瀏覽器\n• 平板：iPad 及 Android 平板\n• 手機：iOS 及 Android 裝置\n\n系統以網頁為基礎，毋需安裝額外軟件，開啟瀏覽器即可登入使用。`,w:`{brand} 支援電腦、平板、手機（iOS/Android），網頁版毋需安裝 App，所有主流瀏覽器均可使用 📱💻`},
+  '整合可行性':{e:`就整合可行性評估，需要了解以下資料：\n\n• 現有系統名稱及版本\n• 整合所需的資料類型及方向\n• 是否有現成 API 或 Webhook 支援\n\n我們的技術團隊可在了解詳情後，為您提供整合評估報告及相關時間與費用估算。`,w:`{brand} 支援第三方系統整合（API/Webhook）！麻煩告知目前使用什麼系統，技術團隊可評估整合可行性 🔗`},
+  '訂製可行性':{e:`就功能訂製可行性，{brand} 提供彈性的客製化服務。訂製評估需要了解：\n\n• 具體功能需求描述\n• 預期完成時間\n• 預算範圍\n\n收到需求後，技術及產品團隊將提供可行性評估、開發時間估算及相關報價。`,w:`{brand} 提供功能訂製服務！請描述具體需求，技術團隊會評估可行性及報價，部分需求可能用現有功能直接解決 ✍️`},
  },
  '需求收集':{
-  '一般需求問卷':{e:`為確保我們能為您提供最合適的解決方案，請協助填寫以下需求資料：\n\n1. 貴機構主要業務範疇\n2. 目前使用的管理系統\n3. 希望改善的主要流程\n4. 預計使用人數\n5. 目標實施時間\n\n收到回覆後，我們將在 2 個工作天內為您跟進。`,w:`想更好了解您的需求，方便簡單回答幾個問題嗎？\n1️⃣ 主要業務\n2️⃣ 目前用什麼系統\n3️⃣ 想改善什麼\n4️⃣ 預計使用人數\n直接回覆就好 😊`},
-  '公司／學校背景':{e:`為便於我們更好地了解貴機構需求，麻煩提供以下背景資料：\n\n• 機構名稱及類型（企業／學校／非牟利機構）\n• 主要業務或教育範疇\n• 員工或學生人數\n• 主要辦公或運作地點\n\n以上資料有助我們針對性地介紹最切合貴機構的功能模組。`,w:`請問方便提供一些機構背景嗎？例如：機構類型、主要業務/學科、大概規模。有助推薦最合適的功能 🙏`},
-  '使用人數與角色':{e:`為評估系統規模及報價，麻煩提供以下使用者資料：\n\n• 預計系統使用總人數\n• 各使用角色劃分（例如：管理員、一般用戶、只讀用戶）\n• 各角色的預計人數\n• 是否需要按部門或分店設定權限\n\n以上資料有助我們為您提供準確的報價及建議配置。`,w:`請問預計多少人使用系統？主要角色有哪些（如：管理員/員工/老師/學生）？各角色大概多少人？有助準確報價 👥`},
-  '現有流程':{e:`為了解系統導入前後的流程對接，麻煩描述貴機構目前的主要管理流程：\n\n• 現有的採購／銷售／庫存管理流程\n• 現有的審批及記錄方式（紙本 / 電子表格 / 其他系統）\n• 目前流程中最費時或最容易出錯的環節\n\n了解現有流程有助我們在系統導入時做好對接及優化建議。`,w:`請問目前是用什麼方式管理日常流程？例如紙本、Excel、還是其他系統？了解現有流程幫助我們做好系統對接 📋`},
-  '主要痛點':{e:`為針對性地為您推薦功能模組，麻煩告知貴機構目前主要面對的業務挑戰：\n\n• 哪些流程最耗費時間或人手？\n• 資料管理方面有哪些困難？\n• 現有系統有哪些不足之處？\n• 主要希望通過新系統解決哪些問題？\n\n您的回覆將有助我們提出最具針對性的解決方案。`,w:`請告知目前業務上最大的痛點是什麼？（例如：手動處理太費時、資料不一致、系統太舊等）這樣我們可以針對性推薦模組 🎯`},
-  '現有系統及資料格式':{e:`為評估資料遷移的可行性及工作量，麻煩提供以下資料：\n\n• 現有系統名稱及版本\n• 主要資料類型（客戶資料、訂單記錄、庫存資料等）\n• 現有資料格式（Excel、CSV、資料庫匯出等）\n• 資料量估算（約多少筆記錄）\n\n了解以上資料後，我們可為您提供資料遷移的具體方案及時間估算。`,w:`請問目前使用什麼系統？現有資料主要是什麼格式（Excel/CSV/其他系統匯出）？有助評估資料遷移工作量 📂`},
-  '渠道與倉庫數量':{e:`為確保系統架構能涵蓋貴機構全部業務，麻煩提供以下資料：\n\n• 銷售渠道數量（門市、網店、批發等）\n• 倉庫或存貨地點數量\n• 各渠道及倉庫是否需要獨立報表或權限設定\n\n以上資料有助我們確認系統配置需求及相應報價。`,w:`請問有多少個銷售渠道（門市/網店等）和倉庫？各自是否需要獨立管理和報表？有助確認系統配置 🏭`},
-  '整合需求':{e:`為評估系統整合工作，麻煩提供以下資料：\n\n• 需要整合的現有系統名稱（例如：POS 系統、會計軟件、電商平台）\n• 整合所需的資料類型及同步方向\n• 整合優先級（哪些是必須，哪些是選擇性）\n• 相關系統是否提供 API 文件\n\n技術團隊將根據以上資料進行整合可行性評估。`,w:`請問需要與哪些系統整合？（例如 POS、會計軟件、網店平台）需要整合哪些資料？技術團隊可以評估可行性 🔗`},
-  '訂製需求':{e:`感謝提出訂製需求。為評估開發可行性及成本，麻煩提供以下資料：\n\n• 功能描述（越詳細越好）\n• 使用場景及使用者角色\n• 預期介面或流程（如有截圖或說明文件更佳）\n• 優先級及預期完成時間\n\n收到詳細需求後，技術團隊將在 3–5 個工作天內提供可行性評估。`,w:`收到訂製需求！請提供詳細功能描述（功能是什麼、誰用、怎麼用），越詳細越好。技術團隊評估可行性及報價 ✍️`},
-  '預算與期望時間':{e:`為確保提供的方案符合貴機構的預算及時間要求，麻煩告知：\n\n• 大概的預算範圍（方便建議合適的模組組合）\n• 期望系統上線時間（有沒有特定截止日期，例如財政年度、開學期等）\n• 是否需要分階段導入\n\n了解以上資料後，我們可以為您設計最切合實際的實施方案。`,w:`請問大概的預算範圍和期望上線時間？有助設計最合適的方案，也可以考慮分階段導入 📅`},
+  '一般需求問卷':{e:`為確保能為您提供最合適的解決方案，請協助填寫以下需求資料：\n\n1. 貴機構主要業務範疇\n2. 目前使用的管理系統\n3. 希望改善的主要流程\n4. 預計使用人數\n5. 目標實施時間\n\n收到回覆後，我們將在 2 個工作天內為您跟進。`,w:`想更好了解您的需求，方便簡單回答幾個問題嗎？\n1️⃣ 主要業務\n2️⃣ 目前用什麼系統\n3️⃣ 想改善什麼\n4️⃣ 預計使用人數\n直接回覆就好 😊`},
+  '公司／學校背景':{e:`為便於我們更好地了解貴機構需求，麻煩提供以下背景資料：\n\n• 機構名稱及類型（企業／學校／非牟利機構）\n• 主要業務或教育範疇\n• 員工或學生人數\n• 主要辦公或運作地點`,w:`請問方便提供一些機構背景嗎？例如：機構類型、主要業務/學科、大概規模。有助推薦最合適的功能 🙏`},
+  '使用人數與角色':{e:`為評估系統規模及報價，麻煩提供以下使用者資料：\n\n• 預計系統使用總人數\n• 各使用角色劃分（例如：管理員、一般用戶、只讀用戶）\n• 各角色的預計人數\n• 是否需要按部門或分店設定權限`,w:`請問預計多少人使用系統？主要角色有哪些（如：管理員/員工/老師/學生）？各角色大概多少人？有助準確報價 👥`},
+  '現有流程':{e:`為了解系統導入前後的流程對接，麻煩描述貴機構目前的主要管理流程：\n\n• 現有的採購／銷售／庫存管理流程\n• 現有的審批及記錄方式（紙本 / 電子表格 / 其他系統）\n• 目前流程中最費時或最容易出錯的環節`,w:`請問目前是用什麼方式管理日常流程？例如紙本、Excel、還是其他系統？了解現有流程幫助我們做好系統對接 📋`},
+  '主要痛點':{e:`為針對性地為您推薦功能模組，麻煩告知貴機構目前主要面對的業務挑戰：\n\n• 哪些流程最耗費時間或人手？\n• 資料管理方面有哪些困難？\n• 現有系統有哪些不足之處？\n• 主要希望通過新系統解決哪些問題？`,w:`請告知目前業務上最大的痛點是什麼？（例如：手動處理太費時、資料不一致、系統太舊等）這樣我們可以針對性推薦模組 🎯`},
+  '現有系統及資料格式':{e:`為評估資料遷移的可行性及工作量，麻煩提供以下資料：\n\n• 現有系統名稱及版本\n• 主要資料類型（客戶資料、訂單記錄、庫存資料等）\n• 現有資料格式（Excel、CSV、資料庫匯出等）\n• 資料量估算（約多少筆記錄）`,w:`請問目前使用什麼系統？現有資料主要是什麼格式（Excel/CSV/其他系統匯出）？有助評估資料遷移工作量 📂`},
+  '渠道與倉庫數量':{e:`為確保系統架構能涵蓋貴機構全部業務，麻煩提供以下資料：\n\n• 銷售渠道數量（門市、網店、批發等）\n• 倉庫或存貨地點數量\n• 各渠道及倉庫是否需要獨立報表或權限設定`,w:`請問有多少個銷售渠道（門市/網店等）和倉庫？各自是否需要獨立管理和報表？有助確認系統配置 🏭`},
+  '整合需求':{e:`為評估系統整合工作，麻煩提供以下資料：\n\n• 需要整合的現有系統名稱\n• 整合所需的資料類型及同步方向\n• 整合優先級（哪些是必須，哪些是選擇性）\n• 相關系統是否提供 API 文件`,w:`請問需要與哪些系統整合？（例如 POS、會計軟件、網店平台）需要整合哪些資料？技術團隊可以評估可行性 🔗`},
+  '訂製需求':{e:`感謝提出訂製需求。為評估開發可行性及成本，麻煩提供以下資料：\n\n• 功能描述（越詳細越好）\n• 使用場景及使用者角色\n• 預期介面或流程（如有截圖或說明文件更佳）\n• 優先級及預期完成時間`,w:`收到訂製需求！請提供詳細功能描述（功能是什麼、誰用、怎麼用），越詳細越好。技術團隊評估可行性及報價 ✍️`},
+  '預算與期望時間':{e:`為確保提供的方案符合貴機構的預算及時間要求，麻煩告知：\n\n• 大概的預算範圍\n• 期望系統上線時間（有沒有特定截止日期）\n• 是否需要分階段導入`,w:`請問大概的預算範圍和期望上線時間？有助設計最合適的方案，也可以考慮分階段導入 📅`},
   '資料不足補問':{e:`感謝您之前提供的資料。為確保我們能夠提供更準確的方案建議，以下資料需要補充：\n\n[請說明具體需要補充的資料]\n\n請問方便提供以上資料嗎？如有任何問題，歡迎隨時聯絡我們。`,w:`感謝之前的資料！我們還需要一些補充才能提供更準確的建議，請問方便回應嗎？🙏`},
  },
  '示範安排':{
-  '邀請預約':{e:`感謝您對 {brand} 的興趣！我們誠意邀請您參加一次線上系統示範，讓您親眼了解系統如何切合貴機構的業務需要。\n\n示範會議約 30–45 分鐘，將針對您的業務類型及關注功能進行展示。請問以下時段是否方便？`,w:`誠邀您參加 {brand} 線上示範（約 30-45 分鐘，針對您的需求展示功能）。請問什麼時間方便？📅`},
-  '收集時段':{e:`感謝您表示有興趣參加示範。麻煩提供 2–3 個方便的時段，我們將盡快確認安排。\n\n示範會議將以視像形式進行，請確保屆時可在電腦前參與，以便清晰查看系統介面。`,w:`請提供 2-3 個方便的時段，我們盡快確認示範安排 📅（例如：週二下午 2-4pm、週四早上 10-12pm）`},
-  '確認預約':{e:`感謝您的回覆。現確認示範預約安排如下：\n\n📅 日期及時間：{ref}\n🖥️ 形式：視像會議\n⏱️ 預計時長：30–45 分鐘\n\n會議連結將在示範前送上。如需更改時間，請提前通知我們。`,w:`✅ 示範已確認！\n📅 時間：{ref}\n🖥️ 視像會議，約 30-45 分鐘\n連結稍後發送。如需更改請提前通知 🙏`},
-  '示範前準備':{e:`為確保示範順利進行，麻煩在會議前完成以下準備：\n\n• 確認電腦已安裝最新版本瀏覽器（Chrome / Safari）\n• 確認麥克風及喇叭正常運作\n• 如方便，可預先準備 1–2 個希望重點了解的業務場景\n\n如有特定希望在示範中查看的功能，歡迎提前告知，我們可針對性安排。`,w:`示範前小提醒：\n✅ 更新瀏覽器至最新版\n✅ 確認麥克風/喇叭正常\n✅ 有特定想了解的功能，提前告知我們！`},
+  '邀請預約':{e:`誠意邀請您參加一次線上系統示範，讓您親眼了解系統如何切合貴機構的業務需要。\n\n示範會議約 30–45 分鐘，將針對您的業務類型及關注功能進行展示。請問以下時段是否方便？`,w:`誠邀您參加 {brand} 線上示範（約 30-45 分鐘，針對您的需求展示功能）。請問什麼時間方便？📅`},
+  '收集時段':{e:`感謝您表示有興趣參加示範。麻煩提供 2–3 個方便的時段，我們將盡快確認安排。\n\n示範會議將以視像形式進行，請確保屆時可在電腦前參與，以便清晰查看系統介面。`,w:`請提供 2-3 個方便的時段，我們盡快確認示範安排 📅`},
+  '確認預約':{e:`現確認示範預約安排如下：\n\n📅 日期及時間：{ref}\n🖥️ 形式：視像會議\n⏱️ 預計時長：30–45 分鐘\n\n會議連結將在示範前送上。如需更改時間，請提前通知我們。`,w:`✅ 示範已確認！\n📅 時間：{ref}\n🖥️ 視像會議，約 30-45 分鐘\n連結稍後發送。如需更改請提前通知 🙏`},
+  '示範前準備':{e:`為確保示範順利進行，麻煩在會議前完成以下準備：\n\n• 確認電腦已安裝最新版本瀏覽器（Chrome / Safari）\n• 確認麥克風及喇叭正常運作\n• 如有特定希望在示範中查看的功能，歡迎提前告知`,w:`示範前小提醒：\n✅ 更新瀏覽器至最新版\n✅ 確認麥克風/喇叭正常\n✅ 有特定想了解的功能，提前告知我們！`},
   '會議提醒':{e:`溫馨提醒，您與 {brand} 的系統示範將於以下時間舉行：\n\n📅 日期及時間：{ref}\n🖥️ 形式：視像會議\n\n如有任何問題或需要更改安排，請盡快聯絡我們。`,w:`⏰ 提醒：{brand} 系統示範將於 {ref} 舉行！如需更改請盡快通知 🙏`},
-  '提供會議連結':{e:`感謝您確認參與示範。以下是視像會議的連結及詳情：\n\n🔗 會議連結：[連結請另行補充]\n📅 時間：{ref}\n\n如連結有任何問題，請隨時聯絡我們。期待與您相見！`,w:`示範會議連結如下 👇\n🔗 [連結請另行補充]\n📅 時間：{ref}\n有問題請隨時告知！`},
-  '改期':{e:`收到您的改期請求。我們理解突發情況難以預計，請放心。\n\n麻煩告知您方便的新時段（建議提供 2–3 個選擇），我們將盡快確認新的示範安排。`,w:`收到！完全理解需要改期 😊 請告知方便的新時段（提供 2-3 個選擇），我們盡快確認新安排 📅`},
-  '取消':{e:`收到您的取消通知，我們已取消原定的示範安排。\n\n如日後您希望重新安排示範，或有任何查詢，歡迎隨時聯絡我們。感謝您對 {brand} 的關注。`,w:`收到！已取消示範安排 ✅ 如之後想重新預約，隨時告知，謝謝 😊`},
-  '客戶缺席':{e:`感謝您之前的示範預約。我們注意到您未能出席原定於 {ref} 的會議，希望一切安好。\n\n如有任何突發情況，我們完全理解。如您希望重新安排，歡迎告知方便的時間。`,w:`您好！留意到您未能出席剛才的會議，希望一切安好 🙏 如方便請告知，我們可以隨時重新安排 😊`},
-  '示範後摘要':{e:`感謝您今日參與 {brand} 系統示範，希望今日的展示能讓您對系統有更清晰的了解。\n\n以下是今日示範的主要重點摘要：\n\n• [主要展示功能 1]\n• [主要展示功能 2]\n• [討論重點]\n\n如您有任何跟進問題，歡迎隨時聯絡。我們將在數個工作天內發送專屬方案建議。`,w:`感謝今日的示範！希望展示對您有幫助 😊 如有跟進問題歡迎隨時問，方案建議稍後跟進 📋`},
-  '發送專屬簡報':{e:`感謝您今日參與示範。如承諾，現附上為貴機構度身整理的 {brand} 系統簡報，內容包括：\n\n• 與貴機構業務相關的功能模組\n• 實施建議方案\n• 初步費用估算\n\n如有任何問題或希望深入了解某個部分，歡迎隨時聯絡。`,w:`簡報已整理好發送給您 📎 包含相關功能、建議方案及初步費用估算。請查閱後如有問題隨時問 😊`},
-  '示範後跟進':{e:`感謝您參與 {brand} 的系統示範。距離示範已有數天，希望您已有機會查閱我們的方案簡報。\n\n請問您對我們的方案有什麼看法？有沒有需要進一步了解的功能或未解答的問題？我們隨時樂意協助。`,w:`您好！跟進一下上次的示範，請問有沒有機會查閱方案簡報？有什麼問題或想法都歡迎告知 😊`},
+  '提供會議連結':{e:`感謝您確認參與示範。以下是視像會議的連結及詳情：\n\n🔗 會議連結：[連結請另行補充]\n📅 時間：{ref}\n\n如連結有任何問題，請隨時聯絡我們。`,w:`示範會議連結如下 👇\n🔗 [連結請另行補充]\n📅 時間：{ref}\n有問題請隨時告知！`},
+  '改期':{e:`收到您的改期請求，我們理解突發情況難以預計，請放心。\n\n麻煩告知您方便的新時段（建議提供 2–3 個選擇），我們將盡快確認新的示範安排。`,w:`收到！完全理解需要改期 😊 請告知方便的新時段（提供 2-3 個選擇），我們盡快確認 📅`},
+  '取消':{e:`收到您的取消通知，我們已取消原定的示範安排。\n\n如日後您希望重新安排示範，或有任何查詢，歡迎隨時聯絡我們。`,w:`收到！已取消示範安排 ✅ 如之後想重新預約，隨時告知 😊`},
+  '客戶缺席':{e:`我們注意到您未能出席原定於 {ref} 的會議，希望一切安好。\n\n如有任何突發情況，我們完全理解。如您希望重新安排，歡迎告知方便的時間。`,w:`您好！留意到您未能出席剛才的會議，希望一切安好 🙏 如方便請告知，我們可以隨時重新安排 😊`},
+  '示範後摘要':{e:`感謝您今日參與 {brand} 系統示範，希望今日的展示能讓您對系統有更清晰的了解。\n\n以下是今日示範的主要重點摘要：\n• [主要展示功能]\n• [討論重點]\n\n如您有任何跟進問題，歡迎隨時聯絡。`,w:`感謝今日的示範！希望展示對您有幫助 😊 如有跟進問題歡迎隨時問，方案建議稍後跟進 📋`},
+  '發送專屬簡報':{e:`如承諾，現附上為貴機構度身整理的 {brand} 系統簡報，內容包括：\n\n• 與貴機構業務相關的功能模組\n• 實施建議方案\n• 初步費用估算\n\n如有任何問題或希望深入了解某個部分，歡迎隨時聯絡。`,w:`簡報已整理好發送給您 📎 包含相關功能、建議方案及初步費用估算。請查閱後如有問題隨時問 😊`},
+  '示範後跟進':{e:`感謝您參與 {brand} 的系統示範。距離示範已有數天，希望您已有機會查閱我們的方案簡報。\n\n請問您對我們的方案有什麼看法？有沒有需要進一步了解的功能或未解答的問題？`,w:`您好！跟進一下上次的示範，請問有沒有機會查閱方案簡報？有什麼問題或想法都歡迎告知 😊`},
  },
  '報價與方案':{
-  '報價前補充資料':{e:`感謝您提出報價要求。為確保報價準確反映貴機構的實際需要，麻煩補充以下資料：\n\n• 預計使用人數（按角色分類）\n• 所需功能模組（如已確定）\n• 是否有訂製需求\n• 目標上線時間\n\n收到以上資料後，我們將盡快為您準備報價。`,w:`感謝報價要求！在準備報價前，請補充：使用人數（各角色）、所需功能模組、有無訂製需求、目標上線時間。有助準確報價 📋`},
-  '發送報價':{e:`請查閱附上的 {brand} 系統報價書（報價編號：{ref}）。\n\n報價內容包括：\n• 建議功能模組組合\n• 費用明細\n• 實施方案概述\n• 付款條款\n\n報價有效期為 30 日。如有任何問題或希望討論方案細節，歡迎隨時聯絡。`,w:`報價書已發送（編號：{ref}）📎 包含功能模組、費用明細及付款條款，有效期 30 日。有問題歡迎隨時問！😊`},
-  '解釋模組組合':{e:`就報價中的功能模組組合，以下是選擇理由說明：\n\n我們根據貴機構的業務規模、使用人數及主要需求，建議以上模組組合。各模組可獨立運作，亦可相互整合，資料共享無縫流通。\n\n如希望調整模組組合（例如增加或移除某些模組），歡迎告知，我們可以為您重新計算費用。`,w:`報價中的模組組合是按您的業務需求配搭的。如想增加/移除某些模組，請告知，我們可以調整報價 😊`},
-  '解釋費用項目':{e:`就報價中的各項費用，以下是詳細說明：\n\n• 系統授權費：按用戶人數及功能模組計算的年費\n• 導入設定費：一次性費用，包括系統設定、資料遷移及培訓\n• 訂製開發費：按訂製需求另行計算（如適用）\n• 維護支援費：每年系統維護及技術支援\n\n如對任何費用項目有疑問，歡迎告知，我們可以進一步說明。`,w:`費用分為：授權費（年費按用戶/模組）、導入費（一次性）、訂製費（如有）、維護費。有任何不清楚請告知 💰`},
-  '解釋訂製範圍':{e:`就報價中的訂製開發範圍，以下是詳細說明：\n\n訂製開發將按照雙方確認的功能規格進行，完成後需要貴機構驗收確認。如後續有新增需求，將按實際工作量另行報價。`,w:`訂製範圍：按雙方確認規格開發，完成後需要您驗收確認。後續新增需求會按工作量另行報價 ✅`},
-  '解釋第三方費用':{e:`就報價外的第三方費用，以下是說明：\n\n部分系統功能需要使用第三方服務（例如：雲端儲存、短訊通知、地圖服務等），相關費用由貴機構直接向服務供應商支付，並非 {brand} 收費範圍。我們會在合約中列明涉及的第三方服務，確保費用透明。`,w:`部分功能需要第三方服務（如雲端儲存/短訊費用），費用直接付給服務商，不計入 {brand} 報價範圍。合約會列明說明 ✅`},
+  '報價前補充資料':{e:`為確保報價準確反映貴機構的實際需要，麻煩補充以下資料：\n\n• 預計使用人數（按角色分類）\n• 所需功能模組（如已確定）\n• 是否有訂製需求\n• 目標上線時間`,w:`感謝報價要求！在準備報價前，請補充：使用人數（各角色）、所需功能模組、有無訂製需求、目標上線時間 📋`},
+  '發送報價':{e:`請查閱附上的 {brand} 系統報價書（報價編號：{ref}）。\n\n報價內容包括：\n• 建議功能模組組合\n• 費用明細\n• 實施方案概述\n• 付款條款\n\n報價有效期為 30 日。如有任何問題，歡迎隨時聯絡。`,w:`報價書已發送（編號：{ref}）📎 包含功能模組、費用明細及付款條款，有效期 30 日。有問題歡迎隨時問！`},
+  '解釋模組組合':{e:`就報價中的功能模組組合，我們根據貴機構的業務規模、使用人數及主要需求配置。各模組可獨立運作，亦可相互整合，資料共享無縫流通。\n\n如希望調整模組組合（增加或移除某些模組），歡迎告知，我們可以為您重新計算費用。`,w:`報價中的模組組合是按您的業務需求配搭的。如想增加/移除某些模組，請告知，我們可以調整報價 😊`},
+  '解釋費用項目':{e:`就報價中的各項費用說明：\n\n• 系統授權費：按用戶人數及功能模組計算的年費\n• 導入設定費：一次性費用，包括系統設定、資料遷移及培訓\n• 訂製開發費：按訂製需求另行計算（如適用）\n• 維護支援費：每年系統維護及技術支援\n\n如對任何費用項目有疑問，歡迎告知。`,w:`費用分為：授權費（年費按用戶/模組）、導入費（一次性）、訂製費（如有）、維護費。有任何不清楚請告知 💰`},
+  '解釋訂製範圍':{e:`就報價中的訂製開發範圍，訂製開發將按照雙方確認的功能規格進行，完成後需要貴機構驗收確認。如後續有新增需求，將按實際工作量另行報價。`,w:`訂製範圍：按雙方確認規格開發，完成後需要您驗收確認。後續新增需求會按工作量另行報價 ✅`},
+  '解釋第三方費用':{e:`部分系統功能需要使用第三方服務（例如：雲端儲存、短訊通知、地圖服務等），相關費用由貴機構直接向服務供應商支付，並非 {brand} 收費範圍。我們會在合約中列明涉及的第三方服務，確保費用透明。`,w:`部分功能需要第三方服務（如雲端儲存/短訊費用），費用直接付給服務商，不計入 {brand} 報價。合約會列明說明 ✅`},
   '報價修訂':{e:`根據您的回覆，我們已按要求修訂報價（修訂版本：{ref}）。\n\n修訂後報價有效期重新計算為 30 日。如對修訂內容有任何問題，歡迎告知。`,w:`已按您要求修訂報價（版本：{ref}）📎 有效期重新計算 30 日。有問題請隨時告知！`},
   '報價到期提醒':{e:`溫馨提醒，您的 {brand} 系統報價（編號：{ref}）將於近期到期。\n\n如您仍有興趣，歡迎在到期前確認，或聯絡我們討論是否需要更新報價。`,w:`⏰ 提醒：報價（{ref}）即將到期！如有興趣請盡快確認，或告知我們是否需要更新方案 😊`},
-  '報價跟進':{e:`您好，就之前發送的 {brand} 系統報價（編號：{ref}），希望了解貴機構的考慮進度。\n\n如有任何疑問、或希望進一步討論方案細節，歡迎隨時聯絡。如貴機構情況有所改變，我們亦樂意重新調整方案。`,w:`您好！跟進一下之前的報價（{ref}），請問考慮得怎樣？有問題歡迎隨時問，也可以調整方案 😊`},
-  '議價回應':{e:`感謝您的回覆及坦誠溝通。就您的預算考量，我們理解並願意尋找雙方都合適的方案。\n\n以下是可以考慮的調整方向：\n• 調整功能模組組合（移除暫時不需要的模組）\n• 分階段導入，分攤初期費用\n• 調整付款方式\n\n請告知您的優先考量，我們會盡力提出切合的解決方案。`,w:`理解您的預算考量！可以考慮調整模組組合、分階段導入或調整付款方式。請告知優先考量，我們盡力配合 💪`},
-  '超出預算':{e:`感謝您的坦誠回覆。我們理解預算是重要的考量因素。\n\n為配合您的預算，我們建議考慮以下方案：\n\n• 精簡版方案：只保留核心必要模組，後期按需擴展\n• 分階段導入：分批實施，分散費用\n• 調整用戶數量：先以核心團隊開始使用\n\n麻煩告知您的預算範圍，我們可以為您重新設計方案。`,w:`理解預算限制！可以考慮：精簡版先用核心模組、分階段導入分散費用、先減少用戶數量。請告知大概預算範圍，我們重新設計方案 🙏`},
+  '報價跟進':{e:`就之前發送的 {brand} 系統報價（編號：{ref}），希望了解貴機構的考慮進度。\n\n如有任何疑問、或希望進一步討論方案細節，歡迎隨時聯絡。`,w:`您好！跟進一下之前的報價（{ref}），請問考慮得怎樣？有問題歡迎隨時問，也可以調整方案 😊`},
+  '議價回應':{e:`感謝您的回覆及坦誠溝通。就您的預算考量，以下是可以考慮的調整方向：\n\n• 調整功能模組組合（移除暫時不需要的模組）\n• 分階段導入，分攤初期費用\n• 調整付款方式\n\n請告知您的優先考量，我們會盡力提出切合的解決方案。`,w:`理解您的預算考量！可以考慮調整模組組合、分階段導入或調整付款方式。請告知優先考量，我們盡力配合 💪`},
+  '超出預算':{e:`我們理解預算是重要的考量因素。為配合您的預算，建議考慮：\n\n• 精簡版方案：只保留核心必要模組，後期按需擴展\n• 分階段導入：分批實施，分散費用\n• 調整用戶數量：先以核心團隊開始使用\n\n麻煩告知您的預算範圍，我們可以為您重新設計方案。`,w:`理解預算限制！可以考慮：精簡版先用核心模組、分階段導入分散費用、先減少用戶數量。請告知大概預算範圍，我們重新設計方案 🙏`},
   '暫未決定':{e:`完全理解，系統選型是重要決定，需要充分考慮。\n\n如您在考慮過程中有任何問題，或需要補充任何資料，歡迎隨時聯絡。我們不希望給您造成壓力，請按您的進度決定。`,w:`完全理解！這是重要決定，需要好好考慮 😊 有任何問題隨時可以問，不用擔心打擾，我們不急著催您 🙏`},
   '接受報價':{e:`非常感謝您確認接受 {brand} 系統方案！我們十分期待與貴機構展開合作。\n\n接下來我們將安排：\n• 發送合約文件供簽署\n• 安排項目啟動會議\n• 分配專屬負責人跟進您的項目`,w:`太好了！感謝確認合作 🎉 接下來會發送合約、安排啟動會議，並為您分配專屬負責人。期待合作！😊`},
   '未能承接':{e:`感謝您的查詢及考慮。非常遺憾是次未能為您提供服務。\n\n如日後情況有所改變，我們歡迎您再次聯絡。感謝您對 {brand} 的關注，祝業務一切順利。`,w:`感謝您的考慮。很遺憾是次未能承接。如日後情況有所改變，歡迎再聯絡，祝業務順利 🙏`},
  },
  '合作啟動':{
   '確認合作':{e:`感謝您確認與 {brand} 展開合作！我們對此次合作感到十分期待，將全力以赴確保項目順利進行。`,w:`確認合作！{brand} 團隊非常期待與您一起工作 🎉 有任何問題請隨時找我們！`},
-  '歡迎加入':{e:`歡迎加入 {brand} 大家庭！\n\n我們很高興能夠成為貴機構的系統合作夥伴。為確保合作順利展開，我們的專屬負責人將在短期內與您聯絡，安排項目啟動會議及後續計劃。`,w:`歡迎加入 {brand}！🎉 我們很高興為您服務。負責人將很快聯絡您安排啟動會議，有問題請隨時找我們 😊`},
+  '歡迎加入':{e:`歡迎加入 {brand} 大家庭！我們很高興能夠成為貴機構的系統合作夥伴。為確保合作順利展開，我們的專屬負責人將在短期內與您聯絡，安排項目啟動會議及後續計劃。`,w:`歡迎加入 {brand}！🎉 我們很高興為您服務。負責人將很快聯絡您安排啟動會議，有問題請隨時找我們 😊`},
   '介紹負責人':{e:`現為您介紹貴機構的專屬項目負責人：{agent}。\n\n{agent} 將全程跟進您的系統導入項目，從合約簽署至系統上線，確保每個階段順利完成。如有任何問題，可直接聯絡 {agent}。`,w:`為您介紹專屬負責人 {agent}！由啟動到上線全程跟進您的項目。有任何問題直接找 {agent} 就好 😊`},
   '項目啟動會議':{e:`為正式啟動 {brand} 系統導入項目，建議安排一次項目啟動會議（約 60 分鐘），議程包括：\n\n• 確認項目範圍及目標\n• 介紹雙方負責人及聯絡方式\n• 確認時間表及里程碑\n• 討論資料收集及遷移安排\n\n請問您方便在哪個時段安排此次會議？`,w:`建議安排項目啟動會議（約 60 分鐘），確認範圍、時間表及分工安排。請問您方便什麼時段？📅`},
-  '確認範圍':{e:`根據合約及雙方討論，現確認本次項目範圍如下：\n\n• 功能模組：[模組列表]\n• 訂製內容：[訂製項目]\n• 整合系統：[整合項目]\n\n請確認以上範圍是否準確。如有任何調整，請在專案啟動前提出，以便及時更新計劃。`,w:`確認項目範圍：功能模組、訂製內容、整合需求如合約所列。請確認無誤，有調整請盡快提出 ✅`},
+  '確認範圍':{e:`根據合約及雙方討論，現確認本次項目範圍如下：\n\n• 功能模組：[模組列表]\n• 訂製內容：[訂製項目]\n• 整合系統：[整合項目]\n\n請確認以上範圍是否準確。如有任何調整，請在專案啟動前提出。`,w:`確認項目範圍：功能模組、訂製內容、整合需求如合約所列。請確認無誤，有調整請盡快提出 ✅`},
   '確認分工':{e:`為確保項目推進順暢，以下是雙方的分工安排：\n\n{brand} 負責：技術開發、系統設定、培訓安排\n貴機構負責：提供資料、測試驗收、用戶協調\n\n如對分工安排有任何問題或建議，歡迎告知。`,w:`確認分工：我方負責技術及培訓，貴機構負責提供資料及確認測試。如有問題請告知 ✅`},
   '確認里程碑':{e:`以下是本項目的主要里程碑時間表：\n\n• [日期]：需求確認及設定完成\n• [日期]：資料遷移完成\n• [日期]：測試環境開放\n• [日期]：培訓完成\n• [日期]：系統正式上線\n\n請確認時間表是否切實可行。如任何里程碑需要調整，請盡早告知。`,w:`項目時間表：[各里程碑日期]。請確認是否可行，有需要調整請盡早告知 📅`},
   '收集品牌素材':{e:`為進行系統介面設定，麻煩提供以下品牌素材：\n\n• 機構 Logo（建議高解析 PNG 或 SVG 格式）\n• 品牌主色色碼\n• 官方機構名稱（中英文）\n\n如有品牌設計指引（Brand Guidelines），亦歡迎一併提供。`,w:`麻煩提供品牌素材：Logo（高清 PNG/SVG）、品牌主色色碼、機構名稱（中英文）。有 Brand Guidelines 也可以一起發 🎨`},
@@ -291,27 +342,27 @@ const BODY = {
   '提醒使用安全渠道交付敏感資料':{e:`重要提醒：在提交帳戶資料、API 金鑰、密碼等敏感資料時，請務必使用安全渠道，例如：\n\n• 加密電郵\n• 密碼管理工具分享功能\n• 我們提供的安全提交表格\n\n請切勿透過一般 WhatsApp、SMS 或普通電郵傳送敏感資料，以保障貴機構的資訊安全。`,w:`⚠️ 重要提醒：密碼/API 金鑰等敏感資料請勿用 WhatsApp 或普通電郵傳送！請使用加密郵件或我們提供的安全表格 🔐`},
  },
  '系統導入':{
-  '導入計劃':{e:`系統導入計劃已確認，主要分以下階段進行：\n\n① 需求確認及環境設定（第 1–2 週）\n② 資料遷移及初步設定（第 3–4 週）\n③ 測試及修正（第 5–6 週）\n④ 培訓安排（第 7 週）\n⑤ 正式上線（第 8 週）\n\n具體時間表將按雙方確認後正式啟動。`,w:`導入計劃已確認，共分 5 個階段：環境設定 → 資料遷移 → 測試修正 → 培訓 → 正式上線。詳細時間表稍後確認 📋`},
-  '資料匯入指引':{e:`為確保資料順利遷移至 {brand} 系統，請參考以下匯入指引：\n\n• 資料格式：請使用我們提供的 Excel 範本\n• 必填欄位：範本中標示黃色底色的欄位\n• 資料清洗：請確保資料無重複、格式統一\n• 提交方式：通過系統管理後台上傳，或透過安全渠道傳送\n\n如有任何疑問，歡迎聯絡我們的資料遷移團隊。`,w:`資料遷移指引：請用我們提供的 Excel 範本、填寫必填欄位、確保資料無重複。有問題隨時問 📂`},
-  '提供匯入範本':{e:`請查閱附上的資料匯入範本（Excel 格式）。\n\n範本說明：\n• 黃色底色欄位為必填\n• 請勿修改欄位標題列\n• 日期格式請統一使用 YYYY-MM-DD\n\n填寫完成後，請發送給我們或通過系統管理後台上傳。`,w:`資料匯入範本已附上 📎 黃色欄位為必填，請勿修改標題列，日期格式用 YYYY-MM-DD。填好後發給我們或上傳後台 ✅`},
+  '導入計劃':{e:`系統導入計劃已確認，主要分以下階段進行：\n\n① 需求確認及環境設定（第 1–2 週）\n② 資料遷移及初步設定（第 3–4 週）\n③ 測試及修正（第 5–6 週）\n④ 培訓安排（第 7 週）\n⑤ 正式上線（第 8 週）`,w:`導入計劃已確認，共分 5 個階段：環境設定 → 資料遷移 → 測試修正 → 培訓 → 正式上線。詳細時間表稍後確認 📋`},
+  '資料匯入指引':{e:`為確保資料順利遷移至 {brand} 系統，請參考以下匯入指引：\n\n• 資料格式：請使用我們提供的 Excel 範本\n• 必填欄位：範本中標示黃色底色的欄位\n• 資料清洗：請確保資料無重複、格式統一\n• 提交方式：通過系統管理後台上傳，或透過安全渠道傳送`,w:`資料遷移指引：請用我們提供的 Excel 範本、填寫必填欄位、確保資料無重複。有問題隨時問 📂`},
+  '提供匯入範本':{e:`請查閱附上的資料匯入範本（Excel 格式）。\n\n• 黃色底色欄位為必填\n• 請勿修改欄位標題列\n• 日期格式請統一使用 YYYY-MM-DD\n\n填寫完成後，請發送給我們或通過系統管理後台上傳。`,w:`資料匯入範本已附上 📎 黃色欄位為必填，請勿修改標題列，日期格式用 YYYY-MM-DD。填好後發給我們或上傳後台 ✅`},
   '資料缺漏':{e:`感謝您提交的資料。我們在核對過程中發現以下缺漏資料：\n\n• [具體缺漏說明]\n\n麻煩提供以上補充資料，以便我們繼續進行資料遷移。`,w:`核對資料時發現有些資料缺漏：[具體說明]。麻煩補充一下，謝謝 🙏`},
-  '格式錯誤':{e:`感謝您提交的資料。我們在處理過程中發現以下格式問題：\n\n• [具體格式錯誤說明]\n\n麻煩按照匯入範本的格式要求進行更正，更新後重新提交。如對格式要求有疑問，請隨時聯絡我們。`,w:`資料格式有些問題：[具體說明]。麻煩按範本格式更正後重新提交，有疑問隨時問 🙏`},
+  '格式錯誤':{e:`感謝您提交的資料。我們在處理過程中發現以下格式問題：\n\n• [具體格式錯誤說明]\n\n麻煩按照匯入範本的格式要求進行更正，更新後重新提交。`,w:`資料格式有些問題：[具體說明]。麻煩按範本格式更正後重新提交，有疑問隨時問 🙏`},
   '重複資料':{e:`感謝您提交的資料。我們發現資料中存在以下重複記錄：\n\n• [重複記錄說明]\n\n請確認需要保留哪筆記錄，或告知合併方式，以便我們正確處理資料遷移。`,w:`資料中發現有重複記錄：[說明]。請確認保留哪筆或如何合併，我們再繼續處理 🙏`},
   '資料核對':{e:`資料遷移已初步完成。請按照以下清單核對已遷移的資料：\n\n• [核對項目]\n\n麻煩完成核對後告知結果，如發現任何差異，請提供具體說明以便我們修正。`,w:`資料遷移初步完成！請核對一下：[核對項目]。核對後告知結果，有問題我們修正 ✅`},
-  '匯入完成':{e:`所有資料已成功遷移至 {brand} 系統，資料核對均無異常。\n\n接下來將進入系統測試階段，我們將為您準備測試環境及測試帳戶。如有任何問題，請隨時聯絡。`,w:`資料遷移完成！✅ 核對無異常，接下來進入系統測試階段，測試帳戶稍後發送。`},
+  '匯入完成':{e:`所有資料已成功遷移至 {brand} 系統，資料核對均無異常。\n\n接下來將進入系統測試階段，我們將為您準備測試環境及測試帳戶。`,w:`資料遷移完成！✅ 核對無異常，接下來進入系統測試階段，測試帳戶稍後發送。`},
   '帳戶建立':{e:`系統帳戶已按您提供的用戶名單建立完成。請查閱附上的帳戶清單，確認用戶名稱及角色權限設定是否正確。\n\n各用戶的初次登入資料將分別以電郵發送至各用戶的登記電郵地址。`,w:`帳戶已按名單建立完成！請確認用戶名稱及角色權限是否正確。初次登入資料已發送至各用戶電郵 ✅`},
   '角色權限確認':{e:`請確認以下角色及權限設定是否符合貴機構的要求：\n\n• [角色 1]：[權限說明]\n• [角色 2]：[權限說明]\n\n如需調整任何角色的權限，請具體說明需要的修改。`,w:`請確認角色權限設定是否正確：[各角色說明]。如需調整請告知我們 ✅`},
   '測試環境準備':{e:`系統測試環境已就緒，現為您提供測試帳戶資料。\n\n• 測試環境網址：[URL]\n• 測試帳戶及密碼：已分別發送至各用戶電郵\n\n測試環境與正式環境完全獨立，可放心進行各類功能測試。`,w:`測試環境已準備好！🎉 網址：[URL]，帳戶資料已發至各用戶電郵。可以開始測試各項功能，有問題隨時告知 ✅`},
-  '測試邀請':{e:`系統測試環境已就緒，誠邀您及團隊成員進行系統測試。\n\n測試重點建議包括：\n• 日常使用功能是否正常\n• 資料顯示是否正確\n• 權限設定是否符合要求\n• 報表生成是否準確\n\n測試期間如發現任何問題，請盡量記錄重現步驟及截圖，方便我們跟進修正。`,w:`請開始系統測試 😊 建議測試：功能是否正常、資料是否正確、權限是否符合、報表是否準確。發現問題請記錄重現步驟及截圖 📝`},
+  '測試邀請':{e:`系統測試環境已就緒，誠邀您及團隊成員進行系統測試。\n\n測試重點建議：\n• 日常使用功能是否正常\n• 資料顯示是否正確\n• 權限設定是否符合要求\n• 報表生成是否準確\n\n測試期間如發現任何問題，請盡量記錄重現步驟及截圖。`,w:`請開始系統測試 😊 建議測試：功能是否正常、資料是否正確、權限是否符合、報表是否準確。發現問題請記錄重現步驟及截圖 📝`},
   '測試結果跟進':{e:`感謝您的測試及回饋。就您提出的問題，我們已進行跟進，修正完成後將通知您重新驗證。如有任何其他問題，請繼續告知。`,w:`感謝測試回饋！問題已跟進處理，修正完成後通知您重新驗證 ✅`},
-  '上線確認':{e:`系統已完成所有測試及修正，現正式確認上線安排如下：\n\n📅 正式上線日期：{ref}\n\n上線前，請確保所有用戶已完成培訓，並備妥正式資料。如有任何顧慮或需要延遲上線，請盡早告知。`,w:`✅ 確認上線！正式上線日期：{ref}。請確保用戶已完成培訓，如需延遲請盡早告知 😊`},
+  '上線確認':{e:`系統已完成所有測試及修正，現正式確認上線安排如下：\n\n📅 正式上線日期：{ref}\n\n上線前，請確保所有用戶已完成培訓，並備妥正式資料。如有任何顧慮，請盡早告知。`,w:`✅ 確認上線！正式上線日期：{ref}。請確保用戶已完成培訓，如需延遲請盡早告知 😊`},
   '上線後跟進':{e:`恭喜！{brand} 系統已正式上線。\n\n上線後初期，我們將密切跟進系統運作情況。如在使用過程中遇到任何問題，請隨時聯絡我們的支援團隊，我們將優先處理。`,w:`🎉 恭喜系統正式上線！初期我們會密切跟進，有任何問題請隨時找我們，優先處理 😊`},
  },
  '教學與操作':{
-  '預約培訓':{e:`為確保您的團隊能充分掌握系統操作，建議安排系統使用培訓。\n\n培訓內容可按貴機構的需要調整，建議涵蓋：\n• 系統基本操作\n• 各角色日常功能\n• 常見問題處理\n\n請問您希望安排幾人培訓？偏好線上還是面對面形式？`,w:`建議安排系統培訓，確保團隊順利上手！請問幾人參加？偏好線上還是面對面？培訓內容可按需要調整 📚`},
-  '培訓確認':{e:`培訓安排已確認：\n\n📅 日期：{ref}\n👥 形式：[線上/面對面]\n📍 地點/連結：[詳情]\n\n請確保培訓人員準時出席，並帶備可登入系統的裝置。如有任何問題，請提前聯絡我們。`,w:`✅ 培訓已確認！\n📅 時間：{ref}\n形式：[線上/面對面]\n請準時出席，帶備可登入系統的裝置 😊`},
-  '培訓提醒':{e:`溫馨提醒，系統使用培訓將於 {ref} 舉行。\n\n請確保所有參與人員準時出席，並預先測試裝置及網絡連接正常。如有任何問題，請提前聯絡我們。`,w:`⏰ 培訓提醒！時間：{ref}。請準時出席，提前測試裝置及網絡。有問題請盡快聯絡 🙏`},
-  '發送教學資料':{e:`請查閱附上的系統使用教學資料，包括：\n\n• 操作手冊（PDF）\n• 常見問題列表\n• 快速參考指南\n\n如對任何功能操作有疑問，歡迎隨時聯絡客服支援，我們將協助解答。`,w:`教學資料已附上 📎 包括操作手冊、常見問題及快速指南。有任何操作問題歡迎隨時問！`},
+  '預約培訓':{e:`為確保您的團隊能充分掌握系統操作，建議安排系統使用培訓。培訓內容可按貴機構的需要調整，建議涵蓋：\n\n• 系統基本操作\n• 各角色日常功能\n• 常見問題處理\n\n請問您希望安排幾人培訓？偏好線上還是面對面形式？`,w:`建議安排系統培訓，確保團隊順利上手！請問幾人參加？偏好線上還是面對面？📚`},
+  '培訓確認':{e:`培訓安排已確認：\n\n📅 日期：{ref}\n👥 形式：[線上/面對面]\n📍 地點/連結：[詳情]\n\n請確保培訓人員準時出席，並帶備可登入系統的裝置。`,w:`✅ 培訓已確認！\n📅 時間：{ref}\n形式：[線上/面對面]\n請準時出席，帶備可登入系統的裝置 😊`},
+  '培訓提醒':{e:`溫馨提醒，系統使用培訓將於 {ref} 舉行。請確保所有參與人員準時出席，並預先測試裝置及網絡連接正常。`,w:`⏰ 培訓提醒！時間：{ref}。請準時出席，提前測試裝置及網絡。有問題請盡快聯絡 🙏`},
+  '發送教學資料':{e:`請查閱附上的系統使用教學資料，包括：\n\n• 操作手冊（PDF）\n• 常見問題列表\n• 快速參考指南\n\n如對任何功能操作有疑問，歡迎隨時聯絡客服支援。`,w:`教學資料已附上 📎 包括操作手冊、常見問題及快速指南。有任何操作問題歡迎隨時問！`},
   '培訓後摘要':{e:`感謝您參與今次系統培訓。教學資料已附上供日後參考。如在實際使用過程中遇到任何問題，請隨時聯絡客服支援。`,w:`感謝參與培訓！📚 教學資料已附上。有任何操作問題隨時找我們 😊`},
   '操作步驟':{e:`就您查詢的功能操作，以下是詳細步驟說明：\n\n① [步驟 1]\n② [步驟 2]\n③ [步驟 3]\n\n如按照以上步驟後仍有問題，請告知具體情況，我們將進一步協助。`,w:`操作步驟如下：\n① [步驟 1]\n② [步驟 2]\n③ [步驟 3]\n如仍有問題請告知，我們繼續協助 😊`},
   '常見問題':{e:`就您的查詢，以下是相關常見問題解答：\n\nQ：[常見問題]\nA：[解答]\n\n如以上解答未能解決您的問題，請提供更多詳情，我們將進一步協助。`,w:`常見問題解答：\n❓ [問題]\n✅ [解答]\n如仍未解決請告知更多詳情，我們繼續協助 😊`},
@@ -322,8 +373,8 @@ const BODY = {
  },
  '帳戶與權限':{
   '登入困難':{e:`就您反映的登入問題，以下是一些常見解決方法：\n\n• 確認電郵地址輸入正確（區分大小寫）\n• 確認密碼正確（注意大小寫及特殊符號）\n• 嘗試清除瀏覽器緩存或使用無痕模式\n• 嘗試不同的瀏覽器或裝置\n\n如仍無法登入，請告知您看到的錯誤訊息，我們將協助查明原因。`,w:`登入問題常見解決：\n✅ 確認電郵/密碼正確（注意大小寫）\n✅ 清除瀏覽器緩存\n✅ 試試無痕模式或其他瀏覽器\n仍有問題請告知錯誤訊息截圖 📸`},
-  '忘記密碼':{e:`請按以下步驟重設您的密碼：\n\n① 在登入頁面點擊「忘記密碼」\n② 輸入您的登記電郵地址\n③ 查收重設密碼電郵（請同時查看垃圾郵件夾）\n④ 點擊連結設定新密碼\n\n如未能收到重設電郵，請告知，我們可以協助從後台重設。`,w:`重設密碼步驟：\n① 點「忘記密碼」\n② 輸入登記電郵\n③ 查收重設電郵（也查垃圾郵件夾）\n④ 設定新密碼\n收不到的話告知我們 😊`},
-  '收不到驗證電郵':{e:`就您反映收不到驗證電郵的問題，請按以下步驟處理：\n\n• 檢查垃圾郵件及促銷郵件夾\n• 確認登記電郵地址是否正確\n• 嘗試重新發送驗證電郵（通常在登入頁有此選項）\n\n如以上方法均無效，請告知您的帳戶電郵地址，我們可以在後台協助驗證帳戶。`,w:`收不到驗證電郵？先查一下：\n✅ 垃圾郵件夾\n✅ 確認電郵地址正確\n✅ 重新發送驗證電郵\n仍未收到請告知帳戶電郵，我們後台處理 😊`},
+  '忘記密碼':{e:`請按以下步驟重設您的密碼：\n\n① 在登入頁面點擊「忘記密碼」\n② 輸入您的登記電郵地址\n③ 查收重設密碼電郵（請同時查看垃圾郵件夾）\n④ 點擊連結設定新密碼\n\n如未能收到重設電郵，請告知，我們可以協助從後台重設。`,w:`重設密碼：\n① 點「忘記密碼」\n② 輸入登記電郵\n③ 查收重設電郵（也查垃圾郵件夾）\n④ 設定新密碼\n收不到的話告知我們 😊`},
+  '收不到驗證電郵':{e:`就您反映收不到驗證電郵的問題：\n\n• 檢查垃圾郵件及促銷郵件夾\n• 確認登記電郵地址是否正確\n• 嘗試重新發送驗證電郵\n\n如以上方法均無效，請告知您的帳戶電郵地址，我們可以在後台協助驗證帳戶。`,w:`收不到驗證電郵？先查一下：\n✅ 垃圾郵件夾\n✅ 確認電郵地址正確\n✅ 重新發送驗證電郵\n仍未收到請告知帳戶電郵，我們後台處理 😊`},
   '帳戶未啟用':{e:`就您的帳戶未啟用問題，可能原因如下：\n\n• 尚未點擊啟用電郵中的連結\n• 啟用電郵中的連結已過期\n\n請告知您的帳戶電郵地址，我們可以在後台重新發送啟用電郵或直接啟用您的帳戶。`,w:`帳戶未啟用？可能是未點啟用連結或連結已過期。請告知帳戶電郵，我們後台重發啟用郵件或直接啟用 😊`},
   '帳戶被停用':{e:`就您的帳戶被停用問題，可能原因包括：異常登入活動、管理員設定或帳戶到期。\n\n麻煩告知您的帳戶電郵地址，以便我們核查原因，並為您安排重新啟用（如符合條件）。`,w:`帳戶被停用？原因可能是異常活動或管理員設定。請告知帳戶電郵，我們幫您查明原因並處理 🙏`},
   '新增使用者':{e:`就新增使用者的請求，麻煩提供以下資料：\n\n• 新用戶姓名\n• 電郵地址\n• 所屬部門\n• 分配角色及權限\n\n確認後我們將建立帳戶並發送登入資料至用戶電郵。`,w:`新增用戶需要：姓名、電郵、部門、角色權限。確認後建立帳戶並發送登入資料至用戶電郵 ✅`},
@@ -336,35 +387,35 @@ const BODY = {
  '技術支援':{
   '收到問題確認':{e:`感謝您的回報。我們已收到您描述的問題，現正安排技術人員跟進。\n\n個案編號：{ref}\n\n我們將在 1 個工作天內回覆具體情況。如問題緊急影響正常業務，請告知，我們將提升優先處理級別。`,w:`已收到問題報告，個案編號：{ref}。技術團隊正在跟進，1 個工作天內回覆。如情況緊急請告知 ⚡`},
   '收集重現步驟':{e:`為便於技術團隊重現及排查問題，麻煩提供以下資料：\n\n• 問題發生的具體操作步驟（由第一步開始描述）\n• 問題發生的頻率（是否每次都出現？）\n• 問題發生的時間（首次發現時間）\n• 受影響的帳戶或功能範圍`,w:`為了排查問題，麻煩提供：\n① 操作步驟（從第一步描述）\n② 問題頻率（每次都出現？）\n③ 首次發生時間\n④ 受影響範圍\n越詳細越好 🙏`},
-  '索取錯誤截圖':{e:`為便於技術團隊分析問題，麻煩提供以下截圖：\n\n• 問題發生時的畫面截圖（包括錯誤訊息）\n• 如可能，請同時提供瀏覽器開發者工具的錯誤記錄（按 F12 開啟，查看 Console 頁）\n\n截圖越清晰越好，確保錯誤訊息完整可見。`,w:`麻煩截圖問題發生時的畫面（包括錯誤訊息）📸 如可以，也截一下瀏覽器 Console 錯誤（按 F12 → Console）謝謝！`},
-  '收集裝置及瀏覽器資料':{e:`為排查技術問題，麻煩提供以下環境資料：\n\n• 使用裝置：（電腦 / 手機 / 平板）\n• 作業系統及版本：（如 Windows 11 / macOS 14 / iOS 17）\n• 瀏覽器及版本：（如 Chrome 120 / Safari 17）\n• 網絡環境：（辦公室 / 家用 / 流動數據）`,w:`麻煩提供環境資料幫助排查：\n裝置：電腦/手機/平板\n作業系統：（例 Windows 11）\n瀏覽器：（例 Chrome 120）\n網絡：辦公室/家用/流動數據 🔧`},
+  '索取錯誤截圖':{e:`為便於技術團隊分析問題，麻煩提供以下截圖：\n\n• 問題發生時的畫面截圖（包括錯誤訊息）\n• 如可能，請同時提供瀏覽器開發者工具的錯誤記錄（按 F12 開啟，查看 Console 頁）`,w:`麻煩截圖問題發生時的畫面（包括錯誤訊息）📸 如可以，也截一下瀏覽器 Console 錯誤（按 F12 → Console）謝謝！`},
+  '收集裝置及瀏覽器資料':{e:`為排查技術問題，麻煩提供以下環境資料：\n\n• 使用裝置：（電腦 / 手機 / 平板）\n• 作業系統及版本：（如 Windows 11 / macOS / iOS）\n• 瀏覽器及版本：（如 Chrome 120 / Safari）\n• 網絡環境：（辦公室 / 家用 / 流動數據）`,w:`麻煩提供環境資料幫助排查：\n裝置：電腦/手機/平板\n作業系統：（例 Windows 11）\n瀏覽器：（例 Chrome 120）\n網絡：辦公室/家用/流動數據 🔧`},
   '無法重現':{e:`感謝您的回報。我們在技術環境中嘗試重現問題，但暫時未能複現相同情況。\n\n麻煩嘗試以下步驟並告知結果：\n• 清除瀏覽器緩存及 Cookie\n• 以無痕模式重試\n• 重新整理頁面後再試\n\n如問題仍然出現，請提供重現步驟的操作錄影。`,w:`技術團隊暫時未能重現問題 🤔 請試試：清除緩存、無痕模式重試、重新整理頁面。仍然出現請提供操作錄影 📹`},
   '已重現':{e:`感謝您的詳細描述。技術團隊已成功重現您所描述的問題，確認這是一個需要修正的技術問題。\n\n個案編號：{ref}\n\n問題現已轉交開發團隊處理，預計修正時間將在確認後告知。`,w:`✅ 已重現問題確認，轉交開發團隊處理（個案：{ref}）。預計修正時間稍後通知 🔧`},
   '排查中':{e:`技術團隊正在積極排查您所描述的問題，目前進度：已確認問題範圍，排查進行中。\n\n我們將在有進一步進展時及時通知您。感謝您的耐心等待。`,w:`技術團隊正在排查中 🔧 有進展會及時通知您。感謝耐心等待 🙏`},
   '提供暫時處理方法':{e:`在問題修正期間，以下是一個臨時處理方法，可以幫助您繼續正常使用相關功能：\n\n[臨時處理方法說明]\n\n以上只是臨時方案，我們仍在積極修正根本問題，完成後將通知您更新。`,w:`臨時解決方案：[方法說明]。正式修正仍在進行，完成後通知您更新 ✅`},
-  '升級技術團隊':{e:`感謝您的耐心等待。鑑於問題的複雜性，我們已將您的個案升級至高級技術團隊處理。\n\n個案編號：{ref}\n\n高級技術團隊將優先跟進。我們了解問題對您的業務造成不便，對此深表歉意。`,w:`已升級至高級技術團隊處理（{ref}），對造成的不便深表歉意 🙏 將優先處理。`},
+  '升級技術團隊':{e:`鑑於問題的複雜性，我們已將您的個案升級至高級技術團隊處理。\n\n個案編號：{ref}\n\n高級技術團隊將優先跟進。我們了解問題對您的業務造成不便，對此深表歉意。`,w:`已升級至高級技術團隊處理（{ref}），對造成的不便深表歉意 🙏 將優先處理。`},
   '進度更新':{e:`就您的個案（{ref}），以下是最新進度更新：\n\n[進度更新說明]\n\n如有任何問題或需要補充資料，請隨時聯絡。`,w:`個案 {ref} 進度更新：[說明]。有問題請隨時聯絡 😊`},
   '修正待測':{e:`就您的個案（{ref}），技術修正已完成，目前進入內部測試階段，確認問題已解決後將通知您進行驗證。`,w:`修正已完成，正在內部測試中（{ref}）。測試通過後通知您驗證 ✅`},
   '修正完成':{e:`就您的個案（{ref}），技術問題已修正並通過測試，現已部署至正式環境。\n\n麻煩嘗試重新操作相關功能，確認問題是否已解決。如仍有問題，請告知。`,w:`修正已完成並部署（{ref}）！請嘗試重新操作，確認問題是否解決。如仍有問題請告知 ✅`},
   '客戶驗證':{e:`請問您已驗證修正是否有效嗎？麻煩嘗試重現之前的問題，並告知結果。\n\n如問題已解決，我們將關閉此個案。如問題仍然存在，請提供詳情以便繼續跟進。`,w:`請問修正後問題解決了嗎？麻煩試試重現之前的情況並告知 ✅ 解決了我們關閉個案，仍有問題繼續跟進 😊`},
   '問題復發':{e:`就您反映的問題復發情況，對此造成的不便深表歉意。\n\n我們已重新開啟個案（{ref}），技術團隊將深入排查問題根本原因，以防止同樣問題再次發生。`,w:`收到問題復發報告，非常抱歉！已重新開啟個案（{ref}），技術團隊深入排查根本原因，確保不再復發 🙏`},
   '結案':{e:`感謝您的確認。個案（{ref}）現正式結案。\n\n如日後遇到其他技術問題，歡迎隨時聯絡我們的技術支援團隊。感謝您的合作。`,w:`個案 {ref} 正式結案 ✅ 如之後遇到其他問題，隨時找我們！謝謝 😊`},
-  '重新開啟個案':{e:`感謝您的通知。已根據您的要求重新開啟個案（{ref}）。\n\n技術團隊將重新跟進您的問題，請提供問題的最新情況及重現步驟，以便我們更有效地處理。`,w:`已重新開啟個案（{ref}）。麻煩提供問題最新情況及重現步驟，我們重新跟進 🔧`},
+  '重新開啟個案':{e:`已根據您的要求重新開啟個案（{ref}）。\n\n技術團隊將重新跟進您的問題，請提供問題的最新情況及重現步驟，以便我們更有效地處理。`,w:`已重新開啟個案（{ref}）。麻煩提供問題最新情況及重現步驟，我們重新跟進 🔧`},
  },
  '資料與報表':{
   '資料未顯示':{e:`就您反映資料未顯示的問題，以下是一些常見原因及解決方法：\n\n• 確認篩選條件是否正確（日期範圍、部門等）\n• 確認帳戶是否有查看該資料的權限\n• 嘗試重新整理頁面\n\n如以上方法無效，請提供截圖及您的帳戶電郵，我們將協助查明原因。`,w:`資料未顯示？先確認：篩選條件正確嗎？帳戶有查看權限嗎？試試重新整理頁面。仍未顯示請截圖告知 📸`},
-  '數字不一致':{e:`就您反映的數字不一致問題，可能涉及報表計算邏輯、時區設定、資料更新延遲或篩選條件不同。\n\n麻煩提供以下資料以便排查：\n• 出現不一致的具體報表及數字\n• 比對的另一來源（例如其他報表或系統）\n• 相關截圖`,w:`數字不一致可能涉及計算邏輯、更新延遲或篩選條件不同。請提供：具體報表/數字及比對來源的截圖，我們幫您查明 🔍`},
-  '報表篩選說明':{e:`就您查詢的報表篩選功能，以下是說明：\n\n報表可按以下維度篩選：\n• 日期範圍（日/週/月/自訂）\n• 部門或分店\n• 狀態（已完成/進行中/等待中）\n\n如需要幫助設定特定篩選條件，請告知您的報表需求，我們可以協助操作。`,w:`報表可按：日期範圍、部門/分店、狀態等篩選。需要幫助設定特定篩選條件嗎？告知需求我們協助 📊`},
+  '數字不一致':{e:`就您反映的數字不一致問題，可能涉及報表計算邏輯、時區設定、資料更新延遲或篩選條件不同。\n\n麻煩提供以下資料以便排查：\n• 出現不一致的具體報表及數字\n• 比對的另一來源\n• 相關截圖`,w:`數字不一致可能涉及計算邏輯、更新延遲或篩選條件不同。請提供：具體報表/數字及比對來源的截圖，我們幫您查明 🔍`},
+  '報表篩選說明':{e:`就您查詢的報表篩選功能，報表可按以下維度篩選：\n\n• 日期範圍（日/週/月/自訂）\n• 部門或分店\n• 狀態（已完成/進行中/等待中）\n\n如需要幫助設定特定篩選條件，請告知您的報表需求，我們可以協助操作。`,w:`報表可按：日期範圍、部門/分店、狀態等篩選。需要幫助設定特定篩選條件嗎？告知需求我們協助 📊`},
   '匯出失敗':{e:`就您反映的報表匯出失敗問題，可能原因如下：\n\n• 資料量過大（建議分批匯出或縮小日期範圍）\n• 瀏覽器彈出視窗被阻擋（請允許彈出視窗）\n• 帳戶沒有匯出權限\n\n如以上方法無效，請告知錯誤訊息截圖，我們將進一步協助。`,w:`報表匯出失敗？試試：縮小日期範圍分批匯出、允許瀏覽器彈出視窗、確認帳戶有匯出權限。仍失敗請截圖告知 📸`},
-  '資料更新延遲':{e:`就您查詢的資料更新延遲問題，系統資料通常每隔一定時間自動更新一次。如需即時查看最新資料，可嘗試手動刷新相關頁面。\n\n如延遲時間超出正常範圍，請告知具體情況，我們將安排技術人員查明原因。`,w:`系統資料定時自動更新，可嘗試手動刷新頁面。如延遲異常請告知，技術團隊查明原因 🔄`},
+  '資料更新延遲':{e:`系統資料通常每隔一定時間自動更新一次。如需即時查看最新資料，可嘗試手動刷新相關頁面。\n\n如延遲時間超出正常範圍，請告知具體情況，我們將安排技術人員查明原因。`,w:`系統資料定時自動更新，可嘗試手動刷新頁面。如延遲異常請告知，技術團隊查明原因 🔄`},
   '資料修正申請':{e:`就您的資料修正申請，麻煩提供以下資料：\n\n• 需要修正的具體資料（包括現有資料及正確資料）\n• 修正原因\n• 相關參考文件（如適用）\n\n確認後，我們將安排授權人員進行修正，並提供修正確認記錄。`,w:`資料修正申請：請提供現有資料/正確資料/修正原因及參考文件。確認後安排授權人員修正 ✅`},
-  '誤刪資料求助':{e:`就您反映的誤刪資料問題，請盡快提供以下資料：\n\n• 被刪除的資料類型及大概數量\n• 刪除時間（越準確越好）\n• 操作人員帳戶\n\n我們將立即查閱系統備份記錄，嘗試為您還原資料。請注意，資料還原的可行性視乎備份時間及設定而定。`,w:`⚠️ 誤刪資料！請立即提供：資料類型/數量、刪除時間（越準確越好）、操作人員帳戶。我們馬上查備份嘗試還原 🙏`},
-  '備份及還原查詢':{e:`就您的備份及還原查詢，{brand} 系統進行每日自動備份。如需要還原特定時間點的資料，請說明所需日期及資料範圍，我們將評估可行性。`,w:`{brand} 每日自動備份。如需還原資料請告知所需日期及資料範圍，我們評估可行性 💾`},
-  '操作記錄查詢':{e:`就您的操作記錄查詢，系統保存了各用戶的操作稽核記錄，包括：\n\n• 登入/登出時間\n• 資料新增/修改/刪除記錄\n• 匯出記錄\n\n請提供查詢的時間範圍及相關帳戶，我們將提供相應的操作記錄報告。`,w:`查詢操作記錄：系統保存登入/資料修改/匯出等記錄。請提供查詢時間範圍及相關帳戶，我們提供記錄報告 📋`},
+  '誤刪資料求助':{e:`就您反映的誤刪資料問題，請盡快提供以下資料：\n\n• 被刪除的資料類型及大概數量\n• 刪除時間（越準確越好）\n• 操作人員帳戶\n\n我們將立即查閱系統備份記錄，嘗試為您還原資料。`,w:`⚠️ 誤刪資料！請立即提供：資料類型/數量、刪除時間（越準確越好）、操作人員帳戶。我們馬上查備份嘗試還原 🙏`},
+  '備份及還原查詢':{e:`{brand} 系統進行每日自動備份。如需要還原特定時間點的資料，請說明所需日期及資料範圍，我們將評估可行性。`,w:`{brand} 每日自動備份。如需還原資料請告知所需日期及資料範圍，我們評估可行性 💾`},
+  '操作記錄查詢':{e:`系統保存了各用戶的操作稽核記錄，包括：\n\n• 登入/登出時間\n• 資料新增/修改/刪除記錄\n• 匯出記錄\n\n請提供查詢的時間範圍及相關帳戶，我們將提供相應的操作記錄報告。`,w:`查詢操作記錄：系統保存登入/資料修改/匯出等記錄。請提供查詢時間範圍及相關帳戶，我們提供記錄報告 📋`},
  },
  'API 與整合':{
-  '整合前評估':{e:`感謝您提出整合需求。在開始整合工作前，我們需要進行技術評估，了解：\n\n• 目標整合系統名稱及版本\n• 整合類型（單向/雙向資料同步）\n• 需要同步的資料類型\n• 目標系統的 API 文件（如有）\n\n評估完成後，我們將提供整合方案建議及相關報價。`,w:`整合評估需要了解：目標系統、整合類型（單向/雙向）、同步資料類型、API 文件（如有）。評估後提供方案及報價 🔗`},
-  '授權指引':{e:`為完成第三方系統整合授權，請按以下步驟操作：\n\n① 登入第三方系統\n② 前往「設定」→「API 設定」或「整合設定」\n③ 生成 API 金鑰或授權 Token\n④ 將金鑰通過安全渠道發送給我們\n\n如在操作過程中遇到問題，請告知具體步驟及截圖。`,w:`授權步驟：\n① 登入第三方系統\n② 前往 API/整合設定\n③ 生成 API 金鑰\n④ 通過安全渠道發送給我們\n有問題告知截圖 🔐`},
+  '整合前評估':{e:`在開始整合工作前，我們需要進行技術評估，了解：\n\n• 目標整合系統名稱及版本\n• 整合類型（單向/雙向資料同步）\n• 需要同步的資料類型\n• 目標系統的 API 文件（如有）\n\n評估完成後，我們將提供整合方案建議及相關報價。`,w:`整合評估需要了解：目標系統、整合類型（單向/雙向）、同步資料類型、API 文件（如有）。評估後提供方案及報價 🔗`},
+  '授權指引':{e:`為完成第三方系統整合授權，請按以下步驟操作：\n\n① 登入第三方系統\n② 前往「設定」→「API 設定」或「整合設定」\n③ 生成 API 金鑰或授權 Token\n④ 將金鑰通過安全渠道發送給我們`,w:`授權步驟：\n① 登入第三方系統\n② 前往 API/整合設定\n③ 生成 API 金鑰\n④ 通過安全渠道發送給我們\n有問題告知截圖 🔐`},
   '授權失效':{e:`我們偵測到第三方系統的整合授權已失效，可能導致資料同步中斷。\n\n請按指引重新授權，完成後系統將自動恢復資料同步。如操作有任何問題，請告知。`,w:`⚠️ 整合授權已失效，資料同步已中斷！請重新授權，完成後同步自動恢復 🔗`},
   '重新授權':{e:`感謝您完成重新授權。我們已確認新的授權設定，資料同步已恢復正常。\n\n如發現資料同步仍有問題，請告知，我們將進一步排查。`,w:`✅ 重新授權完成！資料同步已恢復正常。如發現還有問題請告知 😊`},
   '同步失敗':{e:`我們偵測到資料同步出現失敗。技術團隊正在排查原因，預計在確認後盡快解決。如需緊急處理，請告知。`,w:`資料同步失敗，技術團隊正在排查中 🔧 有更新會及時通知，如需緊急處理請告知 ⚡`},
@@ -372,7 +423,7 @@ const BODY = {
   '欄位對應問題':{e:`就欄位對應問題，可能是系統欄位設定與第三方系統不一致導致。\n\n麻煩提供未能正確對應的具體欄位名稱及預期的對應關係，技術團隊將更新設定後通知您測試。`,w:`欄位對應問題：請告知哪些欄位未能正確對應，以及預期的對應關係。技術團隊更新設定後通知您測試 ✅`},
   '重複同步':{e:`就您反映的資料重複同步問題，可能原因為觸發條件設定問題或網絡超時重試。技術團隊正在排查及優化同步邏輯。在問題解決前，建議暫時避免手動觸發同步。`,w:`重複同步問題已記錄，技術團隊正在排查。在解決前建議暫停手動同步。如需緊急清理資料請告知 🙏`},
   '第三方服務異常':{e:`我們注意到與第三方服務的整合出現異常，初步評估問題源自第三方服務端。我們已嘗試聯絡第三方服務商確認情況，並將持續跟進及更新狀態。`,w:`第三方服務出現異常，問題似乎在對方服務端 🔧 我們正在聯絡他們跟進，有更新會及時通知您`},
-  '接口限制':{e:`就您查詢的 API 接口限制，以下是說明：\n\n• 請求頻率限制：每分鐘最多 [X] 次請求\n• 資料量限制：每次請求最多 [X] 筆記錄\n\n如業務需要超出現有限制，請告知，我們可以評估是否有調整方案。`,w:`API 接口限制：每分鐘最多 [X] 次請求，每次最多 [X] 筆記錄。業務需要超出限制的話告知我們評估方案 ✅`},
+  '接口限制':{e:`就您查詢的 API 接口限制說明：\n\n• 請求頻率限制：每分鐘最多 [X] 次請求\n• 資料量限制：每次請求最多 [X] 筆記錄\n\n如業務需要超出現有限制，請告知，我們可以評估是否有調整方案。`,w:`API 接口限制：每分鐘最多 [X] 次請求，每次最多 [X] 筆記錄。業務需要超出限制的話告知我們評估方案 ✅`},
   '接口版本更新':{e:`重要通知：{brand} API 接口將進行版本更新。\n\n請在舊版本截止支援日期前完成更新。如需技術協助，請聯絡我們的整合支援團隊。`,w:`⚠️ API 版本更新通知，請及時更新至新版本。需要協助請聯絡我們 🔧`},
   '整合測試完成':{e:`整合測試已完成，資料同步、欄位對應及錯誤處理均已測試通過，整合功能現可正常使用。如在正式使用過程中發現任何問題，請隨時告知。`,w:`✅ 整合測試完成！資料同步、欄位對應、錯誤處理均已通過測試。正式使用時有問題請隨時告知 😊`},
  },
@@ -382,10 +433,10 @@ const BODY = {
   '現有功能可處理':{e:`感謝您的功能查詢。根據您描述的需求，現有系統功能已可實現，只需要適當的設定調整。\n\n以下是具體操作方法：\n[功能操作說明]\n\n如需要在系統中示範，歡迎安排一次簡短的線上指導。`,w:`好消息！您描述的需求現有功能已可實現 🎉 操作方法：[說明]。需要線上示範的話隨時告知 😊`},
   '提供替代做法':{e:`就您提出的功能需求，雖然系統目前沒有完全一致的功能，但以下替代方案可以實現類似效果：\n\n[替代方案說明]\n\n如替代方案不能滿足您的需求，我們可以進一步評估訂製開發的可行性。`,w:`目前沒有完全相同的功能，但有替代方案：[說明]。如替代方案不夠理想，可以評估訂製開發 ✅`},
   '需要訂製':{e:`感謝您的詳細需求描述。根據您的情況，需要進行訂製開發。\n\n我們已將您的需求轉交產品及技術團隊評估，預計在數個工作天內回覆可行性評估及報價。`,w:`確認需要訂製開發，已轉交產品/技術團隊評估。預計數個工作天內回覆可行性及報價 ✅`},
-  '可行性評估中':{e:`就您的訂製需求，產品及技術團隊正在進行可行性評估，主要評估範圍包括：\n\n• 技術實現可行性\n• 開發工作量估算\n• 對現有系統的影響\n\n評估完成後，我們將為您提供詳細的可行性報告及報價。`,w:`訂製需求可行性評估中 🔍 評估技術可行性、工作量、對現有系統影響。完成後提供報告及報價 🙏`},
+  '可行性評估中':{e:`就您的訂製需求，產品及技術團隊正在進行可行性評估，主要評估範圍包括：\n\n• 技術實現可行性\n• 開發工作量估算\n• 對現有系統的影響\n\n評估完成後，我們將為您提供詳細的可行性報告及報價。`,w:`訂製需求可行性評估中 🔍 完成後提供可行性報告及報價 🙏`},
   '需要額外報價':{e:`就您的訂製需求，可行性評估已完成。由於此需求超出原有合約範圍，需要額外報價。我們將盡快為您準備詳細的訂製開發報價。`,w:`可行性評估完成，確認需要額外報價（超出原合約範圍）。將盡快發送訂製開發報價 📋`},
   '變更範圍確認':{e:`就功能需求變更，麻煩確認以下變更內容：\n\n• 新增需求：[說明]\n• 移除需求：[說明]\n• 修改需求：[說明]\n\n確認後，我們將更新項目計劃及相關時間表。如變更涉及額外費用，我們將另行通知。`,w:`確認需求變更：新增[說明]/移除[說明]/修改[說明]。確認後更新計劃，如涉及額外費用另行通知 ✅`},
-  '暫不支援':{e:`感謝您的功能建議。就您的需求，我們目前的技術架構暫時未能支援此功能。\n\n我們已記錄您的需求，產品團隊將在規劃路線圖時參考。如有任何進展，我們將主動通知您。感謝您的理解。`,w:`暫時未能支援此功能，已記錄在產品需求列表中。如有進展會主動通知您，感謝理解 🙏`},
+  '暫不支援':{e:`感謝您的功能建議。就您的需求，我們目前的技術架構暫時未能支援此功能。\n\n我們已記錄您的需求，產品團隊將在規劃路線圖時參考。如有任何進展，我們將主動通知您。`,w:`暫時未能支援此功能，已記錄在產品需求列表中。如有進展會主動通知您，感謝理解 🙏`},
   '未有推出日期':{e:`感謝您的查詢。就您詢問的功能，我們確認這是在產品路線圖中的計劃功能，但目前暫未有確實的推出日期。\n\n有進展時，我們亦會主動通知您。`,w:`此功能在計劃路線圖中，但暫未有確實推出日期。有進展會主動通知，或可留意系統更新公告 📢`},
   '功能已推出':{e:`好消息！您之前查詢的功能現已正式推出。\n\n功能位於：[功能位置]\n\n如需要操作指引，我們已準備好相關教學資料，或可安排一次簡短的功能示範。`,w:`🎉 好消息！您之前查詢的功能已正式推出！功能位置：[位置]。需要操作指引或示範嗎？`},
  },
@@ -396,7 +447,7 @@ const BODY = {
   '等待客戶確認':{e:`就以下事項，尚待貴機構確認：\n\n• [等待確認的事項]\n\n麻煩在 [日期] 前回覆確認，以便我們繼續推進項目計劃。`,w:`有以下事項待確認：[說明]。麻煩在 [日期] 前回覆，以便繼續推進項目 ✅`},
   '範圍變更':{e:`就項目範圍變更請求，以下是評估結果：\n\n• 變更內容：[說明]\n• 對時間表的影響：[說明]\n• 對費用的影響：[說明]\n\n麻煩確認是否同意以上變更安排，確認後我們將更新項目計劃。`,w:`範圍變更評估：[內容]。影響時間：[說明]，影響費用：[說明]。請確認是否同意 ✅`},
   '時間安排調整':{e:`就項目時間安排，經評估後建議以下調整：\n\n• 原定時間：[原時間]\n• 建議調整至：[新時間]\n• 調整原因：[說明]\n\n麻煩確認是否同意時間調整，確認後我們將更新項目計劃。`,w:`建議調整時間：[原時間] → [新時間]，原因：[說明]。請確認是否同意 ✅`},
-  '延誤通知':{e:`就項目進度，非常遺憾需要通知您，受以下原因影響，項目將有所延誤：\n\n• 延誤原因：[說明]\n• 預計延誤時間：[說明]\n• 新預計完成日期：[日期]\n\n對此造成的不便，我們深表歉意，並會盡力採取措施減少影響。`,w:`⚠️ 項目延誤通知：原因 [說明]，預計延誤 [時間]，新完成日期 [日期]。深表歉意，我們盡力減少影響 🙏`},
+  '延誤通知':{e:`非常遺憾需要通知您，受以下原因影響，項目將有所延誤：\n\n• 延誤原因：[說明]\n• 預計延誤時間：[說明]\n• 新預計完成日期：[日期]\n\n對此造成的不便，我們深表歉意，並會盡力採取措施減少影響。`,w:`⚠️ 項目延誤通知：原因 [說明]，預計延誤 [時間]，新完成日期 [日期]。深表歉意，我們盡力減少影響 🙏`},
   '階段交付':{e:`項目 [階段名稱] 已完成，現提交交付成果：\n\n• [交付物]\n\n麻煩查閱後告知是否符合要求。如需要修改，請在 [日期] 前提出，以便我們及時跟進。`,w:`[階段名稱] 完成！交付物：[說明]。麻煩查閱確認，如需修改請在 [日期] 前告知 ✅`},
   '驗收提醒':{e:`[階段名稱] 的驗收期限即將到來，截止驗收日期：[日期]。\n\n麻煩在截止日期前完成驗收並告知結果。如驗收中發現任何問題，請盡快反映。`,w:`⏰ 驗收提醒：[階段名稱] 驗收截止日期：[日期]。麻煩盡快完成驗收，有問題請即時告知 🙏`},
   '驗收完成':{e:`感謝您完成驗收確認。[階段名稱] 已正式驗收通過。\n\n接下來將進入下一階段，我們將繼續按計劃推進，並定期向您更新進度。`,w:`✅ [階段名稱] 驗收通過！接下來繼續按計劃推進。有任何問題隨時找我們 😊`},
@@ -410,37 +461,37 @@ const BODY = {
   '已收款確認':{e:`感謝您的付款。已確認收到發票（{ref}）的款項。\n\n如需要收款確認書，請告知，我們將為您提供。`,w:`✅ 已確認收款（發票 {ref}）！如需收款確認書請告知，我們提供 😊`},
   '付款記錄待核對':{e:`就您查詢的付款記錄，我們正在核對帳目。請提供付款日期、金額及付款方式及參考編號，以加快核對進程。確認後我們將盡快回覆。`,w:`付款記錄核對中，請提供：付款日期、金額、付款參考號。確認後盡快回覆 🙏`},
   '重複付款查詢':{e:`就您反映的重複付款問題，我們正在核查帳目記錄。請提供兩次付款的日期、金額及付款參考編號。確認重複付款後，我們將安排退還多餘款項。`,w:`查到重複付款？請提供兩次付款的日期/金額/參考號。確認後安排退還多餘款項 🙏`},
-  '付款失敗':{e:`就您反映的付款失敗問題，可能原因如下：\n\n• 銀行卡限額\n• 網絡連接問題\n• 信用卡資料輸入錯誤\n\n請嘗試重新付款，或選擇其他付款方式。如問題持續，請聯絡您的銀行或告知我們協助。`,w:`付款失敗可能原因：卡片限額、網絡問題、資料錯誤。請重試或換其他付款方式。持續有問題請告知 🙏`},
+  '付款失敗':{e:`就您反映的付款失敗問題，可能原因如下：\n\n• 銀行卡限額\n• 網絡連接問題\n• 信用卡資料輸入錯誤\n\n請嘗試重新付款，或選擇其他付款方式。如問題持續，請告知我們協助。`,w:`付款失敗可能原因：卡片限額、網絡問題、資料錯誤。請重試或換其他付款方式。持續有問題請告知 🙏`},
   '帳單資料更正':{e:`就您申請的帳單資料更正，麻煩提供需要更正的發票號碼（{ref}）、現有資料及正確資料。確認後我們將發出更正發票。`,w:`帳單更正：請提供發票號碼（{ref}）、現有資料、正確資料。確認後發出更正發票 ✅`},
   '費用爭議':{e:`就您提出的費用爭議，我們對此認真看待，將安排財務團隊詳細核查。\n\n麻煩提供爭議的具體說明及相關參考文件（如合約、報價書等）。我們將在數個工作天內回覆調查結果。`,w:`費用爭議已收到，財務團隊正在核查 🔍 請提供具體說明及相關合約/報價文件，預計數個工作天內回覆 🙏`},
   '退款申請已收到':{e:`就您的退款申請（{ref}），我們已收到並正在處理。請耐心等待，我們將盡快告知處理結果。`,w:`退款申請已收到（{ref}）！正在核查處理，有結果會及時告知，請耐心等待 🙏`},
-  '退款進度':{e:`就您的退款申請（{ref}），以下是最新進度：\n\n退款狀態：[處理中/已審批/已退款]\n退款金額：[金額]\n預計到帳時間：[時間]\n\n如有任何問題，請隨時聯絡我們。`,w:`退款進度（{ref}）：狀態 [處理中/已審批/已退款]，金額 [金額]，預計到帳 [時間] 😊`},
-  '轉交財務':{e:`就您的財務查詢，我們已將相關事項轉交財務部門處理。財務部門將盡快直接聯絡您跟進。`,w:`已轉交財務部門處理，將盡快聯絡您。緊急情況請聯絡：[聯絡方式] 🙏`},
+  '退款進度':{e:`就您的退款申請（{ref}），以下是最新進度：\n\n退款狀態：[處理中/已審批/已退款]\n退款金額：[金額]\n預計到帳時間：[時間]`,w:`退款進度（{ref}）：狀態 [處理中/已審批/已退款]，金額 [金額]，預計到帳 [時間] 😊`},
+  '轉交財務':{e:`就您的財務查詢，我們已將相關事項轉交財務部門處理。財務部門將盡快直接聯絡您跟進。`,w:`已轉交財務部門處理，將盡快聯絡您 🙏`},
  },
  '計劃與續約':{
   '目前計劃查詢':{e:`就您查詢目前的訂閱計劃，以下是您帳戶的計劃詳情：\n\n• 計劃名稱：[計劃]\n• 包含模組：[模組列表]\n• 用戶數量：[數量]\n• 計劃到期日：{ref}\n\n如需調整計劃或了解其他方案，歡迎告知。`,w:`您的計劃詳情：[計劃名稱]，模組：[說明]，用戶：[數量]，到期日：{ref}。需要調整請隨時告知 😊`},
   '已包含模組查詢':{e:`就您查詢現有計劃包含的功能模組，以下是完整清單：\n\n[模組清單]\n\n如您希望了解計劃外的功能模組，歡迎告知，我們可以為您提供升級或加購建議。`,w:`現有計劃包含的模組：[清單]。如想了解可加購的模組，隨時告知 😊`},
-  '使用人數調整':{e:`就您申請的用戶數量調整，以下是相關資訊：\n\n現有用戶數：[數量] → 申請調整至：[新數量]\n費用調整：[說明]\n\n確認後我們將更新帳戶設定及相應費用。`,w:`用戶數調整：[現有] → [新數量]，費用調整 [說明]。確認後更新帳戶設定 ✅`},
+  '使用人數調整':{e:`就您申請的用戶數量調整：\n\n現有用戶數：[數量] → 申請調整至：[新數量]\n費用調整：[說明]\n\n確認後我們將更新帳戶設定及相應費用。`,w:`用戶數調整：[現有] → [新數量]，費用調整 [說明]。確認後更新帳戶設定 ✅`},
   '升級':{e:`感謝您申請升級計劃！以下是升級詳情：\n\n現有計劃：[計劃] → 升級至：[新計劃]\n費用差額：[說明]\n生效日期：[日期]\n\n確認後我們將立即處理升級，並開放相應功能。`,w:`計劃升級：[現有] → [新計劃]，費用差額 [說明]，生效日期 [日期]。確認後立即處理 🎉`},
   '降級':{e:`就您申請的計劃降級，請注意降級後以下功能將不再可用：\n\n[功能列表]\n\n生效日期：[日期]\n\n請確認您已了解功能影響，確認後我們將安排降級。`,w:`計劃降級注意：降級後以下功能不再可用：[列表]，生效日期 [日期]。確認後處理 ⚠️`},
   '加購模組':{e:`感謝您申請加購功能模組。\n\n加購模組：[模組名稱]\n費用：[金額]\n生效日期：[日期]\n\n確認後我們將立即開放相關模組，並更新下期帳單。`,w:`加購模組：[名稱]，費用 [金額]，生效日期 [日期]。確認後立即開放功能並更新帳單 ✅`},
   '續約提醒':{e:`溫馨提醒，您的 {brand} 訂閱計劃將於 {ref} 到期。\n\n為確保服務不中斷，建議提前安排續約。如計劃有任何調整需要，請在續約前告知我們。`,w:`⏰ 續約提醒：訂閱計劃將於 {ref} 到期！建議提前安排，如計劃需調整請一併告知 😊`},
-  '續約報價':{e:`請查閱附上的續約報價（{ref}）。\n\n• 續約計劃：[計劃]\n• 費用：[金額]\n• 有效期至：[日期]\n\n如需調整計劃或有任何問題，歡迎告知。`,w:`續約報價已發送（{ref}）📎 計劃 [名稱]，費用 [金額]，有效期至 [日期]。需要調整請告知 😊`},
+  '續約報價':{e:`請查閱附上的續約報價（{ref}）。\n\n• 續約計劃：[計劃]\n• 費用：[金額]\n• 有效期至：[日期]\n\n如需調整計劃或有任何問題，歡迎告知。`,w:`續約報價已發送（{ref}）📎 計劃 [名稱]，費用 [金額]。需要調整請告知 😊`},
   '續約確認':{e:`感謝您確認續約！您的 {brand} 訂閱計劃已成功續期。\n\n如對帳單有任何問題，請隨時聯絡我們。感謝您持續支持 {brand}！`,w:`✅ 續約成功！感謝持續支持 {brand} 🎉 有問題隨時找我們！`},
-  '到期通知':{e:`重要通知：您的 {brand} 訂閱計劃已於 {ref} 到期。\n\n為繼續使用系統，請盡快安排續約。在續約完成前，部分功能可能受限。如需協助，請立即聯絡我們。`,w:`⚠️ 訂閱計劃已於 {ref} 到期！請盡快安排續約以恢復完整功能。如需協助請立即聯絡 🙏`},
-  '暫停服務申請':{e:`就您申請暫停服務，以下是相關注意事項：\n\n• 暫停期間，所有用戶將無法登入系統\n• 資料在暫停期間仍然保存\n\n請確認暫停服務的起始日期及預計恢復日期，我們將安排相關事宜。`,w:`確認申請暫停服務。暫停期間用戶無法登入，但資料保留。請確認起始日期及預計恢復日期 ⚠️`},
+  '到期通知':{e:`重要通知：您的 {brand} 訂閱計劃已於 {ref} 到期。\n\n為繼續使用系統，請盡快安排續約。在續約完成前，部分功能可能受限。`,w:`⚠️ 訂閱計劃已於 {ref} 到期！請盡快安排續約以恢復完整功能。如需協助請立即聯絡 🙏`},
+  '暫停服務申請':{e:`就您申請暫停服務：\n\n• 暫停期間，所有用戶將無法登入系統\n• 資料在暫停期間仍然保存\n\n請確認暫停服務的起始日期及預計恢復日期，我們將安排相關事宜。`,w:`確認申請暫停服務。暫停期間用戶無法登入，但資料保留。請確認起始日期及預計恢復日期 ⚠️`},
   '取消申請':{e:`就您申請取消服務，對於您的離開我們感到遺憾。\n\n為完成取消流程，麻煩確認取消生效日期，並記得在取消前完成資料匯出。如方便告知取消原因，有助我們改善服務（可選填）。`,w:`收到取消申請，很遺憾您的離開 🙏 請確認取消日期，並記得在取消前匯出所需資料。如方便告知原因有助我們改善 😊`},
-  '離場及資料交接':{e:`就系統離場及資料交接安排，以下是相關說明：\n\n• 資料匯出格式：Excel / CSV（標準格式）\n• 匯出範圍：所有帳戶資料\n\n如需要協助匯出特定資料，請告知，我們的技術團隊將協助確保資料完整交接。`,w:`資料交接說明：可匯出 Excel/CSV 格式。需要協助匯出請告知，確保資料完整交接 📂`},
+  '離場及資料交接':{e:`就系統離場及資料交接安排：\n\n• 資料匯出格式：Excel / CSV（標準格式）\n• 匯出範圍：所有帳戶資料\n\n如需要協助匯出特定資料，請告知，我們的技術團隊將協助確保資料完整交接。`,w:`資料交接說明：可匯出 Excel/CSV 格式。需要協助匯出請告知，確保資料完整交接 📂`},
  },
  '維護與服務異常':{
   '預定維護':{e:`重要通知：{brand} 系統將於以下時間進行預定維護：\n\n📅 維護日期：{ref}\n⏱️ 預計時長：[時長]\n🔧 維護內容：系統升級及優化\n\n維護期間系統將暫停服務，請提前安排業務。造成的不便，敬請見諒。`,w:`📢 維護通知：{brand} 系統將於 {ref} 進行預定維護，預計 [時長]。維護期間系統暫停，請提前安排 🙏`},
   '維護前提醒':{e:`溫馨提醒，{brand} 系統將於 [X 小時] 後開始進行維護，預計服務中斷時間為 [時長]。請盡快完成進行中的工作並儲存資料。`,w:`⏰ 提醒：{brand} 系統將於 [X 小時] 後開始維護，請盡快完成工作並儲存資料 🙏`},
   '維護開始':{e:`{brand} 系統維護現已開始。預計恢復時間：{ref}。如有緊急事宜，請通過緊急聯絡方式聯絡我們。`,w:`🔧 {brand} 系統維護已開始，預計恢復時間：{ref}。緊急事宜請聯絡我們`},
-  '維護延期':{e:`就系統維護進度，由於 [原因]，維護時間將延長。最新預計恢復時間：{ref}。對此造成的額外不便，我們深表歉意。`,w:`⚠️ 維護延期：由於 [原因]，最新預計恢復時間：{ref}。對額外不便深表歉意 🙏`},
+  '維護延期':{e:`由於 [原因]，維護時間將延長。最新預計恢復時間：{ref}。對此造成的額外不便，我們深表歉意。`,w:`⚠️ 維護延期：由於 [原因]，最新預計恢復時間：{ref}。對額外不便深表歉意 🙏`},
   '維護完成':{e:`{brand} 系統維護已順利完成，系統現已恢復正常服務。如在使用過程中發現任何異常，請隨時告知我們。感謝您的耐心等待。`,w:`✅ {brand} 系統維護完成，服務已恢復正常！有任何異常請告知，感謝耐心等待 😊`},
   '服務異常首次通知':{e:`重要通知：我們偵測到 {brand} 系統目前出現服務異常，部分功能可能無法正常使用。\n\n技術團隊已緊急介入處理，我們將定時更新處理進度。對此造成的不便，深表歉意。`,w:`⚠️ 服務異常通知：{brand} 部分功能目前出現異常，技術團隊緊急處理中。有更新會及時通知，深表歉意 🙏`},
   '影響範圍更新':{e:`就目前的服務異常，以下是受影響範圍的最新評估：\n\n• 受影響功能：[說明]\n• 不受影響功能：[說明]\n\n技術團隊正全力處理，預計恢復時間：[時間]。`,w:`服務異常影響範圍更新：受影響 [說明]，不受影響 [說明]。預計恢復時間：[時間]。技術團隊緊急處理中 🔧`},
-  '處理進度':{e:`就目前的服務異常，以下是最新處理進度：\n\n• 問題原因：[說明]\n• 目前處理狀態：[說明]\n• 預計恢復時間：[時間]\n\n我們將繼續更新進度，感謝您的耐心。`,w:`服務異常處理進度：原因 [說明]，當前狀態 [說明]，預計恢復 [時間]。繼續跟進中 🔧`},
+  '處理進度':{e:`就目前的服務異常，以下是最新處理進度：\n\n• 問題原因：[說明]\n• 目前處理狀態：[說明]\n• 預計恢復時間：[時間]`,w:`服務異常處理進度：原因 [說明]，當前狀態 [說明]，預計恢復 [時間]。繼續跟進中 🔧`},
   '服務恢復':{e:`好消息！{brand} 系統服務已恢復正常，技術團隊已確認所有功能均正常運作。\n\n如在使用過程中發現任何殘餘問題，請立即告知。對今次異常造成的不便，再次致歉。`,w:`✅ 服務已恢復正常！所有功能確認正常運作。如仍有異常請立即告知。再次為今次不便致歉 🙏`},
   '事件摘要':{e:`以下是今次服務異常的事件摘要：\n\n• 發生時間：[時間]\n• 恢復時間：{ref}\n• 受影響服務：[說明]\n• 根本原因：[說明]\n• 預防措施：[說明]\n\n我們對此次事件深表歉意，並承諾採取改善措施防止類似情況再次發生。`,w:`服務異常事件摘要：發生 [時間]，恢復 {ref}，原因 [說明]，預防措施 [說明]。深表歉意並承諾改善 🙏`},
   '後續改善':{e:`就今次服務異常，我們已制定以下後續改善措施：\n\n• [改善措施 1]\n• [改善措施 2]\n\n我們承諾持續改善系統穩定性，確保類似事件不再發生。`,w:`後續改善措施：[說明]。我們承諾改善系統穩定性，確保不再發生類似事件 💪`},
@@ -471,15 +522,15 @@ const BODY = {
   '轉交專責人員':{e:`就您的查詢，已轉交相關專責人員跟進。負責人員將盡快直接聯絡您。如有緊急情況，請通過緊急聯絡方式聯絡。`,w:`已轉交專責人員，將盡快聯絡您。緊急情況請聯絡緊急渠道 🙏`},
  },
  '客戶關係':{
-  '新客戶關懷':{e:`再次歡迎您使用 {brand}！\n\n您已成功啟用系統，作為新客戶，我們為您準備了以下資源：\n\n• 新手入門指引（已附上）\n• 客服支援聯絡方式\n• 常見問題解答\n\n如在使用過程中有任何疑問，請隨時聯絡我們的支援團隊。我們期待與您長期合作！`,w:`歡迎加入 {brand}！🎉 已附上新手入門指引，有任何問題隨時聯絡我們的支援團隊。期待與您長期合作！😊`},
+  '新客戶關懷':{e:`再次歡迎您使用 {brand}！\n\n您已成功啟用系統，作為新客戶，我們為您準備了以下資源：\n\n• 新手入門指引（已附上）\n• 客服支援聯絡方式\n• 常見問題解答\n\n如在使用過程中有任何疑問，請隨時聯絡我們的支援團隊。`,w:`歡迎加入 {brand}！🎉 已附上新手入門指引，有任何問題隨時聯絡我們的支援團隊。期待與您長期合作！😊`},
   '使用情況跟進':{e:`您好！希望您使用 {brand} 系統一切順利。\n\n我們想了解您目前的系統使用情況，以確保系統能夠充分協助您的業務。請問有沒有任何需要協助的地方，或對系統有任何想法？`,w:`您好！跟進一下 {brand} 的使用情況，一切順利嗎？有需要協助的地方或任何想法都歡迎告知 😊`},
   '低使用率關懷':{e:`我們注意到近期您的帳戶使用率較低，希望確認一切正常，並了解是否有我們可以協助的地方。\n\n常見的原因包括：介面不熟悉、缺乏某些功能、或需要額外培訓支援。如有任何困難，請告知，我們樂意提供支援。`,w:`注意到近期帳戶使用率較低，一切 OK 嗎？如有任何困難（介面不熟悉、缺少功能等）請告知，我們提供支援 😊`},
   '滿意度調查':{e:`感謝您持續使用 {brand}！為了持續改善我們的服務，誠邀您參加一個簡短的滿意度調查（約 2–3 分鐘）。\n\n您的意見對我們非常寶貴，調查結果將用於改善系統及服務品質。`,w:`感謝使用 {brand}！誠邀您參加 2-3 分鐘滿意度調查，您的意見非常寶貴，幫助我們持續改善 🙏 方便嗎？`},
-  '邀請提供意見':{e:`您好！我們一直致力改善 {brand} 的系統及服務。作為我們的用戶，您的意見對我們非常重要。\n\n請問您對目前系統有任何改善建議，或對我們的服務有任何意見？任何正面或負面的意見都非常歡迎。`,w:`我們一直努力改善服務，您的意見對我們很重要！對 {brand} 有任何改善建議嗎？正負面意見都非常歡迎 😊`},
+  '邀請提供意見':{e:`我們一直致力改善 {brand} 的系統及服務。作為我們的用戶，您的意見對我們非常重要。\n\n請問您對目前系統有任何改善建議，或對我們的服務有任何意見？任何正面或負面的意見都非常歡迎。`,w:`我們一直努力改善服務，您的意見對我們很重要！對 {brand} 有任何改善建議嗎？正負面意見都非常歡迎 😊`},
   '邀請評價':{e:`感謝您持續使用及支持 {brand}！\n\n如您對我們的系統或服務感到滿意，誠邀您在相關平台留下評價，讓更多有需要的機構了解我們的服務。您的支持對我們意義重大！`,w:`感謝您的支持！如對 {brand} 滿意，誠邀留下評價 ⭐ 讓更多人了解我們，非常感謝！`},
-  '邀請案例分享':{e:`感謝您使用 {brand} 以來的一路支持！我們誠意邀請您參與客戶成功案例分享，分享內容可包括您的業務挑戰及使用 {brand} 後的改變及成效。如有興趣，我們可以安排專人與您進一步溝通。`,w:`誠邀您分享使用 {brand} 的成功案例 ✨ 可以分享業務挑戰及使用後的改變。有興趣嗎？可以進一步討論 😊`},
+  '邀請案例分享':{e:`感謝您使用 {brand} 以來的一路支持！我們誠意邀請您參與客戶成功案例分享，分享您的業務挑戰及使用 {brand} 後的改變及成效。如有興趣，我們可以安排專人與您進一步溝通。`,w:`誠邀您分享使用 {brand} 的成功案例 ✨ 有興趣嗎？可以進一步討論 😊`},
   '轉介邀請':{e:`感謝您一直以來的支持！如您對 {brand} 感到滿意，歡迎推薦給有類似需要的朋友或商業夥伴。\n\n您的推薦是我們最大的認可，我們亦設有轉介優惠計劃，詳情請聯絡我們。`,w:`感謝您的支持！如對 {brand} 滿意，歡迎推薦給有類似需要的朋友 😊 我們設有轉介優惠，詳情可以問我們 🎁`},
-  '舊客戶重新聯絡':{e:`您好！希望您一切安好。距離上次合作已有一段時間，我們誠意重新聯絡，了解貴機構目前的業務情況。\n\n{brand} 在這段期間亦推出了多項新功能及改善，或許能夠更好地配合您目前的業務需要。如有興趣，歡迎安排一次簡短的更新介紹。`,w:`您好！好久不見，希望業務一切順利 😊 {brand} 最近推出了不少新功能，有興趣了解一下嗎？可以安排簡短介紹 🎉`},
+  '舊客戶重新聯絡':{e:`您好！希望您一切安好。距離上次合作已有一段時間，我們誠意重新聯絡，了解貴機構目前的業務情況。\n\n{brand} 在這段期間亦推出了多項新功能及改善，或許能夠更好地配合您目前的業務需要。如有興趣，歡迎安排一次簡短的更新介紹。`,w:`您好！好久不見，希望業務一切順利 😊 {brand} 最近推出了不少新功能，有興趣了解一下嗎？`},
   '感謝合作':{e:`衷心感謝您與 {brand} 的合作！\n\n與您的合作是我們的榮幸，希望 {brand} 為貴機構帶來了實際的業務價值。如日後有任何需要，我們隨時歡迎您再次聯絡。祝業務蒸蒸日上！`,w:`衷心感謝與您的合作！🙏 與您合作是我們的榮幸，希望 {brand} 帶來了實際幫助。如有需要隨時找我們，祝業務一切順利！😊`},
  },
  '通用對話':{
@@ -489,7 +540,7 @@ const BODY = {
   '等待其他部門':{e:`就您的查詢，我們正在等待 [部門名稱] 確認相關資料，預計在 [時間] 內回覆您。感謝您的耐心等待。`,w:`正在等待 [部門] 確認資料，預計 [時間] 內回覆，感謝耐心等待 🙏`},
   '轉交同事':{e:`就您的查詢，我們已轉交最適合跟進的同事 {agent} 處理。{agent} 將盡快直接聯絡您。`,w:`已轉交同事 {agent} 跟進，將盡快聯絡您 ✅`},
   '重複查詢合併':{e:`我們注意到您的查詢與早前記錄（{ref}）為同一事項，我們已將兩個查詢合併跟進，以確保處理一致。`,w:`發現與之前個案（{ref}）為同一事項，已合併跟進確保一致處理 ✅`},
-  '無法理解問題':{e:`感謝您的訊息。很抱歉，我們對您的查詢未能完全理解，麻煩您進一步說明：\n\n• 您希望解決什麼問題？\n• 目前遇到的具體情況是什麼？\n\n越詳細的說明越有助我們為您提供準確的協助。`,w:`抱歉未能完全理解您的查詢 🙏 能夠進一步說明嗎？例如：想解決什麼問題？目前具體情況是什麼？謝謝！`},
+  '無法理解問題':{e:`感謝您的訊息。很抱歉，我們對您的查詢未能完全理解，麻煩您進一步說明：\n\n• 您希望解決什麼問題？\n• 目前遇到的具體情況是什麼？`,w:`抱歉未能完全理解您的查詢 🙏 能夠進一步說明嗎？例如：想解決什麼問題？目前具體情況是什麼？謝謝！`},
   '要求轉用電郵':{e:`就您的查詢，由於涉及較複雜的技術問題或需要傳送文件，建議通過電郵繼續溝通，以便更清晰地處理。請在電郵中注明參考編號：{ref}。`,w:`這個問題建議改用電郵溝通，方便傳送文件及清晰記錄。請在電郵中注明參考號：{ref} 📧`},
   '附件遺漏':{e:`感謝您的電郵，但我們注意到您提及的附件並沒有附上。麻煩重新傳送電郵並附上相關文件。`,w:`您好！收到您的訊息，但附件好像沒有附上 😅 麻煩重新發送一次並附上文件，謝謝！`},
   '連結失效':{e:`感謝告知，我們已發現相關連結失效的問題。最新連結如下：\n\n[新連結]\n\n如仍有問題，請告知。`,w:`感謝告知連結失效！最新連結：[連結]。如仍有問題請告知 😊`},
@@ -504,15 +555,15 @@ const BODY = {
   '補貨':{e:`就您查詢的補貨情況，所訂購的商品預計將於 {ref} 到貨。\n\n如您希望預留，請告知，我們到貨後優先為您安排出貨。`,w:`商品預計 {ref} 補貨到！如您想預留，請告知，到貨後優先為您出貨 😊`},
   '預購':{e:`感謝您的預購！商品預計發售日期為 {ref}。\n\n我們已為您記錄預購，發售後將優先安排出貨，出貨前會通知您確認。`,w:`感謝預購！商品預計發售日期 {ref}，已記錄您的預購，發售後優先安排出貨通知您 🎉`},
   '出貨':{e:`好消息！您的訂單（{ref}）已出貨。\n\n物流追蹤資料：\n• 物流公司：[物流商]\n• 追蹤號碼：[追蹤號]\n\n預計送達時間：[時間]。如有任何問題，請隨時聯絡。`,w:`✅ 訂單（{ref}）已出貨！物流：[物流商]，追蹤號：[追蹤號]，預計送達：[時間]。有問題隨時告知 😊`},
-  '物流追蹤':{e:`就您查詢訂單（{ref}）的物流情況：\n\n• 物流公司：[物流商]\n• 追蹤號碼：[追蹤號]\n• 目前狀態：[狀態]\n\n如物流追蹤有問題，請告知我們協助跟進。`,w:`訂單 {ref} 物流：[物流商]，追蹤號 [追蹤號]，當前狀態：[狀態]。有問題隨時告知 📦`},
+  '物流追蹤':{e:`就您查詢訂單（{ref}）的物流情況：\n\n• 物流公司：[物流商]\n• 追蹤號碼：[追蹤號]\n• 目前狀態：[狀態]`,w:`訂單 {ref} 物流：[物流商]，追蹤號 [追蹤號]，當前狀態：[狀態]。有問題隨時告知 📦`},
   '延誤':{e:`非常抱歉，您的訂單（{ref}）出貨有所延誤。受 [延誤原因] 影響，更新預計送達時間：[新時間]。\n\n對此造成的不便，我們深表歉意。`,w:`非常抱歉訂單（{ref}）延誤！原因：[說明]，更新預計送達：[時間]。對不便深表歉意 🙏`},
   '派送失敗':{e:`就您的訂單（{ref}），物流公司通知未能成功派送，原因為 [原因]。\n\n請問您希望如何安排？\n• 重新預約派送時間\n• 更改送貨地址\n• 自取（如適用）`,w:`訂單 {ref} 未能成功派送（原因：[說明]）。您希望重新預約/更改地址/自取？請告知 🚚`},
   '遺失':{e:`非常抱歉，訂單（{ref}）的貨件在物流過程中疑似遺失。我們已即時向物流公司提出追查。\n\n在調查結果確定前，我們建議先安排補發貨品，以免影響您的業務。請告知您的意見。`,w:`非常抱歉！訂單 {ref} 貨件疑似遺失，已向物流公司追查 😔 建議先安排補發，您覺得如何？`},
   '錯貨':{e:`非常抱歉，您收到的貨品與訂單不符。對此造成的不便，我們深感歉意。\n\n麻煩提供收到的貨品照片及訂單編號（{ref}），確認後我們將安排換貨，並收回錯誤發出的貨品。`,w:`非常抱歉發錯貨了！😔 請提供收到貨品的照片及訂單號（{ref}），確認後安排換貨並收回錯誤貨品 🙏`},
   '漏貨':{e:`非常抱歉，您的訂單（{ref}）出現漏發的情況。請核對訂單中缺少哪件貨品，我們將盡快安排補發。`,w:`非常抱歉漏發貨品！😔 訂單 {ref} 缺少哪件請告知，我們盡快安排補發 🙏`},
   '損壞':{e:`非常抱歉，您收到的貨品在運送過程中出現損壞。麻煩提供損壞貨品的照片，我們將安排換貨或退款處理。`,w:`非常抱歉收到損壞貨品！😔 麻煩提供損壞照片，我們安排換貨或退款 🙏`},
-  '退換貨':{e:`就您申請退換貨，請注意以下事項：\n\n• 貨品需保持原包裝\n• 訂單編號：{ref}\n\n確認後我們將安排退換貨安排及處理相關費用。`,w:`退換貨申請已收到（{ref}）。需保持原包裝。確認後安排退換及費用處理 ✅`},
-  '退款':{e:`就您的退款申請（訂單 {ref}），我們將安排退款至原付款方式。退款通常需要 5–7 個工作天處理，請耐心等待。如有任何問題，請隨時聯絡。`,w:`退款已安排！訂單 {ref}，退至原付款方式，5-7 個工作天處理。請耐心等待 💳`},
+  '退換貨':{e:`就您申請退換貨（訂單 {ref}），請注意以下事項：\n\n• 貨品需保持原包裝\n\n確認後我們將安排退換貨安排及處理相關費用。`,w:`退換貨申請已收到（{ref}）。需保持原包裝。確認後安排退換及費用處理 ✅`},
+  '退款':{e:`就您的退款申請（訂單 {ref}），我們將安排退款至原付款方式。退款通常需要 5–7 個工作天處理，請耐心等待。`,w:`退款已安排！訂單 {ref}，退至原付款方式，5-7 個工作天處理。請耐心等待 💳`},
   '保養':{e:`就您查詢的保養事宜，請提供購買證明及問題描述，我們將按照保養條款為您安排跟進。`,w:`申請保養請提供購買證明及問題描述，我們按保養條款為您跟進 ✅`},
   '優惠碼及會員查詢':{e:`就您查詢的優惠碼／會員資料：\n\n[優惠碼/會員相關說明]\n\n如對優惠碼或會員計劃有任何問題，請告知。`,w:`優惠碼/會員查詢：[說明]。有其他問題請告知 🎁`},
  },
@@ -543,215 +594,299 @@ const CAT_COLORS = {
   '客戶關係':['#047857','#d1fae5'],'通用對話':['#4b5563','#f3f4f6'],'零售／網店':['#be185d','#fce7f3'],
 };
 
+const he = s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
 // ═══════════════════════════════════════════
-// STATE
+// CS STATE & FUNCTIONS
 // ═══════════════════════════════════════════
 let ST = {
-  brand:'BizCore ERP', agent:'', coEmail:'', coWa:'',
-  cname:'', ref:'', ctype:'企業客戶',
-  cat:Object.keys(CATS)[0], subcat:'',
-  status:'跟進中', tone:'中性告知', style:'正式',
-  channel:'email', addContact:true, addSign:true,
+  brand:'OmniStompboxs ERP',agent:'',coEmail:'',coWa:'',
+  cname:'',ref:'',ctype:'企業客戶',
+  cat:Object.keys(CATS)[0],subcat:'',
+  status:'跟進中',tone:'中性告知',style:'正式',
+  channel:'email',addContact:true,addSign:true,
 };
-ST.subcat = CATS[ST.cat][0];
+ST.subcat=CATS[ST.cat][0];
 
-// ═══════════════════════════════════════════
-// GENERATOR
-// ═══════════════════════════════════════════
-const he = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function fill(str,p){return str.replace(/\{brand\}/g,p.brand||'OmniStompboxs').replace(/\{name\}/g,p.name||'您').replace(/\{ref\}/g,p.ref?(p.ref.includes('-')||p.ref.includes('/')?p.ref:'#'+p.ref):'相關參考').replace(/\{agent\}/g,p.agent||'客服');}
 
-function fill(str, p) {
-  return str
-    .replace(/\{brand\}/g, p.brand||'BizCore')
-    .replace(/\{name\}/g, p.name||'您')
-    .replace(/\{ref\}/g, p.ref ? (p.ref.includes('-')||p.ref.includes('/')  ? p.ref : '#'+p.ref) : '相關參考')
-    .replace(/\{agent\}/g, p.agent||'客服');
-}
-
-function getOpeningEmail(tone, style, name, brand) {
-  const n = name ? name : '您';
-  const g = style==='正式' ? `尊敬的 ${n}，` : `您好，${n}，`;
-  const tos = {
+function getOpeningEmail(tone,style,name,brand){
+  const n=name?name:'您';
+  const g=style==='正式'?`尊敬的 ${n}，`:`您好，${n}，`;
+  const tos={
     '正式':{'道歉為主':`${g}\n\n感謝您聯絡 ${brand} 客服團隊。就您所遇到的情況，我們深感遺憾，並對為您帶來的不便深表歉意。`,'中性告知':`${g}\n\n感謝您聯絡 ${brand}。就您的查詢，我們已為您跟進，現回覆如下。`,'積極跟進':`${g}\n\n感謝您聯絡 ${brand}。我們已即時跟進您的請求，請放心。`,'感謝回應':`${g}\n\n非常感謝您的聯絡及一直以來對 ${brand} 的支持。`},
     '親切':{'道歉為主':`${g}\n\n感謝您聯絡 ${brand}！就您遇到的情況，我們感到非常抱歉，對為您帶來的不便衷心致歉。`,'中性告知':`${g}\n\n感謝您聯絡 ${brand}！關於您的查詢，我們已為您了解清楚，詳情如下。`,'積極跟進':`${g}\n\n感謝您的聯絡！我們已緊急跟進您的請求，請放心交給我們處理。`,'感謝回應':`${g}\n\n非常感謝您的聯絡及支持，能夠為您服務是我們的榮幸！`},
     '簡潔':{'道歉為主':`${g}\n\n感謝聯絡，就您遇到的問題，非常抱歉為您帶來不便。`,'中性告知':`${g}\n\n感謝聯絡，就您的查詢，回覆如下。`,'積極跟進':`${g}\n\n感謝聯絡，已即時跟進您的請求。`,'感謝回應':`${g}\n\n感謝您的聯絡及支持。`},
   };
-  return tos[style]?.[tone] || tos['正式']['中性告知'];
+  return tos[style]?.[tone]||tos['正式']['中性告知'];
 }
 
-function getStatusNote(status, channel) {
-  const em = channel==='email';
-  const m = {
-    '待跟進':em?'我們將於下一個工作天內安排跟進。':'我們將盡快跟進。',
-    '跟進中':em?'我們目前正積極跟進此事項，有任何進展將立即通知您。':'我們正在跟進中，有更新會通知您。',
-    '等待客戶回覆':em?'麻煩您在方便時回覆，以便我們繼續跟進。':'麻煩方便時回覆，讓我們繼續跟進 🙏',
-    '已完成':em?'此事項已處理完成，如有任何其他問題歡迎再次聯絡。':'已處理完成！有其他問題隨時找我們 ✅',
-    '已升級':em?'此個案已升級至高級支援團隊，將優先處理。':'已升級至高級團隊處理，優先跟進 ⚡',
-    '已轉交':em?'此事項已轉交相關部門處理，將有專人跟進。':'已轉交相關部門，將有專人跟進 ✅',
-  };
+function getStatusNote(status,channel){
+  const em=channel==='email';
+  const m={'待跟進':em?'我們將於下一個工作天內安排跟進。':'我們將盡快跟進。','跟進中':em?'我們目前正積極跟進此事項，有任何進展將立即通知您。':'我們正在跟進中，有更新會通知您。','等待客戶回覆':em?'麻煩您在方便時回覆，以便我們繼續跟進。':'麻煩方便時回覆，讓我們繼續跟進 🙏','已完成':em?'此事項已處理完成，如有任何其他問題歡迎再次聯絡。':'已處理完成！有其他問題隨時找我們 ✅','已升級':em?'此個案已升級至高級支援團隊，將優先處理。':'已升級至高級團隊處理，優先跟進 ⚡','已轉交':em?'此事項已轉交相關部門處理，將有專人跟進。':'已轉交相關部門，將有專人跟進 ✅'};
   return m[status]||'';
 }
 
-function getClosingEmail(style, brand, agent, email, wa) {
-  const lines = [];
-  if (ST.addContact && (email||wa)) {
-    lines.push('如有任何其他問題，歡迎透過以下方式聯絡我們：');
-    if (email) lines.push(`電郵：${email}`);
-    if (wa)    lines.push(`WhatsApp：${wa}`);
-  }
-  const contact = lines.length ? '\n\n'+lines.join('\n') : '';
-  const sign = ST.addSign ? (style==='簡潔' ? `\n\n${agent||brand+' 客服'}` : `\n\n此致\n${agent?agent+'\n':''}${brand} 客服團隊`) : '';
-  const thanks = {'正式':'感謝您的理解與支持。','親切':'再次感謝您的耐心及支持，期待繼續為您服務！','簡潔':'如有其他問題，請隨時聯絡。'};
+function getClosingEmail(style,brand,agent,email,wa){
+  const lines=[];
+  if(ST.addContact&&(email||wa)){lines.push('如有任何其他問題，歡迎透過以下方式聯絡我們：');if(email)lines.push(`電郵：${email}`);if(wa)lines.push(`WhatsApp：${wa}`);}
+  const contact=lines.length?'\n\n'+lines.join('\n'):'';
+  const sign=ST.addSign?(style==='簡潔'?`\n\n${agent||brand+' 客服'}`:`\n\n此致\n${agent?agent+'\n':''}${brand} 客服團隊`):'';
+  const thanks={'正式':'感謝您的理解與支持。','親切':'再次感謝您的耐心及支持，期待繼續為您服務！','簡潔':'如有其他問題，請隨時聯絡。'};
   return `${contact}\n\n${thanks[style]||thanks['正式']}${sign}`;
 }
 
-function getWAOpening(tone, name) {
-  const n = name||'您好';
-  const m = {'道歉為主':`您好，${n}！\n非常抱歉為您帶來不便 🙏`,'中性告知':`您好，${n}！\n感謝您的聯絡。`,'積極跟進':`您好，${n}！\n感謝聯絡，我們已即時跟進。`,'感謝回應':`您好，${n}！\n感謝您一直以來的支持 😊`};
+function getWAOpening(tone,name){
+  const n=name||'您好';
+  const m={'道歉為主':`您好，${n}！\n非常抱歉為您帶來不便 🙏`,'中性告知':`您好，${n}！\n感謝您的聯絡。`,'積極跟進':`您好，${n}！\n感謝聯絡，我們已即時跟進。`,'感謝回應':`您好，${n}！\n感謝您一直以來的支持 😊`};
   return m[tone]||m['中性告知'];
 }
 
-function getWAClosing(style, brand, agent, email, wa) {
-  const ci = [];
-  if (ST.addContact && (email||wa)) ci.push([email,wa].filter(Boolean).join(' / '));
-  const c = ci.length ? `\n\n如有需要可聯絡：${ci[0]}` : '';
-  const signs = {'正式':`${c}\n\n感謝您的合作。\n${agent?agent+'\n':''}${brand} 客服`,'親切':`${c}\n\n有任何問題隨時找我們！😊\n${agent?agent+'\n':''}${brand} 客服`,'簡潔':`${c}\n\n${agent||brand}`};
-  return ST.addSign ? (signs[style]||signs['正式']) : c;
+function getWAClosing(style,brand,agent,email,wa){
+  const ci=[];
+  if(ST.addContact&&(email||wa))ci.push([email,wa].filter(Boolean).join(' / '));
+  const c=ci.length?`\n\n如有需要可聯絡：${ci[0]}`:'';
+  const signs={'正式':`${c}\n\n感謝您的合作。\n${agent?agent+'\n':''}${brand} 客服`,'親切':`${c}\n\n有任何問題隨時找我們！😊\n${agent?agent+'\n':''}${brand} 客服`,'簡潔':`${c}\n\n${agent||brand}`};
+  return ST.addSign?(signs[style]||signs['正式']):c;
 }
 
-function generate() {
-  const p = { brand:ST.brand||'BizCore', name:ST.cname, ref:ST.ref, agent:ST.agent };
-  const tpl = BODY[ST.cat]?.[ST.subcat];
-  const rawB = tpl ? tpl[ST.channel==='email'?'e':'w'] : `【${ST.subcat}】相關處理正在跟進中，我們將盡快為您回覆。`;
-  const body = fill(rawB, p);
-  const sn = getStatusNote(ST.status, ST.channel);
-  if (ST.channel==='email') {
-    const op = fill(getOpeningEmail(ST.tone, ST.style, p.name, p.brand), p);
-    const cl = getClosingEmail(ST.style, p.brand, p.agent, ST.coEmail, ST.coWa);
-    return [op, body, sn, cl].filter(Boolean).join('\n\n');
-  } else {
-    const op = fill(getWAOpening(ST.tone, p.name), p);
-    const cl = getWAClosing(ST.style, p.brand, p.agent, ST.coEmail, ST.coWa);
-    return [op, body, sn, cl].filter(Boolean).join('\n\n');
+function generate(){
+  const p={brand:ST.brand||'OmniStompboxs',name:ST.cname,ref:ST.ref,agent:ST.agent};
+  const tpl=BODY[ST.cat]?.[ST.subcat];
+  const rawB=tpl?tpl[ST.channel==='email'?'e':'w']:`【${ST.subcat}】相關處理正在跟進中，我們將盡快為您回覆。`;
+  const body=fill(rawB,p);
+  const sn=getStatusNote(ST.status,ST.channel);
+  if(ST.channel==='email'){
+    const op=fill(getOpeningEmail(ST.tone,ST.style,p.name,p.brand),p);
+    const cl=getClosingEmail(ST.style,p.brand,p.agent,ST.coEmail,ST.coWa);
+    return[op,body,sn,cl].filter(Boolean).join('\n\n');
+  }else{
+    const op=fill(getWAOpening(ST.tone,p.name),p);
+    const cl=getWAClosing(ST.style,p.brand,p.agent,ST.coEmail,ST.coWa);
+    return[op,body,sn,cl].filter(Boolean).join('\n\n');
   }
 }
 
-function getSubject() {
-  const pf = SUBJ[ST.cat]||'【客服回覆】';
-  const rf = ST.ref ? ` #${ST.ref}` : '';
-  const nm = ST.cname ? ` ${ST.cname}` : '';
-  return `${pf}${rf}${nm}`.trim();
+function getSubject(){
+  const pf=SUBJ[ST.cat]||'【客服回覆】';
+  const rf=ST.ref?` #${ST.ref}`:'';
+  const nm=ST.cname?` ${ST.cname}`:'';
+  return`${pf}${rf}${nm}`.trim();
 }
 
-// ═══════════════════════════════════════════
-// UI
-// ═══════════════════════════════════════════
-function chip(label, active, onclick, ac) {
-  const cls = active
-    ? `chip-btn px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border ${ac||'bg-blue-600 text-white border-blue-600'}`
-    : 'chip-btn px-3 py-1 rounded-xl text-xs font-semibold cursor-pointer border border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
-  return `<button onclick="${onclick}" class="${cls}">${he(label)}</button>`;
+function chip(label,active,onclick,ac){
+  const cls=active?`chip-btn px-3 py-1 rounded-xl border text-xs font-semibold cursor-pointer ${ac||'bg-blue-600 text-white border-blue-600'}`:'chip-btn px-3 py-1 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-semibold cursor-pointer';
+  return`<button onclick="${onclick}" class="${cls}">${he(label)}</button>`;
 }
 
-function renderChips(id, opts, val, key, ac) {
-  const el = document.getElementById(id);
-  if (el) el.innerHTML = opts.map(o => chip(o, o===val, `setST('${key}','${o.replace(/'/g,"\\'")}')`, ac)).join('');
+function renderChips(id,opts,val,key,ac){const el=document.getElementById(id);if(el)el.innerHTML=opts.map(o=>chip(o,o===val,`setST('${key}','${o.replace(/'/g,"\\'")}')`,ac)).join('');}
+function setST(k,v){ST[k]=v;if(k==='cat'){ST.subcat=CATS[v]?.[0]||'';renderSubcats();}refreshAll();}
+function update(){ST.brand=document.getElementById('brand').value;ST.agent=document.getElementById('agent').value;ST.coEmail=document.getElementById('co-email').value;ST.coWa=document.getElementById('co-wa').value;ST.cname=document.getElementById('cname').value;ST.ref=document.getElementById('ref').value;ST.subcat=document.getElementById('subcat').value;refreshPreview();}
+function onCatChange(){ST.cat=document.getElementById('cat').value;ST.subcat=CATS[ST.cat]?.[0]||'';renderSubcats();refreshPreview();}
+function renderSubcats(){const s=document.getElementById('subcat');s.innerHTML=(CATS[ST.cat]||[]).map(c=>`<option value="${he(c)}"${c===ST.subcat?' selected':''}>${he(c)}</option>`).join('');}
+
+function refreshPreview(){
+  const msg=generate();const subj=getSubject();
+  const sb=document.getElementById('subject-box');
+  if(ST.channel==='email'){sb.classList.remove('hidden');document.getElementById('subject-text').textContent=subj;}else sb.classList.add('hidden');
+  document.getElementById('msg-body').textContent=msg;
+  document.getElementById('ch-badge').textContent=msg.length+' 字';
+  const hint=document.getElementById('ch-hint');
+  hint.textContent=ST.channel==='whatsapp'?`WhatsApp 版本（${msg.length} 字符）`:`電郵版本（${msg.length} 字符）`;
+  const cc=CAT_COLORS[ST.cat]||['#374151','#f3f4f6'];
+  const tags=[ST.cname&&{label:`👤 ${ST.cname}`,color:'#374151',bg:'#f1f5f9'},{label:ST.brand||'Brand',color:'#1d4ed8',bg:'#dbeafe'},{label:ST.cat,color:cc[0],bg:cc[1]},{label:ST.tone,color:'#92400e',bg:'#fef3c7'},{label:ST.style,color:'#7c3aed',bg:'#ede9fe'},{label:ST.channel==='email'?'✉️ 電郵':'💬 WhatsApp',color:'#0369a1',bg:'#e0f2fe'}].filter(Boolean);
+  document.getElementById('tag-row').innerHTML=tags.map(t=>`<span class="tag-b" style="color:${t.color};background:${t.bg}">${he(t.label)}</span>`).join('');
 }
 
-function setST(k, v) { ST[k]=v; if(k==='cat'){ST.subcat=CATS[v]?.[0]||'';renderSubcats();} refreshAll(); }
-
-function update() {
-  ST.brand   = document.getElementById('brand').value;
-  ST.agent   = document.getElementById('agent').value;
-  ST.coEmail = document.getElementById('co-email').value;
-  ST.coWa    = document.getElementById('co-wa').value;
-  ST.cname   = document.getElementById('cname').value;
-  ST.ref     = document.getElementById('ref').value;
-  ST.subcat  = document.getElementById('subcat').value;
+function refreshAll(){
+  renderChips('ctype-chips',CTYPES,ST.ctype,'ctype','bg-indigo-600 text-white border-indigo-600');
+  renderChips('status-chips',STATUSES,ST.status,'status','bg-green-600 text-white border-green-600');
+  renderChips('tone-chips',TONES,ST.tone,'tone','bg-amber-500 text-white border-amber-500');
+  renderChips('style-chips',STYLES,ST.style,'style','bg-purple-600 text-white border-purple-600');
   refreshPreview();
 }
 
-function onCatChange() {
-  ST.cat    = document.getElementById('cat').value;
-  ST.subcat = CATS[ST.cat]?.[0]||'';
-  renderSubcats();
-  refreshPreview();
-}
-
-function renderSubcats() {
-  const s = document.getElementById('subcat');
-  s.innerHTML = (CATS[ST.cat]||[]).map(c=>`<option value="${he(c)}"${c===ST.subcat?' selected':''}>${he(c)}</option>`).join('');
-}
-
-function setChannel(ch) {
-  ST.channel = ch;
-  ['email','wa'].forEach(c => {
-    const btn = document.getElementById(`btn-${c}`);
-    if (c===ch) btn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-blue-600 text-white shadow-sm';
-    else btn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200';
+function setChannel(ch){
+  ST.channel=ch;
+  ['email','wa'].forEach(c=>{
+    const btn=document.getElementById(`btn-${c}`);
+    if(c===ch)btn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-sm';
+    else btn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all';
   });
   refreshPreview();
 }
 
-function refreshPreview() {
-  const msg = generate();
-  const subj = getSubject();
-  const sb = document.getElementById('subject-box');
-  if (ST.channel==='email') { sb.classList.remove('hidden'); document.getElementById('subject-text').textContent=subj; }
-  else sb.classList.add('hidden');
-  document.getElementById('msg-body').textContent = msg;
-  document.getElementById('ch-badge').textContent = msg.length+' 字';
-  const hint = document.getElementById('ch-hint');
-  hint.textContent = ST.channel==='whatsapp'
-    ? `WhatsApp 版本（${msg.length} 字符）`
-    : `電郵版本（${msg.length} 字符）· 建議貼入電郵客戶端後再調整格式`;
-  // Tags
-  const cc = CAT_COLORS[ST.cat]||['#374151','#f3f4f6'];
-  const tags = [
-    ST.cname && { label:`👤 ${ST.cname}`, color:'#374151', bg:'#f1f5f9' },
-    { label:ST.brand||'Brand', color:'#1d4ed8', bg:'#dbeafe' },
-    { label:ST.cat, color:cc[0], bg:cc[1] },
-    { label:ST.tone, color:'#92400e', bg:'#fef3c7' },
-    { label:ST.style, color:'#7c3aed', bg:'#ede9fe' },
-    { label:ST.channel==='email'?'✉️ 電郵':'💬 WhatsApp', color:'#0369a1', bg:'#e0f2fe' },
-  ].filter(Boolean);
-  document.getElementById('tag-row').innerHTML = tags.map(t=>
-    `<span class="tag-b" style="color:${t.color};background:${t.bg}">${he(t.label)}</span>`
+async function copyMsg(){
+  const msg=generate();
+  const full=ST.channel==='email'?`主旨：${getSubject()}\n\n${msg}`:msg;
+  try{
+    await navigator.clipboard.writeText(full);
+    const btn=document.getElementById('copy-btn');const orig=btn.innerHTML;
+    btn.innerHTML='✅ 已複製！';btn.style.background='#16a34a';
+    setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);
+  }catch(e){alert('複製失敗，請手動複製');}
+}
+
+// ═══════════════════════════════════════════
+// BLOG STATE & FUNCTIONS
+// ═══════════════════════════════════════════
+let BS={type:'系統更新',stopType:'暫停使用'};
+
+function bvr(id,ph){const el=document.getElementById(id);return el&&el.value.trim()?el.value.trim():`{{${ph}}}`;}
+
+function blogTitleRaw(){
+  return BS.type==='系統更新'
+    ?`系統更新｜${bvr('b-sysName','系統名稱')}：${bvr('b-updateKey','更新重點')}`
+    :`服務通知｜${bvr('b-maintSysName','系統名稱')}：${bvr('b-maintDate','維護日期')} 預定維護`;
+}
+
+function blogSummaryRaw(){
+  if(BS.type==='系統更新'){
+    return`${bvr('b-sysName','系統名稱')} 本次新增／優化 ${bvr('b-funcName','功能名稱')}，協助 ${bvr('b-userRole','使用角色')} 在 ${bvr('b-workContext','工作情境')} 中 ${bvr('b-improvement','實際改善')}。本文介紹更新內容、適用範圍及使用方法。`;
+  }else{
+    return`${bvr('b-maintSysName','系統名稱')} 將於 ${bvr('b-startTime','開始時間')} 至 ${bvr('b-endTime','預計結束時間')}\n（${bvr('b-timezone','時區')}）進行維護，期間 ${bvr('b-affectedService','受影響服務')} 將\n${BS.stopType}。`;
+  }
+}
+
+function blogBodyRaw(){
+  if(BS.type==='系統更新'){
+    const mod=bvr('b-funcModule','功能模組');
+    return[
+      `${bvr('b-updateDate','更新日期')}｜${bvr('b-sysName','系統名稱')}｜${mod}`,'',
+      `${bvr('b-userRole','使用角色')} 在處理 ${bvr('b-workContext','工作情境')} 時，經常需要 ${bvr('b-oldMethod','原有做法或困難')}。這次我們為 ${mod} 加入 ${bvr('b-updateTitle','更新名稱')}，讓 ${bvr('b-confirmedImprove','已確認的改善')}。`,'',
+      '這次更新了甚麼',
+      bvr('b-whatChanged','新增或調整的功能，寫清楚實際行為，以及與原有版本的分別。'),'',
+      '對誰有幫助',
+      `${bvr('b-targetRole','適用角色')} 可以利用這項更新 ${bvr('b-usage','用途')}，減少 ${bvr('b-reduceWork','重複工作或跟進困難')}。`,'',
+      '如何使用',
+      bvr('b-step1','操作步驟一'),
+      bvr('b-step2','操作步驟二'),
+      bvr('b-afterResult','完成後會看到的結果'),'',
+      '適用範圍與注意事項',
+      bvr('b-scope','適用系統、模組、帳戶角色、是否需要啟用，以及已知限制。只填已確認資料。'),'',
+      '下一步',
+      bvr('b-nextExisting','已使用系統的客戶應做甚麼；有興趣的客戶可以查看哪個功能頁或聯絡安排示範。'),'',
+      `查看${bvr('b-funcName','功能名稱')} → ${bvr('b-pageLink','功能頁連結')}`,
+    ].join('\n');
+  }else{
+    const lines=[
+      `為進行 ${bvr('b-maintPurpose','已確認的維護目的')}，我們將安排以下維護：`,'',
+      '維護時間',
+      `${bvr('b-startTime','開始日期及時間')} 至 ${bvr('b-endTime','預計結束日期及時間')}`,
+      `時區：${bvr('b-timezone','時區')}`,'',
+      '影響範圍',
+      bvr('b-affectedDetail','受影響的系統、模組、用戶及操作。'),
+    ];
+    const unaf=document.getElementById('b-unaffectedDetail')?.value.trim();
+    if(unaf)lines.push(unaf);
+    lines.push('','維護前請注意',bvr('b-beforeNote','用戶需要提前完成、儲存或暫停的操作。'),'','維護完成後',`我們會於 ${bvr('b-notifyChannel','通知渠道')} 更新服務狀態。`,'如時間安排有變，會另行通知。','',`如有查詢，請透過 ${bvr('b-contactMethod','聯絡方式')} 聯絡我們。`,'感謝你的理解與配合。');
+    return lines.join('\n');
+  }
+}
+
+const BLOG_SEC_H=new Set(['這次更新了甚麼','對誰有幫助','如何使用','適用範圍與注意事項','下一步','維護時間','影響範圍','維護前請注意','維護完成後']);
+
+function blogToHtml(raw,type){
+  return raw.trim().split(/\n\n+/).map((para,pi)=>{
+    const lines=para.split('\n');
+    const html=lines.map((line,li)=>{
+      const t=line.trim();
+      if(BLOG_SEC_H.has(t)){
+        const cls=type==='maint'?'blog-sec blog-sec-org':'blog-sec';
+        return`<strong class="${cls}">${he(t)}</strong>`;
+      }
+      const esc=he(line).replace(/\{\{([^}]+)\}\}/g,(_,p)=>`<span class="ph">{{${p}}}</span>`);
+      if(pi===0&&li===0&&type==='update'&&line.includes('｜'))return`<span class="blog-dateline">${esc}</span>`;
+      return esc;
+    }).join('<br>');
+    return`<p class="mb-2">${html}</p>`;
+  }).join('');
+}
+
+function refreshBlogPreview(){
+  const tr=blogTitleRaw(),sr=blogSummaryRaw(),br=blogBodyRaw();
+  const isU=BS.type==='系統更新';
+  document.getElementById('blog-title-preview').innerHTML=he(tr).replace(/\{\{([^}]+)\}\}/g,(_,p)=>`<span class="ph">{{${p}}}</span>`);
+  document.getElementById('blog-summary-preview').innerHTML=he(sr).replace(/\n/g,'<br>').replace(/\{\{([^}]+)\}\}/g,(_,p)=>`<span class="ph">{{${p}}}</span>`);
+  document.getElementById('blog-body-preview').innerHTML=blogToHtml(br,isU?'update':'maint');
+  const stripped=s=>s.replace(/\{\{[^}]+\}\}/g,'');
+  document.getElementById('blog-title-count').textContent=stripped(tr).length+' 字';
+  document.getElementById('blog-summary-count').textContent=stripped(sr).length+' 字';
+  document.getElementById('blog-body-count').textContent=stripped(br).length+' 字';
+  document.getElementById('blog-total-count').textContent='共 '+(stripped(tr)+stripped(sr)+stripped(br)).length+' 字';
+  const tags=[
+    {label:BS.type,color:isU?'#1d4ed8':'#d97706',bg:isU?'#dbeafe':'#fef3c7'},
+    {label:isU?'📝 系統更新文章':'🔧 維護通知',color:'#374151',bg:'#f1f5f9'},
+  ];
+  document.getElementById('blog-tag-row').innerHTML=tags.map(t=>`<span class="tag-b" style="color:${t.color};background:${t.bg}">${he(t.label)}</span>`).join('');
+}
+
+function blogUpdate(){refreshBlogPreview();}
+
+function setBlogType(t){
+  BS.type=t;
+  document.getElementById('blog-update-form').style.display=t==='系統更新'?'block':'none';
+  document.getElementById('blog-maint-form').style.display=t==='系統更新'?'none':'block';
+  renderBlogChips();refreshBlogPreview();
+}
+
+function setStopType(t){BS.stopType=t;renderBlogChips();refreshBlogPreview();}
+
+function renderBlogChips(){
+  document.getElementById('blog-type-chips').innerHTML=['系統更新','維護通知'].map(t=>
+    chip(t,t===BS.type,`setBlogType('${t}')`,t==='系統更新'?'bg-blue-600 text-white border-blue-600':'bg-orange-500 text-white border-orange-500')
+  ).join('');
+  const sc=document.getElementById('stop-type-chips');
+  if(sc)sc.innerHTML=['暫停使用','間歇性無法使用'].map(t=>
+    chip(t,t===BS.stopType,`setStopType('${t}')`, 'bg-orange-500 text-white border-orange-500')
   ).join('');
 }
 
-function refreshAll() {
-  renderChips('ctype-chips',  CTYPES,   ST.ctype,  'ctype',  'bg-indigo-600 text-white border-indigo-600');
-  renderChips('status-chips', STATUSES, ST.status, 'status', 'bg-green-600 text-white border-green-600');
-  renderChips('tone-chips',   TONES,    ST.tone,   'tone',   'bg-amber-500 text-white border-amber-500');
-  renderChips('style-chips',  STYLES,   ST.style,  'style',  'bg-purple-600 text-white border-purple-600');
-  refreshPreview();
+async function copyBlogSection(section){
+  const t=blogTitleRaw(),s=blogSummaryRaw(),b=blogBodyRaw();
+  let text='';
+  if(section==='title')text=t;
+  else if(section==='summary')text=s;
+  else if(section==='body')text=b;
+  else text=`標題：${t}\n\n摘要：\n${s}\n\n內文：\n${b}`;
+  try{
+    await navigator.clipboard.writeText(text);
+    if(section==='all'){
+      const btn=document.getElementById('copy-blog-all-btn');const orig=btn.innerHTML;
+      btn.innerHTML='✅ 已複製！';btn.style.background='#16a34a';
+      setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},2000);
+    }
+  }catch(e){alert('複製失敗，請手動複製');}
 }
 
-async function copyMsg() {
-  const msg = generate();
-  const full = ST.channel==='email' ? `主旨：${getSubject()}\n\n${msg}` : msg;
-  try {
-    await navigator.clipboard.writeText(full);
-    const btn = document.getElementById('copy-btn');
-    const orig = btn.innerHTML;
-    btn.innerHTML='✅ 已複製！';
-    btn.classList.add('bg-green-600'); btn.classList.remove('bg-blue-600','hover:bg-blue-500');
-    setTimeout(()=>{ btn.innerHTML=orig; btn.classList.remove('bg-green-600'); btn.classList.add('bg-blue-600','hover:bg-blue-500'); }, 2000);
-  } catch(e) { alert('複製失敗，請手動複製'); }
+// ═══════════════════════════════════════════
+// MODE TOGGLE
+// ═══════════════════════════════════════════
+function setMode(m){
+  const csBtn=document.getElementById('mode-cs'),blogBtn=document.getElementById('mode-blog');
+  const cc=document.getElementById('cs-container'),bc=document.getElementById('blog-container');
+  const hc=document.getElementById('hdr-count');
+  if(m==='cs'){
+    csBtn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-sm';
+    blogBtn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all';
+    cc.style.display='flex';bc.style.display='none';hc.style.display='';
+  }else{
+    blogBtn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-sm';
+    csBtn.className='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-200 transition-all';
+    cc.style.display='none';bc.style.display='flex';hc.style.display='none';
+    renderBlogChips();refreshBlogPreview();
+  }
 }
 
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
-(function init() {
-  let total = 0;
-  Object.values(CATS).forEach(v => total += v.length);
-  document.getElementById('total-count').textContent = total;
-  const cs = document.getElementById('cat');
-  cs.innerHTML = Object.keys(CATS).map(c=>`<option value="${he(c)}"${c===ST.cat?' selected':''}>${he(c)}</option>`).join('');
-  renderSubcats();
-  refreshAll();
+(function init(){
+  let total=0;Object.values(CATS).forEach(v=>total+=v.length);
+  document.getElementById('total-count').textContent=total;
+  const cs=document.getElementById('cat');
+  cs.innerHTML=Object.keys(CATS).map(c=>`<option value="${he(c)}"${c===ST.cat?' selected':''}>${he(c)}</option>`).join('');
+  renderSubcats();refreshAll();renderBlogChips();
 })();
 </script>
 </body>
