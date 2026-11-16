@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BatchMail — Outlook 批量個人化電郵工具</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin { animation: spin 1s linear infinite; display: inline-block; }
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+</style>
+</head>
+<body class="bg-gray-100 h-screen flex flex-col text-sm">
+
+<!-- Hidden file inputs (persistent outside step panels) -->
+<input type="file" id="data-file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="onDataFile(this)">
+<input type="file" id="pdf-file-input"  accept=".pdf"            style="display:none" onchange="onPDFFile(this)">
+
+<!-- ═══ HEADER ═══ -->
+<header class="bg-white border-b border-gray-200 px-6 flex-shrink-0 flex items-center justify-between" style="height:56px">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+    <div>
+      <div class="font-bold text-gray-900 leading-tight">BatchMail</div>
+      <div class="text-xs text-gray-500 leading-tight">Outlook 批量個人化電郵工具</div>
+    </div>
+  </div>
+  <div id="hdr-status" class="flex items-center gap-4"></div>
+</header>
+
+<!-- ═══ BODY LAYOUT ═══ -->
+<div class="flex flex-1 overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-60 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+    <div class="flex-1 p-4 overflow-y-auto">
+      <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">操作步驟</div>
+      <nav id="steps-nav" class="space-y-0.5"></nav>
+    </div>
+    <div class="p-4 border-t border-gray-100 flex-shrink-0">
+      <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">批次概覽</div>
+      <div id="overview" class="space-y-2"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main" class="flex-1 overflow-auto">
+    <div class="p-8">
+      <div id="panel-1" class="step-panel"></div>
+      <div id="panel-2" class="step-panel"></div>
+      <div id="panel-3" class="step-panel"></div>
+      <div id="panel-4" class="step-panel"></div>
+      <div id="panel-5" class="step-panel"></div>
+      <div id="panel-6" class="step-panel"></div>
+      <div class="max-w-5xl mt-10 pt-4 border-t border-gray-200 flex justify-between">
+        <button id="btn-prev" onclick="prevStep()"
+          class="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          ← 上一步
+        </button>
+        <button id="btn-next" onclick="nextStep()"
+          class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          下一步 ›
+        </button>
+      </div>
+    </div>
+  </main>
+
+</div><!-- end flex -->
+
+<script>
+// ════════════════════════════════════════════════════════
+// ICONS
+// ════════════════════════════════════════════════════════
+const I = {
+  upload:    n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+  filetext:  n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  mail:      n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+  paperclip: n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>`,
+  eye:       n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  send:      n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+  check:     n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+  x:         n=>`<svg width="${n||12}" height="${n||12}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  download:  n=>`<svg width="${n||16}" height="${n||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+};
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+const DEFAULT_COLS = ['Name','Position','Company','Email','Department','Date'];
+const DEFAULT_DATA = [
+  {Name:'Alice Chan', Position:'Manager',   Company:'ABC Corp', Email:'alice@abc.com', Department:'HR',      Date:'2026-08-27'},
+  {Name:'Bob Lee',    Position:'Director',  Company:'XYZ Ltd',  Email:'bob@xyz.com',  Department:'Finance', Date:'2026-08-27'},
+  {Name:'Carol Wong', Position:'Executive', Company:'DEF Inc',  Email:'carol@def.com',Department:'Sales',   Date:'2026-08-27'},
+];
+
+const S = {
+  step:       1,
+  file:       null,
+  cols:       [...DEFAULT_COLS],
+  rows:       DEFAULT_DATA.map(r=>({...r})),
+  subject:    'Invitation for <Name> - Annual Conference 2026',
+  body:       'Dear <Name>,\n\nWe are pleased to invite you to our upcoming annual conference.\n\nYour role as <Position> at <Company> has been noted in our records.\n\nPlease find the attached document for further details.\n\nBest regards,',
+  sig:        'John Smith\nHead of Business Development\nABC Company Limited\nTel: +852 1234 5678\nEmail: john@abccompany.com',
+  pdf:        null,
+  pdfFile:    null,
+  genCount:   0,
+  generating: false,
+  hasLogo:    false,
+  logoUrl:    '',
+  preview:    0,
+};
+
+const STEPS = [
+  {id:1, label:'資料來源',    desc:'上傳 Excel / CSV', icon:'upload'},
+  {id:2, label:'範本編輯器',  desc:'撰寫及設定標記',   icon:'filetext'},
+  {id:3, label:'簽名設定',    desc:'統一公司簽名',     icon:'mail'},
+  {id:4, label:'批次附件',    desc:'揀選 PDF 附件',    icon:'paperclip'},
+  {id:5, label:'預覽 & 生成', desc:'確認並生成 HTML',  icon:'eye'},
+  {id:6, label:'推送 Outlook',desc:'匯出 VBA 草稿',    icon:'send'},
+];
+
+// ════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Apply <Col> markers using function replacement (safe against $ in values)
+function sub(text, row) {
+  let r = text;
+  S.cols.forEach(c => {
+    const pat = new RegExp('<' + c.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '>', 'g');
+    const val = row[c] ?? '';
+    r = r.replace(pat, () => val);
+  });
+  return r;
+}
+
+function fmtBytes(b) {
+  return b<1024 ? b+' B' : b<1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+}
+
+function stepDone(id) {
+  if(id===1) return !!S.file;
+  if(id===3) return !!S.sig;
+  if(id===4) return !!S.pdf;
+  if(id===5) return S.genCount > 0;
+  return false;
+}
+
+// ════════════════════════════════════════════════════════
+// SIDEBAR RENDER
+// ════════════════════════════════════════════════════════
+function renderNav() {
+  document.getElementById('steps-nav').innerHTML = STEPS.map(step => {
+    const done=stepDone(step.id), active=S.step===step.id;
+    const iBg  = done ? 'bg-green-500' : active ? 'bg-blue-600' : 'bg-gray-200';
+    const iClr = (done||active) ? 'text-white' : 'text-gray-400';
+    const lClr = active ? 'text-blue-700' : done ? 'text-gray-700' : 'text-gray-400';
+    const dClr = active ? 'text-blue-400' : 'text-gray-400';
+    const bg   = active ? 'bg-blue-50' : 'hover:bg-gray-50';
+    return `<button onclick="goStep(${step.id})" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${bg}">
+      <div class="w-8 h-8 ${iBg} rounded-full flex items-center justify-center flex-shrink-0 ${iClr}">
+        ${done ? I.check() : I[step.icon]()}
+      </div>
+      <div>
+        <div class="font-medium ${lClr}">${step.label}</div>
+        <div class="text-xs ${dClr}">${step.desc}</div>
+      </div>
+    </button>`;
+  }).join('');
+
+  document.getElementById('overview').innerHTML = [
+    ['收件人', S.file ? `${S.rows.length} 位` : '—',                                        !!S.file],
+    ['附件',   S.pdf  ? (S.pdf.length>16?S.pdf.slice(0,13)+'…':S.pdf) : '未設定',           !!S.pdf],
+    ['已生成', `${S.genCount} / ${S.rows.length}`,                                            S.genCount>0],
+  ].map(([l,v,a])=>`<div class="flex justify-between text-xs">
+      <span class="text-gray-400">${l}</span>
+      <span class="font-medium ${a?'text-gray-700':'text-gray-400'}">${esc(v)}</span>
+    </div>`).join('');
+
+  document.getElementById('hdr-status').innerHTML = [
+    S.file && `<div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-400 rounded-full"></div><span class="text-xs text-gray-500">${S.rows.length} 位收件人已載入</span></div>`,
+    S.pdf  && `<div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-red-400   rounded-full"></div><span class="text-xs text-gray-500">附件已設定</span></div>`,
+  ].filter(Boolean).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 1 — DATA SOURCE
+// ════════════════════════════════════════════════════════
+function r1() {
+  const hasFile = !!S.file;
+  return `<div class="max-w-2xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">資料來源</h2>
+      <p class="text-sm text-gray-500 mt-1">上傳包含收件人資料的 Excel 或 CSV 檔案，第一行須為欄位標題。</p>
+    </div>
+    ${hasFile ? `
+      <div class="border-2 border-dashed rounded-xl p-10 text-center border-green-400 bg-green-50">
+        <div class="flex flex-col items-center gap-3">
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-500">${I.check(20)}</div>
+          <div class="font-medium text-green-700">${esc(S.file)}</div>
+          <div class="text-xs text-gray-400">${S.rows.length} 筆資料 · ${S.cols.length} 個欄位</div>
+          <button onclick="clearData()" class="text-xs text-red-400 hover:text-red-600 flex items-center gap-1 mt-1 transition-colors">${I.x()} 移除</button>
+        </div>
+      </div>
+      <div class="mt-6 bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+          <div class="text-sm font-medium text-gray-700">資料預覽（前 ${Math.min(S.rows.length,5)} 行）</div>
+          <span class="text-xs text-gray-400">${S.cols.length} 個欄位 · ${S.rows.length} 位收件人</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead><tr class="bg-gray-50">
+              ${S.cols.map(c=>`<th class="px-3 py-2 text-left font-semibold text-gray-500 border-b border-gray-100 whitespace-nowrap">${esc(c)}</th>`).join('')}
+            </tr></thead>
+            <tbody>
+              ${S.rows.slice(0,5).map(row=>`<tr class="hover:bg-gray-50">
+                ${S.cols.map(c=>`<td class="px-3 py-2 text-gray-600 border-b border-gray-50 whitespace-nowrap">${esc(row[c])}</td>`).join('')}
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>` : `
+      <div onclick="document.getElementById('data-file-input').click()"
+        class="border-2 border-dashed rounded-xl p-10 text-center border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer">
+        <div class="flex flex-col items-center gap-3 pointer-events-none">
+          <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">${I.upload(24)}</div>
+          <div>
+            <div class="font-medium text-gray-700">點擊或拖放上傳</div>
+            <div class="text-xs text-gray-400 mt-1">支援 .xlsx、.xls、.csv</div>
+          </div>
+          <button onclick="event.stopPropagation();document.getElementById('data-file-input').click()"
+            class="mt-1 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors pointer-events-auto">選擇檔案</button>
+        </div>
+      </div>
+      <div class="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center justify-between gap-4">
+        <div class="text-xs text-blue-700">若無檔案，可使用內置示範資料（Alice Chan · Bob Lee · Carol Wong）繼續操作</div>
+        <button onclick="useSample()" class="flex-shrink-0 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors">使用示範資料</button>
+      </div>`}
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 2 — TEMPLATE EDITOR
+// ════════════════════════════════════════════════════════
+function r2() {
+  const row0 = S.rows[0] || {};
+  const preview = sub(S.body, row0).substring(0, 130);
+  const firstName = row0[S.cols[0]] || '（收件人 1）';
+  return `<div class="max-w-5xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">範本編輯器</h2>
+      <p class="text-sm text-gray-500 mt-1">撰寫電郵內文，點擊右側欄位按鈕即可插入個人化標記。</p>
+    </div>
+    <div class="grid grid-cols-3 gap-6">
+      <div class="col-span-2 space-y-4">
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <label class="text-xs font-semibold text-gray-500 block mb-2">電郵主題</label>
+          <input id="subj-inp" type="text" value="${esc(S.subject)}" oninput="S.subject=this.value"
+            class="w-full text-gray-700 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <label class="text-xs font-semibold text-gray-500 block mb-2">電郵內文</label>
+          <textarea id="body-ta" oninput="S.body=this.value;refreshBodyPreview()"
+            class="w-full h-64 text-gray-700 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none font-mono">${esc(S.body)}</textarea>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-white rounded-xl border border-gray-200 p-4">
+          <div class="text-xs font-semibold text-gray-500 mb-1">插入欄位標記</div>
+          <div class="text-xs text-gray-400 mb-3">點擊欄位名稱，標記將附加至內文末端</div>
+          <div class="space-y-1.5">
+            ${S.cols.map(c=>`
+              <button data-col="${esc(c)}" onclick="insertMark(this.dataset.col)"
+                class="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded-lg text-gray-600 transition-colors group">
+                <span class="font-medium">${esc(c)}</span>
+                <span class="text-xs text-gray-400 group-hover:text-blue-400 font-mono">&lt;${esc(c)}&gt;</span>
+              </button>`).join('')}
+          </div>
+        </div>
+        <div class="bg-blue-50 rounded-xl border border-blue-100 p-4">
+          <div class="text-xs font-semibold text-blue-700 mb-2">即時預覽（${esc(firstName)}）</div>
+          <p id="body-preview" class="text-xs text-blue-600 leading-relaxed break-words">${esc(preview)}...</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 3 — SIGNATURE
+// ════════════════════════════════════════════════════════
+function r3() {
+  return `<div class="max-w-2xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">簽名設定</h2>
+      <p class="text-sm text-gray-500 mt-1">統一公司簽名，一次設定後所有批次自動附加於電郵底部。</p>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+        <div>
+          <div class="font-medium text-gray-700">附加公司 Logo</div>
+          <div class="text-xs text-gray-400 mt-0.5">在簽名上方顯示公司標誌圖片</div>
+        </div>
+        <button onclick="S.hasLogo=!S.hasLogo;update()"
+          class="w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${S.hasLogo?'bg-blue-600':'bg-gray-300'}">
+          <div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${S.hasLogo?'left-6':'left-1'}"></div>
+        </button>
+      </div>
+      ${S.hasLogo?`
+      <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <label class="text-xs font-semibold text-gray-500 block mb-2">Logo 圖片 URL</label>
+        <input type="text" value="${esc(S.logoUrl)}" placeholder="https://yourcompany.com/logo.png"
+          oninput="S.logoUrl=this.value"
+          class="w-full text-gray-700 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300" />
+      </div>`:''}
+      <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <label class="text-xs font-semibold text-gray-500 block mb-2">簽名文字</label>
+        <textarea id="sig-ta" oninput="S.sig=this.value;refreshSigPreview()"
+          class="w-full h-36 text-gray-700 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none">${esc(S.sig)}</textarea>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <div class="text-xs font-semibold text-gray-500 mb-3">預覽</div>
+        <div class="border-t border-gray-200 pt-3">
+          ${S.hasLogo?`<div class="w-24 h-8 bg-gray-100 rounded flex items-center justify-center mb-3 text-xs text-gray-400">Logo</div>`:''}
+          <p id="sig-preview" class="text-gray-600 whitespace-pre-line">${esc(S.sig)}</p>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 4 — ATTACHMENT
+// ════════════════════════════════════════════════════════
+function r4() {
+  if(S.pdf) return `<div class="max-w-2xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">批次附件</h2>
+      <p class="text-sm text-gray-500 mt-1">為本批次揀選一份 PDF，所有收件人均自動附上同一份文件。</p>
+    </div>
+    <div class="border-2 border-dashed rounded-xl p-10 text-center border-red-300 bg-red-50">
+      <div class="flex flex-col items-center gap-3">
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-500">${I.filetext(24)}</div>
+        <div class="font-medium text-red-700">${esc(S.pdf)}</div>
+        <div class="text-xs text-gray-400">${S.pdfFile ? fmtBytes(S.pdfFile.size)+' · ' : ''}PDF</div>
+        <button onclick="clearPDF()" class="text-xs text-gray-400 hover:text-red-600 flex items-center gap-1 mt-1 transition-colors">${I.x()} 更換附件</button>
+      </div>
+    </div>
+    <div class="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4">
+      <p class="text-sm text-amber-700"><span class="font-semibold">批次提示：</span>下次執行新批次時，在此重新揀選新 PDF，舊批次不受影響。</p>
+    </div>
+  </div>`;
+
+  return `<div class="max-w-2xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">批次附件</h2>
+      <p class="text-sm text-gray-500 mt-1">為本批次揀選一份 PDF，所有收件人均自動附上同一份文件。</p>
+    </div>
+    <div onclick="document.getElementById('pdf-file-input').click()"
+      class="border-2 border-dashed rounded-xl p-10 text-center border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer">
+      <div class="flex flex-col items-center gap-3 pointer-events-none">
+        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">${I.paperclip(24)}</div>
+        <div>
+          <div class="font-medium text-gray-700">揀選 PDF 附件</div>
+          <div class="text-xs text-gray-400 mt-1">僅支援 .pdf 格式</div>
+        </div>
+        <button onclick="event.stopPropagation();document.getElementById('pdf-file-input').click()"
+          class="mt-1 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors pointer-events-auto">選擇 PDF</button>
+      </div>
+    </div>
+    <div class="mt-4 bg-gray-50 border border-gray-100 rounded-xl p-4">
+      <p class="text-xs text-gray-400">附件為選填項目，若不需要可直接進入下一步。</p>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 5 — PREVIEW & GENERATE
+// ════════════════════════════════════════════════════════
+function r5() {
+  const idx = Math.min(S.preview, S.rows.length-1);
+  const row = S.rows[idx] || {};
+  const emailCol = S.cols.find(c=>/email/i.test(c)) || S.cols[3] || S.cols[0];
+
+  const btnCls = S.generating
+    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+    : S.genCount>0 ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-blue-600 text-white hover:bg-blue-700';
+  const btnHtml = S.generating
+    ? `<div class="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full spin"></div><span>生成中...</span>`
+    : S.genCount>0
+    ? `${I.download()}<span>重新生成 (${S.genCount}/${S.rows.length})</span>`
+    : `${I.download()}<span>批量生成 HTML</span>`;
+
+  return `<div class="max-w-5xl">
+    <div class="mb-6 flex items-start justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-900">預覽 & 生成</h2>
+        <p class="text-sm text-gray-500 mt-1">確認每位收件人的電郵內容，無誤後批量生成 HTML 檔。</p>
+      </div>
+      <button onclick="doGenerate()" ${S.generating?'disabled':''}
+        class="flex-shrink-0 px-5 py-2.5 rounded-lg font-medium transition-all flex items-center gap-2 ${btnCls}">${btnHtml}</button>
+    </div>
+    <div class="grid grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 font-medium text-gray-700">收件人列表</div>
+        <div class="divide-y divide-gray-50">
+          ${S.rows.map((r,i)=>{
+            const name=r[S.cols[0]]||`收件人 ${i+1}`;
+            const s1=S.cols[1]?r[S.cols[1]]:'', s2=S.cols[2]?r[S.cols[2]]:'';
+            const on=S.preview===i;
+            return `<button onclick="S.preview=${i};update()"
+              class="w-full px-4 py-3 text-left transition-colors ${on?'bg-blue-50':'hover:bg-gray-50'}">
+              <div class="font-medium ${on?'text-blue-700':'text-gray-700'}">${esc(name)}</div>
+              ${s1||s2?`<div class="text-xs text-gray-400 mt-0.5">${esc(s1)}${s1&&s2?' · ':''}${esc(s2)}</div>`:''}
+              ${S.genCount>i?`<div class="text-xs text-green-600 flex items-center gap-1 mt-1">${I.check(12)}<span>已生成</span></div>`:''}
+            </button>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+          <div class="font-medium text-gray-700">電郵預覽 — ${esc(row[S.cols[0]]||'')}</div>
+          <span class="text-xs text-gray-400">${esc(row[emailCol]||'')}</span>
+        </div>
+        <div class="p-5">
+          <div class="text-xs text-gray-500 mb-4 pb-3 border-b border-gray-100">
+            <span class="font-medium">主題：</span>${esc(sub(S.subject,row))}
+          </div>
+          <p class="text-gray-600 whitespace-pre-line leading-relaxed select-text">${esc(sub(S.body,row))}</p>
+          <div class="mt-5 pt-4 border-t border-gray-100">
+            <div class="text-xs text-gray-400 mb-2 font-medium">— 統一簽名 —</div>
+            ${S.hasLogo&&S.logoUrl?`<div class="w-24 h-8 bg-gray-100 rounded flex items-center justify-center mb-2 text-xs text-gray-400">Logo</div>`:''}
+            <p class="text-gray-500 whitespace-pre-line select-text">${esc(S.sig)}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 6 — OUTLOOK EXPORT
+// ════════════════════════════════════════════════════════
+function r6() {
+  if(!S.genCount) return `<div class="max-w-2xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">推送至 Outlook</h2>
+      <p class="text-sm text-gray-500 mt-1">下載 HTML 檔案包及 VBA 腳本，在 Outlook 執行後自動建立草稿，逐封確認發送。</p>
+    </div>
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center">
+      <p class="text-amber-700 font-medium">請先完成「預覽 & 生成」步驟</p>
+      <p class="text-sm text-amber-600 mt-1">尚未生成任何 HTML 檔案</p>
+    </div>
+  </div>`;
+
+  const howto = [
+    '解壓 ZIP 檔案至本機資料夾（例：C:\\BatchMail\\）',
+    'PDF 附件已包含於 ZIP 內，確認路徑正確',
+    '開啟 Outlook → Alt+F11 進入 VBA 編輯器',
+    '點選「File → Import File」，匯入下載的 .bas 腳本',
+    '在腳本頂部修改 htmlFolder 及 pdfPath 路徑',
+    '按 F5 或「Tools → Macros → Run CreateOutlookDrafts」',
+    '在草稿箱逐封核對內容，確認後按發送',
+  ];
+
+  return `<div class="max-w-2xl">
+    <div class="mb-6">
+      <h2 class="text-xl font-bold text-gray-900">推送至 Outlook</h2>
+      <p class="text-sm text-gray-500 mt-1">下載 HTML 檔案包及 VBA 腳本，在 Outlook 執行後自動建立草稿，逐封確認發送。</p>
+    </div>
+    <div class="space-y-4">
+      <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+        <div class="text-green-500 flex-shrink-0">${I.check(18)}</div>
+        <div>
+          <div class="font-medium text-green-700">${S.genCount} 份 HTML 已生成</div>
+          <div class="text-xs text-green-600 mt-0.5">可下載 HTML 檔案包及 VBA 腳本</div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between gap-4">
+        <div>
+          <div class="font-medium text-gray-700">HTML 檔案包</div>
+          <div class="text-xs text-gray-400 mt-0.5">${S.genCount} 個 .html ${S.pdfFile?'+ PDF 附件 ':''}（ZIP 格式）</div>
+        </div>
+        <button onclick="dlZip()" class="flex-shrink-0 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors">
+          ${I.download()} 下載 ZIP
+        </button>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between gap-4">
+        <div>
+          <div class="font-medium text-gray-700">Outlook VBA 腳本</div>
+          <div class="text-xs text-gray-400 mt-0.5">自動讀取 HTML 並建立草稿（含附件路徑）</div>
+        </div>
+        <button onclick="dlVBA()" class="flex-shrink-0 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 flex items-center gap-2 transition-colors">
+          ${I.download()} 下載 .bas
+        </button>
+      </div>
+      <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <div class="font-semibold text-gray-700 mb-3">執行步驟</div>
+        <div class="space-y-2.5">
+          ${howto.map((s,i)=>`<div class="flex items-start gap-3 text-gray-600">
+            <span class="w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">${i+1}</span>
+            <span>${s}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+// CORE UPDATE
+// ════════════════════════════════════════════════════════
+const RF = {1:r1, 2:r2, 3:r3, 4:r4, 5:r5, 6:r6};
+
+function update() {
+  renderNav();
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById(`panel-${S.step}`);
+  panel.classList.add('active');
+  panel.innerHTML = RF[S.step]();
+  document.getElementById('btn-prev').disabled = S.step===1;
+  document.getElementById('btn-next').disabled = S.step===6;
+}
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function goStep(n)  { S.step=n; update(); document.getElementById('main').scrollTop=0; }
+function prevStep() { if(S.step>1) goStep(S.step-1); }
+function nextStep() { if(S.step<6) goStep(S.step+1); }
+
+// ════════════════════════════════════════════════════════
+// STEP 1 ACTIONS
+// ════════════════════════════════════════════════════════
+function onDataFile(inp) {
+  if(!inp.files.length) return;
+  const f   = inp.files[0];
+  const ext = f.name.split('.').pop().toLowerCase();
+
+  if(ext==='csv') {
+    if(typeof Papa==='undefined') { alert('CSV 解析器尚未載入，請重試。'); return; }
+    Papa.parse(f, { header:true, skipEmptyLines:true,
+      complete(res) {
+        if(!res.data.length) { alert('CSV 為空或格式有誤。'); return; }
+        S.cols=res.meta.fields; S.rows=res.data;
+        S.file=f.name; S.preview=0; S.genCount=0; update();
+      },
+      error(e) { alert('CSV 解析失敗：'+e.message); }
+    });
+  } else if(ext==='xlsx'||ext==='xls') {
+    if(typeof XLSX==='undefined') { alert('Excel 解析器尚未載入，請重試。'); return; }
+    const rd = new FileReader();
+    rd.onload = e => {
+      try {
+        const wb   = XLSX.read(e.target.result, {type:'array'});
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        if(json.length<2) { alert('Excel 至少需要兩行（標題 + 資料）。'); return; }
+        S.cols = json[0].map(String);
+        S.rows = json.slice(1)
+          .map(r => { const o={}; S.cols.forEach((c,i)=>{o[c]=String(r[i]??'')}); return o; })
+          .filter(r => S.cols.some(c=>r[c]));
+        S.file=f.name; S.preview=0; S.genCount=0; update();
+      } catch(err) { alert('Excel 解析失敗：'+err.message); }
+    };
+    rd.readAsArrayBuffer(f);
+  }
+  inp.value='';
+}
+
+function clearData() {
+  S.file=null;
+  S.cols=[...DEFAULT_COLS];
+  S.rows=DEFAULT_DATA.map(r=>({...r}));
+  S.genCount=0; S.preview=0; update();
+}
+
+function useSample() {
+  S.file='sample_data.xlsx（示範）'; S.genCount=0; update();
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 2 ACTIONS
+// ════════════════════════════════════════════════════════
+function insertMark(col) {
+  S.body += `<${col}>`;
+  const ta = document.getElementById('body-ta');
+  if(ta) { ta.value=S.body; ta.scrollTop=ta.scrollHeight; }
+  refreshBodyPreview();
+}
+
+function refreshBodyPreview() {
+  const p  = sub(S.body, S.rows[0]||{}).substring(0,130);
+  const el = document.getElementById('body-preview');
+  if(el) el.innerHTML = esc(p)+'...';
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 3 ACTIONS
+// ════════════════════════════════════════════════════════
+function refreshSigPreview() {
+  const el = document.getElementById('sig-preview');
+  if(el) el.innerHTML = esc(S.sig);
+}
+
+// ════════════════════════════════════════════════════════
+// STEP 4 ACTIONS
+// ════════════════════════════════════════════════════════
+function onPDFFile(inp) {
+  if(!inp.files.length) return;
+  S.pdf=inp.files[0].name; S.pdfFile=inp.files[0]; update(); inp.value='';
+}
+function clearPDF() { S.pdf=null; S.pdfFile=null; update(); }
+
+// ════════════════════════════════════════════════════════
+// STEP 5 ACTIONS
+// ════════════════════════════════════════════════════════
+function doGenerate() {
+  if(S.generating) return;
+  S.generating=true; S.genCount=0; update();
+  setTimeout(()=>{ S.generating=false; S.genCount=S.rows.length; update(); }, 1500);
+}
+
+// ════════════════════════════════════════════════════════
+// BUILD EMAIL HTML
+// ════════════════════════════════════════════════════════
+function buildEmailHTML(row) {
+  const toHtml = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  const bodyHtml = toHtml(sub(S.body, row));
+  const sigHtml  = toHtml(S.sig);
+  const logoHtml = S.hasLogo&&S.logoUrl
+    ? `<img src="${S.logoUrl.replace(/"/g,'&quot;')}" alt="Logo" style="max-height:40px;display:block;margin-bottom:12px;">`
+    : '';
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${esc(sub(S.subject,row))}</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #333;
+         max-width: 620px; margin: 0 auto; padding: 24px; line-height: 1.65; }
+  hr   { border: none; border-top: 1px solid #e5e7eb; margin: 20px 0; }
+  .sig { font-size: 13px; color: #555; }
+</style>
+</head>
+<body>
+<p style="margin-top:0">${bodyHtml}</p>
+<hr>
+${logoHtml}
+<div class="sig">${sigHtml}</div>
+</body>
+</html>`;
+}
+
+// ════════════════════════════════════════════════════════
+// DOWNLOAD FUNCTIONS
+// ════════════════════════════════════════════════════════
+async function dlZip() {
+  if(typeof JSZip==='undefined') { alert('JSZip 尚未載入，請確認網絡連線後重試。'); return; }
+  const zip    = new JSZip();
+  const folder = zip.folder('BatchMail');
+
+  S.rows.forEach((row,i) => {
+    const name = String(row[S.cols[0]]||`email_${i+1}`).replace(/[^a-zA-Z0-9\u4e00-\u9fff_-]/g,'_');
+    folder.file(name+'.html', buildEmailHTML(row));
+  });
+  if(S.pdfFile) folder.file(S.pdfFile.name, S.pdfFile);
+
+  const readme = [
+    'BatchMail Export',
+    'Date     : '+new Date().toLocaleDateString('zh-HK'),
+    'Emails   : '+S.rows.length,
+    'Subject  : '+S.subject,
+    S.pdf ? 'Attachment: '+S.pdf : '',
+    '',
+    'See BatchMail_Outlook.bas for Outlook VBA instructions.',
+  ].join('\n');
+  folder.file('README.txt', readme);
+
+  try {
+    const blob = await zip.generateAsync({type:'blob', compression:'DEFLATE'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href=url; a.download='BatchMail_Export.zip'; a.click();
+    URL.revokeObjectURL(url);
+  } catch(e) { alert('ZIP 生成失敗：'+e.message); }
+}
+
+function dlVBA() {
+  const pdfLine = S.pdf
+    ? `    pdfPath = htmlFolder & "${S.pdf.replace(/"/g,'""')}"`
+    : `    pdfPath = ""   ' Set full PDF path, e.g.: "C:\\BatchMail\\brochure.pdf"`;
+
+  const vba = `Attribute VB_Name = "BatchMailModule"
+' ================================================================
+' BatchMail VBA Script
+' Generated : ${new Date().toLocaleDateString('zh-HK')}
+' Recipients: ${S.rows.length}
+' Subject   : ${S.subject}
+' ================================================================
+' HOW TO USE:
+'  1. Extract BatchMail_Export.zip to a local folder
+'  2. In Outlook press Alt+F11 to open VBA Editor
+'  3. File > Import File > select this .bas file
+'  4. Update htmlFolder path at the top of the sub
+'  5. Press F5 to run CreateOutlookDrafts
+' ================================================================
+
+Sub CreateOutlookDrafts()
+    Dim olApp  As Object
+    Dim olMail As Object
+    Dim fso    As Object
+    Dim f      As Object
+    Dim txt    As Object
+    Dim html   As String
+    Dim ok     As Integer
+    Dim bad    As Integer
+
+    ' !! CHANGE THIS PATH to your extracted ZIP folder !!
+    Dim htmlFolder As String
+    htmlFolder = "C:\\BatchMail\\BatchMail\\"
+
+    ' PDF attachment path (leave empty for no attachment)
+    Dim pdfPath As String
+${pdfLine}
+
+    Set olApp = CreateObject("Outlook.Application")
+    Set fso   = CreateObject("Scripting.FileSystemObject")
+
+    If Not fso.FolderExists(htmlFolder) Then
+        MsgBox "Folder not found:" & Chr(10) & htmlFolder, vbCritical, "BatchMail"
+        Exit Sub
+    End If
+
+    ok  = 0
+    bad = 0
+
+    For Each f In fso.GetFolder(htmlFolder).Files
+        If LCase(Right(f.Name, 5)) = ".html" Then
+            On Error Resume Next
+            Err.Clear
+
+            Set txt = fso.OpenTextFile(f.Path, 1, False, -1)
+            html    = txt.ReadAll
+            txt.Close
+
+            Set olMail      = olApp.CreateItem(0)
+            olMail.HTMLBody = html
+            olMail.Subject  = "${S.subject.replace(/"/g,'""')}"
+            If Len(Trim(pdfPath)) > 0 Then
+                If fso.FileExists(pdfPath) Then olMail.Attachments.Add pdfPath
+            End If
+            olMail.Save   ' Save as Draft — do NOT use .Send
+
+            If Err.Number = 0 Then ok = ok + 1 Else bad = bad + 1
+            On Error GoTo 0
+        End If
+    Next f
+
+    MsgBox ok & " draft(s) created!" _
+      & IIf(bad > 0, Chr(10) & bad & " error(s) skipped.", "") _
+      & Chr(10) & Chr(10) & "Review drafts before sending.", _
+      vbInformation, "BatchMail"
+End Sub`;
+
+  const blob = new Blob([vba], {type:'text/plain;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download='BatchMail_Outlook.bas'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+update();
+</script>
+</body>
+</html>
