@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Table Mapper</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  .dot-bg { background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); background-size: 28px 28px; }
+  .dz-blue:hover   { border-color:#3b82f6!important; background:#eff6ff!important; }
+  .dz-purple:hover { border-color:#9333ea!important; background:#faf5ff!important; }
+  .dz-over-blue   { border-color:#3b82f6!important; background:#eff6ff!important; }
+  .dz-over-purple { border-color:#9333ea!important; background:#faf5ff!important; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spin { animation:spin .75s linear infinite; display:inline-block; }
+  @keyframes fs { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  .fs { animation:fs .22s ease forwards; }
+  .tscroll { max-height:320px; overflow-y:auto; }
+  .tscroll::-webkit-scrollbar { width:4px; height:4px; }
+  .tscroll::-webkit-scrollbar-track { background:#f8fafc; }
+  .tscroll::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<div class="fixed inset-0 dot-bg opacity-25 pointer-events-none z-0"></div>
+
+<!-- HEADER -->
+<header class="sticky top-0 z-30 bg-white/95 backdrop-blur-sm border-b border-slate-200 px-5 py-3 flex items-center gap-3 shadow-sm">
+  <div class="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center shadow">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
+    </svg>
+  </div>
+  <div>
+    <span class="font-bold text-slate-900 tracking-tight">Table Mapper</span>
+    <span class="hidden sm:inline text-xs text-slate-400 ml-2">表格比對填充工具</span>
+  </div>
+  <div class="ml-auto flex items-center gap-2">
+    <div id="hdr-pill" class="text-xs font-mono font-bold text-blue-600 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">Step 1 / 3</div>
+  </div>
+</header>
+
+<main class="relative z-10 max-w-2xl mx-auto px-4 py-7 space-y-4">
+
+  <div id="step-bar" class="bg-white border border-slate-200 rounded-2xl px-5 py-4 shadow-sm"></div>
+
+  <div id="err-banner" class="hidden items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-xs text-red-600 shadow-sm">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="err-text" class="flex-1"></span>
+    <button onclick="hideErr()" class="flex-shrink-0 hover:text-red-800">✕</button>
+  </div>
+
+  <!-- ══ STEP 1 ══ -->
+  <div id="s1" class="space-y-4 fs">
+
+    <!-- How it works -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">運作原理</p>
+      <div class="flex items-center justify-between gap-1">
+        <div class="flex flex-col items-center gap-1 flex-shrink-0">
+          <div class="w-14 h-10 bg-blue-50 border-2 border-blue-200 rounded-xl flex items-center justify-center">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+          </div>
+          <span class="text-xs font-bold text-blue-600">表一</span>
+          <span class="text-xs text-slate-400">來源</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full flex items-center"><div class="flex-1 h-px bg-slate-300"></div><svg width="7" height="7" viewBox="0 0 7 7" fill="#94a3b8"><polygon points="0,0 7,3.5 0,7"/></svg></div>
+          <span class="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">Key 比對</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 flex-shrink-0">
+          <div class="w-14 h-10 bg-purple-50 border-2 border-purple-200 rounded-xl flex items-center justify-center">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+          </div>
+          <span class="text-xs font-bold text-purple-600">表二</span>
+          <span class="text-xs text-slate-400">目標</span>
+        </div>
+        <div class="flex-1 flex flex-col items-center gap-1">
+          <div class="w-full flex items-center"><div class="flex-1 h-px bg-slate-300"></div><svg width="7" height="7" viewBox="0 0 7 7" fill="#94a3b8"><polygon points="0,0 7,3.5 0,7"/></svg></div>
+          <span class="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full whitespace-nowrap">填充更新</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 flex-shrink-0">
+          <div class="w-14 h-10 bg-green-50 border-2 border-green-200 rounded-xl flex items-center justify-center">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/><path d="m9 12 2 2 4-4" stroke-width="2.5"/></svg>
+          </div>
+          <span class="text-xs font-bold text-green-600">結果</span>
+          <span class="text-xs text-slate-400">下載</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">① 上傳兩份表格</p>
+      <input type="file" id="fi1" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFI(event,1)">
+      <div id="dz1" onclick="document.getElementById('fi1').click()"
+        ondragover="dzOver(event,'dz1',false)" ondragleave="dzLeave('dz1',false)" ondrop="dzDrop(event,'dz1',1)"
+        class="dz-blue border-2 border-dashed border-slate-300 rounded-xl p-4 cursor-pointer transition-all">
+        <div id="dz1-empty" class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-slate-700">① 表一（來源）</div>
+            <div class="text-xs text-slate-400">拖入或點擊上傳 · .xlsx / .xls / .csv</div>
+          </div>
+          <div id="dz1-spin" class="hidden"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
+        </div>
+        <div id="dz1-info" class="hidden items-center gap-3">
+          <div class="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div id="dz1-name" class="text-sm font-semibold text-blue-600 truncate"></div>
+            <div id="dz1-meta" class="text-xs text-slate-400 mt-0.5"></div>
+          </div>
+          <button onclick="clearF(event,1)" class="flex-shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-100 hover:text-red-500 flex items-center justify-center text-slate-400 transition">✕</button>
+        </div>
+      </div>
+
+      <input type="file" id="fi2" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleFI(event,2)">
+      <div id="dz2" onclick="document.getElementById('fi2').click()"
+        ondragover="dzOver(event,'dz2',true)" ondragleave="dzLeave('dz2',true)" ondrop="dzDrop(event,'dz2',2)"
+        class="dz-purple border-2 border-dashed border-slate-300 rounded-xl p-4 cursor-pointer transition-all">
+        <div id="dz2-empty" class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="text-sm font-semibold text-slate-700">② 表二（目標）</div>
+            <div class="text-xs text-slate-400">拖入或點擊上傳 · .xlsx / .xls / .csv</div>
+          </div>
+          <div id="dz2-spin" class="hidden"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></div>
+        </div>
+        <div id="dz2-info" class="hidden items-center gap-3">
+          <div class="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div id="dz2-name" class="text-sm font-semibold text-purple-600 truncate"></div>
+            <div id="dz2-meta" class="text-xs text-slate-400 mt-0.5"></div>
+          </div>
+          <button onclick="clearF(event,2)" class="flex-shrink-0 w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-100 hover:text-red-500 flex items-center justify-center text-slate-400 transition">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Select -->
+    <div id="key-sec" class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3 transition-opacity duration-300" style="opacity:.5">
+      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">② 選擇比對欄位（Key）</p>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-blue-600 mb-1.5">表一比對欄位</label>
+          <select id="k1" disabled onchange="S.key1=this.value;refreshS1()"
+            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition cursor-pointer disabled:opacity-40">
+            <option>— 請先上傳表一 —</option>
+          </select>
+          <p id="k1-cnt" class="text-xs text-slate-400 mt-1 h-4"></p>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-purple-600 mb-1.5">表二比對欄位</label>
+          <select id="k2" disabled onchange="S.key2=this.value;refreshS1()"
+            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 transition cursor-pointer disabled:opacity-40">
+            <option>— 請先上傳表二 —</option>
+          </select>
+          <p id="k2-cnt" class="text-xs text-slate-400 mt-1 h-4"></p>
+        </div>
+      </div>
+      <div id="kprev" class="hidden bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 flex items-center gap-2 flex-wrap">
+        <span id="kp1" class="text-xs font-mono text-blue-700 bg-blue-100 border border-blue-200 px-2 py-0.5 rounded-lg"></span>
+        <span class="text-xs text-slate-400">→ 比對 →</span>
+        <span id="kp2" class="text-xs font-mono text-purple-700 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-lg"></span>
+        <span class="ml-auto text-xs text-green-600 whitespace-nowrap">✦ 下一步自動偵測欄位</span>
+      </div>
+    </div>
+
+    <button id="s1-btn" onclick="goS2()" disabled
+      class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold bg-slate-100 text-slate-400 cursor-not-allowed transition-all">
+      下一步：欄位對應設定 ›
+    </button>
+  </div>
+
+  <!-- ══ STEP 2 ══ -->
+  <div id="s2" class="hidden space-y-4"></div>
+
+  <!-- ══ STEP 3 ══ -->
+  <div id="s3" class="hidden space-y-4"></div>
+
+</main>
+<footer class="relative z-10 text-center py-6 text-xs text-slate-400">Design by Tabris Yuen, 2026</footer>
+
+<script>
+// ═══ STATE ═══
+const S = {
+  t1:null, t2:null, key1:'', key2:'',
+  maps:[], cTo:{}, autoN:0,
+  inclMiss:false, result:null,
+  step:1, tab:'filled'
+};
+
+// ═══ HELPERS ═══
+const nk = v => v==null ? '' : String(v).trim().toLowerCase();
+const he = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function showErr(m){ document.getElementById('err-text').textContent=m; const b=document.getElementById('err-banner'); b.classList.remove('hidden'); b.classList.add('flex'); }
+function hideErr(){ const b=document.getElementById('err-banner'); b.classList.add('hidden'); b.classList.remove('flex'); }
+
+function trigDl(blob, fn){
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=fn; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },300);
+}
+
+const IC = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const IDL= `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+const ILD= `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+const IBK= `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+const IFW= `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+// ═══ CSV / XLSX PARSE ═══
+function parseCSV(txt){
+  const lines=txt.replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n').filter(l=>l.trim());
+  if(!lines.length) return [];
+  const pr=l=>{ const r=[]; let c='',q=false;
+    for(let i=0;i<l.length;i++){ const ch=l[i];
+      if(ch==='"'){ if(q&&l[i+1]==='"'){c+='"';i++;}else q=!q; }
+      else if(ch===','&&!q){r.push(c.trim());c='';}else c+=ch; }
+    r.push(c.trim()); return r; };
+  const h=pr(lines[0]);
+  return lines.slice(1).map(l=>{ const v=pr(l),r={}; h.forEach((hh,i)=>r[hh]=v[i]??''); return r; })
+    .filter(r=>Object.values(r).some(v=>v!==''));
+}
+async function parseFile(f){
+  if(f.name.toLowerCase().endsWith('.csv')) return parseCSV(await f.text());
+  const ab=await f.arrayBuffer(), wb=XLSX.read(new Uint8Array(ab),{type:'array'});
+  return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+}
+
+// ═══ DRAG / DROP ═══
+function dzOver(e,id,p){ e.preventDefault(); document.getElementById(id).classList.add(p?'dz-over-purple':'dz-over-blue'); }
+function dzLeave(id,p){ document.getElementById(id).classList.remove(p?'dz-over-purple':'dz-over-blue'); }
+function dzDrop(e,id,n){ e.preventDefault(); dzLeave(id,n===2); const f=e.dataTransfer.files[0]; if(f) loadF(f,n); }
+function handleFI(e,n){ const f=e.target.files[0]; if(f){ loadF(f,n); e.target.value=''; } }
+
+async function loadF(file,n){
+  hideErr();
+  const sp=document.getElementById(`dz${n}-spin`); sp.classList.remove('hidden'); sp.classList.add('flex');
+  try{
+    const data=await parseFile(file), cols=data.length?Object.keys(data[0]):[];
+    if(n===1){S.t1={name:file.name,data,cols};S.key1=cols[0]??'';}
+    else      {S.t2={name:file.name,data,cols};S.key2=cols[0]??'';}
+    updFUI(n); updKSel(); refreshS1();
+  }catch(e){ showErr('讀取失敗，請確認格式正確。'); }
+  finally{ sp.classList.add('hidden'); sp.classList.remove('flex'); }
+}
+function clearF(e,n){
+  e.stopPropagation();
+  if(n===1){S.t1=null;S.key1='';}else{S.t2=null;S.key2='';}
+  updFUI(n); updKSel(); refreshS1();
+}
+function updFUI(n){
+  const info=n===1?S.t1:S.t2, dz=document.getElementById(`dz${n}`);
+  const em=document.getElementById(`dz${n}-empty`), inf=document.getElementById(`dz${n}-info`);
+  if(info){
+    em.classList.add('hidden'); inf.classList.remove('hidden'); inf.classList.add('flex');
+    document.getElementById(`dz${n}-name`).textContent=info.name;
+    document.getElementById(`dz${n}-meta`).textContent=`${info.cols.length} 個欄位 · ${info.data.length} 筆資料`;
+    dz.classList.remove('border-dashed','border-slate-300');
+    dz.classList.add(n===1?'border-blue-300':'border-purple-300', n===1?'bg-blue-50':'bg-purple-50');
+    dz.onclick=null;
+  }else{
+    em.classList.remove('hidden'); inf.classList.add('hidden'); inf.classList.remove('flex');
+    dz.classList.add('border-dashed','border-slate-300');
+    dz.classList.remove('border-blue-300','bg-blue-50','border-purple-300','bg-purple-50');
+    dz.onclick=()=>document.getElementById(`fi${n}`).click();
+  }
+}
+function updKSel(){
+  const s1=document.getElementById('k1'), s2=document.getElementById('k2');
+  s1.innerHTML=S.t1?S.t1.cols.map(c=>`<option value="${he(c)}" ${c===S.key1?'selected':''}>${he(c)}</option>`).join(''):'<option>— 請先上傳表一 —</option>';
+  s2.innerHTML=S.t2?S.t2.cols.map(c=>`<option value="${he(c)}" ${c===S.key2?'selected':''}>${he(c)}</option>`).join(''):'<option>— 請先上傳表二 —</option>';
+  s1.disabled=!S.t1; s2.disabled=!S.t2;
+  document.getElementById('k1-cnt').textContent=S.t1?`共 ${S.t1.data.length} 筆`:'';
+  document.getElementById('k2-cnt').textContent=S.t2?`共 ${S.t2.data.length} 筆`:'';
+}
+function refreshS1(){
+  const rdy=S.t1&&S.t2&&S.key1&&S.key2;
+  document.getElementById('key-sec').style.opacity=(S.t1&&S.t2)?'1':'0.5';
+  const btn=document.getElementById('s1-btn'), kp=document.getElementById('kprev');
+  if(rdy){
+    btn.disabled=false; btn.className='w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 active:scale-95 text-white transition-all shadow-sm';
+    kp.classList.remove('hidden');
+    document.getElementById('kp1').textContent=S.key1; document.getElementById('kp2').textContent=S.key2;
+  }else{
+    btn.disabled=true; btn.className='w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold bg-slate-100 text-slate-400 cursor-not-allowed transition-all';
+    kp.classList.add('hidden');
+  }
+}
+
+// ═══ STEP 2 ═══
+function getToCol(m,i){ if(m.to==='__new__') return (S.cTo[i]??'').trim()||m.from; if(!m.to) return m.from; return m.to; }
+
+function goS2(){
+  if(!S.t1||!S.t2||!S.key1||!S.key2) return;
+  const t2s=new Set(S.t2.cols), ex=new Set([S.key1,S.key2]);
+  const det=S.t1.cols.filter(c=>t2s.has(c)&&!ex.has(c)).map(c=>({from:c,to:c}));
+  const extra=S.t1.cols.filter(c=>!t2s.has(c)&&!ex.has(c)).slice(0,5).map(c=>({from:c,to:'__new__'}));
+  S.maps=[...det,...extra]; if(!S.maps.length) S.maps=[{from:'',to:''}];
+  S.cTo={}; extra.forEach((m,i)=>{ S.cTo[det.length+i]=m.from; });
+  S.autoN=det.length;
+  showStep(2); renderS2();
+}
+
+function renderS2(){
+  const vc=S.maps.filter(m=>(m.from??'').trim()).length;
+  const rows=S.maps.length===0
+    ?`<div class="text-center py-6 text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">點擊「新增」手動設定欄位對應</div>`
+    :S.maps.map((m,i)=>{
+      const fo=`<option value="">選擇欄位…</option>`+S.t1.cols.map(c=>`<option value="${he(c)}" ${c===m.from?'selected':''}>${he(c)}</option>`).join('');
+      const to=S.t2.cols.map(c=>`<option value="${he(c)}" ${c===m.to?'selected':''}>${he(c)}</option>`).join('');
+      const isN=m.to==='__new__';
+      return `<div class="flex items-start gap-2">
+        <div class="flex-1">
+          ${i===0?'<label class="block text-xs font-medium text-slate-500 mb-1.5">來源（表一）</label>':''}
+          <select onchange="S.maps[${i}].from=this.value;if(S.maps[${i}].to==='')S.maps[${i}].to='';renderS2()"
+            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition cursor-pointer">${fo}</select>
+        </div>
+        <div class="flex-shrink-0 ${i===0?'mt-7':'mt-2.5'} text-slate-400">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="flex-1">
+          ${i===0?'<label class="block text-xs font-medium text-slate-500 mb-1.5">目標（表二）</label>':''}
+          <select onchange="S.maps[${i}].to=this.value;if(this.value!=='__new__')delete S.cTo[${i}];renderS2()"
+            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition cursor-pointer">
+            <option value="">同名欄位（自動）</option>${to}
+            <option value="__new__" ${isN?'selected':''}>＋ 建立新欄位…</option>
+          </select>
+          ${isN?`<input type="text" placeholder="新欄位名稱" value="${he(S.cTo[i]??'')}"
+            oninput="S.cTo[${i}]=this.value"
+            class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm mt-1.5 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200 transition">`:''}
+        </div>
+        <button onclick="delMap(${i})"
+          class="flex-shrink-0 ${i===0?'mt-7':'mt-2.5'} w-7 h-7 rounded-lg bg-slate-50 hover:bg-red-50 hover:text-red-500 flex items-center justify-center text-slate-400 transition border border-slate-200" style="font-size:11px">✕</button>
+      </div>`;
+    }).join('');
+
+  document.getElementById('s2').innerHTML=`
+    ${S.autoN>0
+      ?`<div class="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 shadow-sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>
+          <p class="text-xs text-green-700">自動偵測到 <strong>${S.autoN}</strong> 個同名欄位，已預填對應</p></div>`
+      :`<div class="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 shadow-sm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p class="text-xs text-amber-700">未找到同名欄位，請手動設定對應關係</p></div>`}
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
+      <div class="flex items-start justify-between gap-3">
+        <div><p class="text-sm font-semibold text-slate-800">欄位對應</p><p class="text-xs text-slate-400 mt-0.5">選擇從表一哪欄 → 填入表二哪欄</p></div>
+        <button onclick="S.maps.push({from:'',to:''});renderS2()" class="flex-shrink-0 flex items-center gap-1.5 text-xs font-semibold text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新增
+        </button>
+      </div>
+      <div class="space-y-2">${rows}</div>
+      ${vc>0?`<div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3"><p class="text-xs text-blue-600">共 <strong>${vc}</strong> 個有效對應，比對成功的列將從表一複製欄位值到表二</p></div>`:''}
+    </div>
+    <div class="bg-white border border-slate-200 rounded-2xl px-5 py-4 shadow-sm flex items-center justify-between gap-4">
+      <div><p class="text-sm font-medium text-slate-800">附加表一有、表二缺的行</p><p class="text-xs text-slate-400 mt-0.5">開啟後，缺漏行會附加在下載檔案末尾</p></div>
+      <button onclick="S.inclMiss=!S.inclMiss;renderS2()" class="relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${S.inclMiss?'bg-blue-600':'bg-slate-200'}">
+        <div class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${S.inclMiss?'translate-x-5':'translate-x-0.5'}"></div>
+      </button>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="showStep(1)" class="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-slate-600 border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 transition-all shadow-sm">
+        ${IBK} 上一步
+      </button>
+      <button id="run-btn" onclick="doRun()" class="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 active:scale-95 text-white transition-all shadow-sm">
+        執行比對 ${IFW}
+      </button>
+    </div>`;
+}
+
+function delMap(i){
+  S.maps.splice(i,1);
+  const nxt={}; Object.entries(S.cTo).forEach(([k,v])=>{ const ki=parseInt(k); if(ki<i)nxt[ki]=v; else if(ki>i)nxt[ki-1]=v; });
+  S.cTo=nxt; renderS2();
+}
+
+// ═══ RUN ═══
+async function doRun(){
+  if(!S.t1||!S.t2||!S.key1||!S.key2) return;
+  const btn=document.getElementById('run-btn'); if(!btn||btn.disabled) return;
+  btn.disabled=true; btn.innerHTML=`${ILD} 比對中…`; btn.className='flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-slate-100 text-slate-500 cursor-not-allowed transition-all';
+  hideErr(); await new Promise(r=>setTimeout(r,60));
+  try{
+    const lk={};
+    for(const r of S.t1.data){ const k=nk(r[S.key1]); if(k) lk[k]=r; }
+    const vm=S.maps.reduce((acc,m,i)=>{ const f=(m.from??'').trim(); if(!f) return acc; acc.push({from:f,to:getToCol(m,i)||f}); return acc; },[]);
+    const t2ks=new Set(S.t2.data.map(r=>nk(r[S.key2])));
+    const miss=S.t1.data.filter(r=>{ const k=nk(r[S.key1]); return k&&!t2ks.has(k); });
+    let matched=0;
+    const upd=S.t2.data.map(row=>{ const k=nk(row[S.key2]),src=lk[k]; if(!src) return{...row}; matched++; const nr={...row}; for(const m of vm){if(m.from in src)nr[m.to]=src[m.from];} return nr; });
+    const addC=[...new Set(vm.map(m=>m.to).filter(c=>c&&!S.t2.cols.includes(c)))];
+    const newC=[...S.t2.cols,...addC];
+    S.result={miss,upd,out:S.inclMiss?[...upd,...miss]:upd,matched,newC,addC,vmCount:vm.length};
+    S.tab=matched>0?'filled':'missing';
+    showStep(3); renderS3();
+  }catch(e){ showErr('比對時發生錯誤：'+e.message); renderS2(); }
+}
+
+// ═══ STEP 3 ═══
+function tabContent(tab){
+  const r=S.result;
+  if(tab==='filled'){
+    const cols=r.newC;
+    return `<div class="space-y-2">
+      ${r.addC.length?`<div class="flex items-center gap-2 flex-wrap mb-2">
+        <span class="text-xs text-green-600">✦ 新增欄位：</span>
+        ${r.addC.map(c=>`<span class="text-xs font-mono text-green-700 bg-green-100 border border-green-200 px-2 py-0.5 rounded-lg">${he(c)}</span>`).join('')}</div>`:''}
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs border-collapse">
+          <thead><tr class="border-b-2 border-slate-200">
+            ${cols.slice(0,8).map(c=>`<th class="text-left pb-2 pr-4 whitespace-nowrap font-semibold ${r.addC.includes(c)?'text-green-600':'text-slate-500'}">${he(c)}${r.addC.includes(c)?' ✦':''}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${r.upd.slice(0,50).map((row,i)=>`<tr class="border-b border-slate-100 ${i%2===0?'':'bg-slate-50/50'} hover:bg-blue-50/40 transition-colors">
+              ${cols.slice(0,8).map(c=>`<td class="py-1.5 pr-4 font-mono whitespace-nowrap ${r.addC.includes(c)?'text-green-700':'text-slate-600'}">${he(String(row[c]??''))}</td>`).join('')}
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        ${r.upd.length>50?`<p class="text-xs text-slate-400 text-center pt-3">僅顯示前 50 筆，完整資料請下載</p>`:''}
+      </div></div>`;
+  }else{
+    if(!r.miss.length) return `<div class="text-center py-10 text-xs text-green-600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>表二已涵蓋表一所有資料</div>`;
+    const mc=Object.keys(r.miss[0]);
+    return `<div class="overflow-x-auto"><table class="w-full text-xs border-collapse">
+      <thead><tr class="border-b-2 border-slate-200">${mc.slice(0,8).map(c=>`<th class="text-left pb-2 pr-4 whitespace-nowrap font-semibold text-slate-500">${he(c)}</th>`).join('')}</tr></thead>
+      <tbody>${r.miss.map((row,i)=>`<tr class="border-b border-slate-100 ${i%2===0?'':'bg-amber-50/30'} hover:bg-amber-50 transition-colors">${mc.slice(0,8).map(c=>`<td class="py-1.5 pr-4 font-mono whitespace-nowrap text-amber-700">${he(String(row[c]??''))}</td>`).join('')}</tr>`).join('')}
+      </tbody></table></div>`;
+  }
+}
+
+function switchTab(t){
+  S.tab=t;
+  ['filled','missing'].forEach(tt=>{
+    const b=document.getElementById(`tb-${tt}`); if(!b) return;
+    if(tt===t) b.className=`flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${tt==='filled'?'border-blue-500 text-blue-600 bg-blue-50/50':'border-amber-500 text-amber-600 bg-amber-50/50'}`;
+    else b.className='flex-1 py-3 text-xs font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-600';
+  });
+  document.getElementById('tab-cnt').innerHTML=tabContent(t);
+}
+
+function renderS3(){
+  const r=S.result;
+  const rate=r.upd.length?Math.round(r.matched/r.upd.length*100):0;
+  const rc=rate>=80?'bg-green-500':rate>=50?'bg-amber-500':'bg-red-500';
+  const rt=rate>=80?'text-green-600':rate>=50?'text-amber-600':'text-red-600';
+  
+  let warn='';
+  if(r.vmCount===0) warn+=`<div class="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 shadow-sm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p class="text-xs text-amber-700">未設定任何欄位對應，輸出與原表二相同。請返回設定</p></div>`;
+  if(r.matched===0&&r.vmCount>0) warn+=`<div class="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 shadow-sm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div><p class="text-xs text-red-600 font-semibold">比對欄位值完全沒有匹配</p><p class="text-xs text-red-400 mt-0.5">請確認兩份表格的 Key 欄格式一致（數字/文字/前導零）</p></div></div>`;
+
+  document.getElementById('s3').innerHTML=`
+    ${warn}
+    <div class="grid grid-cols-3 gap-3">
+      <div class="bg-white border border-slate-200 rounded-2xl p-4 text-center shadow-sm"><p class="text-2xl font-bold font-mono text-slate-800">${r.upd.length}</p><p class="text-xs text-slate-400 mt-1 leading-tight">表二<br>總筆數</p></div>
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-4 text-center shadow-sm"><p class="text-2xl font-bold font-mono text-green-600">${r.matched}</p><p class="text-xs text-green-500 mt-1 leading-tight">成功<br>比對填入</p></div>
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center shadow-sm"><p class="text-2xl font-bold font-mono text-amber-600">${r.miss.length}</p><p class="text-xs text-amber-500 mt-1 leading-tight">表一有<br>表二缺</p></div>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-slate-600">比對成功率</span>
+        <span class="text-xs font-bold font-mono ${rt}">${rate}%</span>
+      </div>
+      <div class="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+        <div id="rate-bar" class="h-full rounded-full ${rc} transition-all duration-700" style="width:0%"></div>
+      </div>
+      <div class="flex justify-between mt-2 text-xs text-slate-400">
+        <span>${r.matched} / ${r.upd.length} 筆成功填入</span>
+        <span>${r.addC.length>0?`新增 ${r.addC.length} 個欄位`:'無新增欄位'}</span>
+      </div>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+      <div class="flex border-b border-slate-200">
+        <button id="tb-filled" onclick="switchTab('filled')" class="flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${S.tab==='filled'?'border-blue-500 text-blue-600 bg-blue-50/50':'border-transparent text-slate-400 hover:text-slate-600'}">填入結果 (${r.upd.length})</button>
+        <button id="tb-missing" onclick="switchTab('missing')" class="flex-1 py-3 text-xs font-semibold transition-all border-b-2 ${S.tab==='missing'?'border-amber-500 text-amber-600 bg-amber-50/50':'border-transparent text-slate-400 hover:text-slate-600'}">缺漏行 (${r.miss.length})</button>
+      </div>
+      <div id="tab-cnt" class="p-4 tscroll">${tabContent(S.tab)}</div>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+      <div class="flex items-center justify-between">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">下載結果</p>
+        <p class="text-xs text-slate-400">${r.out.length} 筆${S.inclMiss&&r.miss.length?`<span class="text-blue-500 ml-1">（含 ${r.miss.length} 缺漏行）</span>`:''}</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <button id="dl-x" onclick="dlXLSX()" class="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 active:scale-95 text-white transition-all shadow-sm">${IDL} 下載 .xlsx</button>
+        <button onclick="dlCSV()" class="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 active:scale-95 transition-all shadow-sm">${IDL} 下載 .csv</button>
+      </div>
+      <p class="text-xs text-slate-400 text-center">.xlsx 失敗時請改用 .csv（Excel 可直接開啟）</p>
+    </div>
+    <button onclick="showStep(2)" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 transition-all shadow-sm">${IBK} 返回修改設定</button>`;
+
+  requestAnimationFrame(()=>setTimeout(()=>{ const b=document.getElementById('rate-bar'); if(b) b.style.width=rate+'%'; },80));
+}
+
+// ═══ DOWNLOAD ═══
+async function dlXLSX(){
+  if(!S.result) return;
+  const btn=document.getElementById('dl-x'); if(!btn||btn.disabled) return;
+  btn.disabled=true; btn.innerHTML=`${ILD} 處理中…`; btn.className='flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-slate-100 text-slate-500 cursor-not-allowed transition-all';
+  try{
+    const base=(S.t2?.name??'result').replace(/\.[^.]+$/,'');
+    const ws=XLSX.utils.json_to_sheet(S.result.out), wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+    const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+    trigDl(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),`updated_${base}.xlsx`);
+    btn.innerHTML=`${IC} 完成！`; btn.className='flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-green-600 text-white transition-all shadow-sm';
+    setTimeout(()=>{ btn.disabled=false; btn.innerHTML=`${IDL} 下載 .xlsx`; btn.className='flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 active:scale-95 text-white transition-all shadow-sm'; },2500);
+  }catch(e){
+    showErr('Excel 下載失敗，請改用 CSV。');
+    btn.disabled=false; btn.innerHTML=`${IDL} 下載 .xlsx`; btn.className='flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 active:scale-95 text-white transition-all shadow-sm';
+  }
+}
+function dlCSV(){
+  if(!S.result?.out.length) return;
+  const data=S.result.out, cols=Object.keys(data[0]);
+  const ev=v=>{ const s=String(v??''); return(s.includes(',')||s.includes('"')||s.includes('\n'))?`"${s.replace(/"/g,'""')}"`  :s; };
+  const csv=[cols.map(ev).join(','),...data.map(r=>cols.map(c=>ev(r[c])).join(','))].join('\r\n');
+  const base=(S.t2?.name??'result').replace(/\.[^.]+$/,'');
+  trigDl(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}),`updated_${base}.csv`);
+}
+
+// ═══ STEP BAR + NAV ═══
+function renderBar(){
+  const steps=['上傳 & 設定','欄位對應','結果 & 下載'];
+  document.getElementById('step-bar').innerHTML=`<div class="flex items-center gap-2">
+    ${steps.map((s,i)=>{ const n=i+1,done=S.step>n,act=S.step===n;
+      return `<div class="flex items-center gap-1.5 min-w-0">
+        <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-all
+          ${done?'bg-green-500 text-white':act?'bg-blue-600 text-white shadow-sm':'bg-slate-100 text-slate-400 border border-slate-200'}">
+          ${done?`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`:n}
+        </div>
+        <span class="text-xs font-semibold whitespace-nowrap truncate ${act?'text-slate-800':done?'text-green-600':'text-slate-400'}">${s}</span>
+      </div>${i<2?'<div class="flex-1 h-px bg-slate-200 min-w-1"></div>':''}`;
+    }).join('')}
+  </div>`;
+  document.getElementById('hdr-pill').textContent=`Step ${S.step} / 3`;
+}
+
+function showStep(n){
+  S.step=n;
+  ['s1','s2','s3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(i+1===n){ el.classList.remove('hidden'); el.classList.add('fs'); setTimeout(()=>el.classList.remove('fs'),300); }
+    else el.classList.add('hidden');
+  });
+  renderBar(); window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderBar();
+</script>
+</body>
+</html>
