@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>校務系統 EDM Builder</title>
+<title>OmniStompboxs EDM Builder</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,'Microsoft JhengHei',sans-serif;background:#f3f4f6;display:flex;flex-direction:column;height:100vh;overflow:hidden}
@@ -27,11 +27,13 @@ h4{font-size:12px;font-weight:bold;color:#374151;margin:0 0 8px;text-transform:u
 .bm{padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;background:#fff;color:#6b7280}
 .bm.on{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.tbtn{padding:5px 11px;border:1.5px solid #d1d5db;border-radius:20px;cursor:pointer;font-size:11px;font-weight:bold;background:#fff;color:#6b7280;transition:all .15s;white-space:nowrap}
+.tbtn.on{color:#fff!important;border-color:transparent!important}
 </style>
 </head>
 <body>
 <div id="tb">
-  <strong style="color:#1e3a5f;font-size:14px">📚 校務系統 EDM Builder</strong>
+  <strong style="color:#1e3a5f;font-size:14px">📧 OmniStompboxs EDM Builder</strong>
   <div style="flex:1"></div>
   <button class="bm on" id="bd" onclick="sm('d')">🖥 600px</button>
   <button class="bm" id="bm2" onclick="sm('m')">📱 375px</button>
@@ -41,8 +43,16 @@ h4{font-size:12px;font-weight:bold;color:#374151;margin:0 0 8px;text-transform:u
 </div>
 <div id="main">
   <div id="ed">
+    <div style="margin-bottom:8px;">
+      <div style="font-size:10px;color:#9ca3af;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:bold;">選擇範本</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <button class="tbtn on" id="tpl_school" style="background:#1e3a5f;color:#fff;border-color:#1e3a5f" onclick="loadTpl('school')">🎓 校務系統</button>
+        <button class="tbtn" id="tpl_christmas" onclick="loadTpl('christmas')">🎄 聖誕節</button>
+        <button class="tbtn" id="tpl_cny" onclick="loadTpl('cny')">🧧 農曆新年</button>
+      </div>
+    </div>
     <div style="background:#e0f2fe;border:1px solid #bae6fd;color:#0369a1;padding:7px 10px;border-radius:6px;font-size:11px;line-height:1.65;margin-bottom:8px">
-      📚 9 個校務區塊 ・ 🛍️ Shopify Liquid 相容 ・ 🔗 官方 URL 已預填
+      📚 9 個區塊 ・ 🛍️ Shopify Liquid 相容 ・ 切換範本將載入預設內容
     </div>
     <div id="ef"></div>
   </div>
@@ -53,9 +63,19 @@ h4{font-size:12px;font-weight:bold;color:#374151;margin:0 0 8px;text-transform:u
 
 <script>
 // ═══════════════════════════════════════
-// STATE
+// HELPERS
 // ═══════════════════════════════════════
-const D={
+const q=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const qb=s=>q(s).replace(/\n/g,"<br>");
+function dc(o){return JSON.parse(JSON.stringify(o));}
+
+// ═══════════════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════════════
+const TEMPLATES={
+
+// ── 🎓 校務系統 ──────────────────────────
+school:{
  nav:{bg:"#111827",logoText:"OmniStompboxs",logoTextColor:"#ffffff",logoLink:"https://omnistompboxs.myshopify.com/",menuTextColor:"#9ca3af",menus:[{text:"官方網站",link:"https://omnistompboxs.myshopify.com/"},{text:"聯絡我們",link:"https://omnistompboxs.myshopify.com/pages/contact"},{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"}]},
  hero:{bgFrom:"#111827",bgTo:"#1e3a5f",eyebrow:"OmniStompboxs School",eyebrowColor:"#60a5fa",title:"點名要整理，回條要追，\n學生資料分散各處？",titleColor:"#ffffff",accentText:"分散各處？",accentColor:"#60a5fa",text:"每天點名要整理，活動回條要追收，學生資料又分散在不同表格——把這些整合到同一個平台，讓老師多花時間在學生身上。",textColor:"#94a3b8",tags:["#電子點名","#電子回條","#家校溝通","#校務自動化"],btnPrimary:{text:"瀏覽校務功能",link:"https://omnistompboxs.myshopify.com/pages/highlights",color:"#2563eb"},btnOutline:{text:"預約示範",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#60a5fa",borderColor:"#3b82f6"}},
  intro:{text1:"當教職員花太多時間找資料、重複輸入和逐一跟進，真正需要關注的學生與教學工作，往往被行政瑣事擠走。",text2:"OmniStompboxs School 將校務管理、教學支援與家校溝通集中在同一個雲端平台，以可視化、自動化及多方協作，協助學校理順日常工作。若您有功能查詢、訂閱方案或示範安排，歡迎聯絡我們！",textColor:"#555555",brandText:"OmniStompboxs School",brandColor:"#1d4ed8",btnA:{text:"瀏覽產品",link:"https://omnistompboxs.myshopify.com/pages/highlights",color:"#2563eb"},btnB:{text:"聯絡在線客服",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#2563eb",borderColor:"#2563eb"}},
@@ -81,13 +101,90 @@ const D={
  ],note:"可依校務需求提供年級分層與功能建議。",noteColor:"#9ca3af"},
  finalCta:{bgFrom:"#111827",bgTo:"#1e3a5f",title:"從學校最想改善的\n一項流程開始",titleColor:"#ffffff",text:"歡迎預約示範，看看 OmniStompboxs School 如何配合你們的日常運作。可依校務需求提供年級分層與功能建議。",textColor:"#94a3b8",btn:{text:"預約校務系統示範",link:"https://omnistompboxs.myshopify.com/pages/contact",textColor:"#1e3a5f"}},
  footer:{bg:"#0f172a",logoText:"OmniStompboxs",logoColor:"#f1f5f9",desc:"企業雲端 ERP 及學校管理系統\n專注於可視化、自動化、多方協作",descColor:"#64748b",email:"omnistompboxsystem@gmail.com",website:"omnistompboxs.myshopify.com",contactColor:"#64748b",links:[{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"},{text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},{text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}],linkColor:"#475569",copyright:"© 2026 OmniStompboxs. All rights reserved.",copyrightColor:"#334155"}
-};
+},
+
+// ── 🎄 聖誕節 ────────────────────────────
+christmas:{
+ nav:{bg:"#7f1d1d",logoText:"OmniStompboxs 🎄",logoTextColor:"#fef2f2",logoLink:"https://omnistompboxs.myshopify.com/",menuTextColor:"#fca5a5",menus:[{text:"聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"聯絡我們",link:"https://omnistompboxs.myshopify.com/pages/contact"},{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"}]},
+ hero:{bgFrom:"#7f1d1d",bgTo:"#14532d",eyebrow:"🎄 聖誕限定優惠 2026",eyebrowColor:"#fbbf24",title:"送份真正有用的禮物\n給學校同事",titleColor:"#ffffff",accentText:"真正有用的禮物",accentColor:"#fbbf24",text:"趁聖誕前完成採購，新學年開學即用。預訂 OmniStompboxs 校務管理系統，享聖誕專屬優惠，省卻下學年的行政煩惱。",textColor:"#fca5a5",tags:["#聖誕優惠","#限時特惠","#校務系統","#新年開學"],btnPrimary:{text:"🎁 查看聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnOutline:{text:"預約示範",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#fbbf24",borderColor:"#f59e0b"}},
+ intro:{text1:"每到年尾，行政工作堆積、師生資料要更新、新學期的準備又要開始——這些工作，其實可以提早做好準備。",text2:"OmniStompboxs School 讓學校在聖誕假期後，以更有條理的方式迎接新學年。現在訂閱，聖誕前確認方案，一月開學即可全面啟用。",textColor:"#4b5563",brandText:"OmniStompboxs School",brandColor:"#dc2626",btnA:{text:"🎄 聖誕優惠詳情",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnB:{text:"即時查詢",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#dc2626",borderColor:"#dc2626"}},
+ features:{title:"🎁 六大功能，送給學校最好的禮物",subtitle:"讓新學年從第一天起就更有效率。",titleColor:"#111827",subtitleColor:"#6b7280",accentColor:"#dc2626",items:[
+  {icon:"🎅",title:"電子點名\n開學即用",titleColor:"#111827",desc:"聖誕前完成設定，開學第一天點名即可全面電子化，數據自動整理。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-attendance",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🎄",title:"活動回條\n家長一鍵回覆",titleColor:"#111827",desc:"農曆新年活動、開學典禮回條，全部電子化處理，不再逐張收紙。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"⭐",title:"學生資料集中\n新學年更新更快",titleColor:"#111827",desc:"年度資料更新在同一平台完成，不需要多個表格互相對照。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-reports",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🔔",title:"家校通知\n假期都能發送",titleColor:"#111827",desc:"重要通知透過家長入口發送，假期緊急聯絡不再靠人手逐個傳訊。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🎁",title:"教學資源\n新學期整理好",titleColor:"#111827",desc:"趁聖誕假期整理教材、更新課程資源，新學年開始即可分享給全科同事。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/teaching-resources",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🌟",title:"靈活訂閱方案\n按需付費",titleColor:"#111827",desc:"按學校規模與功能需求選擇方案，不需要為用不着的功能多付。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/plans",linkText:"查看方案 →",linkColor:"#dc2626"}
+ ]},
+ security:{bg:"#fff7ed",borderColor:"#fed7aa",title:"資料安全，節日一樣有保障",subtitle:"角色權限・操作記錄・資料保護",titleColor:"#111827",subtitleColor:"#6b7280",intro:"即使在聖誕假期，學校的學生資料和行政記錄都受到妥善保護。系統全年運作，讓管理員隨時掌握資料存取情況。",introColor:"#4b5563",cardBorder:"#fdba74",items:[
+  {icon:"🔐",title:"角色權限，放假都生效",titleColor:"#9a3412",desc:"不同職務的教職員只能查看和操作其負責範圍的資料，假期期間亦如常執行。",descColor:"#6b7280"},
+  {icon:"🏥",title:"健康資料，嚴格分級",titleColor:"#9a3412",desc:"學生健康記錄按職務設定存取限制，確保敏感資訊只供有需要的人員查閱。",descColor:"#6b7280"},
+  {icon:"🗄️",title:"資料庫層級保護",titleColor:"#9a3412",desc:"權限控制落實至資料庫層面，不依賴畫面隱藏，確保底層數據安全。",descColor:"#6b7280"},
+  {icon:"📝",title:"操作記錄，全年追蹤",titleColor:"#9a3412",desc:"重要資料的查閱與修改均有記錄，方便節後審查及異常跟進。",descColor:"#6b7280"}
+ ],noteText:"聖誕節前預訂，可安排假期後示範，確保開學第一天順利使用。歡迎預約示範了解詳情。",noteLinkText:"歡迎預約示範了解詳情",noteLinkUrl:"https://omnistompboxs.myshopify.com/pages/contact",noteLinkColor:"#dc2626",noteColor:"#9a3412",noteBg:"#fff7ed",noteBorder:"#fed7aa"},
+ midCta:{bg:"#fef2f2",borderColor:"#fecaca",highlight:"🎄 聖誕前訂閱，\n新學年即刻用得着。",highlightColor:"#991b1b",text:"聖誕假期是最好的時機——趁老師較空閒，完成系統設定和資料整理，讓開學第一天從容不迫。",textColor:"#374151",btn:{text:"🎁 查看聖誕優惠方案",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"}},
+ services:{title:"聖誕前，我們能為你做什麼",titleColor:"#111827",items:[
+  {icon:"🎅",title:"聖誕前快速示範",titleColor:"#111827",desc:"30 分鐘示範，聖誕前確認方案",descColor:"#6b7280"},
+  {icon:"🎄",title:"假期後快速部署",titleColor:"#111827",desc:"1 月初可完成設定，開學即用",descColor:"#6b7280"},
+  {icon:"🌟",title:"聖誕限定優惠",titleColor:"#111827",desc:"現在訂閱享專屬折扣，詳情請查詢",descColor:"#6b7280"}
+ ],note:"優惠有效期至 2026 年 12 月 31 日，名額有限。",noteColor:"#9ca3af"},
+ finalCta:{bgFrom:"#7f1d1d",bgTo:"#14532d",title:"🎄 給學校同事\n最實用的聖誕禮物",titleColor:"#ffffff",text:"聖誕前完成採購，新學年開學即用。歡迎預約示範，了解如何在假期後快速上線。",textColor:"#fca5a5",btn:{text:"🎁 立即查詢聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/contact",textColor:"#7f1d1d"}},
+ footer:{bg:"#1c0a00",logoText:"OmniStompboxs 🎄",logoColor:"#fef2f2",desc:"企業雲端 ERP 及學校管理系統\n祝大家聖誕快樂，新年進步！",descColor:"#9a3412",email:"omnistompboxsystem@gmail.com",website:"omnistompboxs.myshopify.com",contactColor:"#9a3412",links:[{text:"聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},{text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}],linkColor:"#78350f",copyright:"© 2026 OmniStompboxs. All rights reserved. 🎄 Merry Christmas!",copyrightColor:"#92400e"}
+},
+
+// ── 🧧 農曆新年 ──────────────────────────
+cny:{
+ nav:{bg:"#7f1d1d",logoText:"OmniStompboxs 🧧",logoTextColor:"#fef2f2",logoLink:"https://omnistompboxs.myshopify.com/",menuTextColor:"#fca5a5",menus:[{text:"新春優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"聯絡我們",link:"https://omnistompboxs.myshopify.com/pages/contact"},{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"}]},
+ hero:{bgFrom:"#7f1d1d",bgTo:"#92400e",eyebrow:"🧧 農曆新年限定優惠",eyebrowColor:"#fbbf24",title:"新年新開始，\n校務管理換個新方法",titleColor:"#ffffff",accentText:"換個新方法",accentColor:"#fbbf24",text:"農曆新年是換個新方式的好時機。趁開學前完成系統部署，讓新學期的行政工作更有條理，把時間留給學生。",textColor:"#fca5a5",tags:["#新春優惠","#農曆新年","#校務系統","#新學期"],btnPrimary:{text:"🧧 查看新春優惠",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnOutline:{text:"預約示範",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#fbbf24",borderColor:"#f59e0b"}},
+ intro:{text1:"每年農曆新年後，學校都要重新起步——更新學生資料、安排新學期活動、跟進家長回條，行政工作接踵而來。",text2:"OmniStompboxs School 讓你在新春前完成部署，開學第一天就以嶄新方式處理校務。現在訂閱，享農曆新年專屬優惠。",textColor:"#4b5563",brandText:"OmniStompboxs School",brandColor:"#dc2626",btnA:{text:"🧧 新春優惠詳情",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnB:{text:"即時查詢",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#dc2626",borderColor:"#dc2626"}},
+ features:{title:"🧧 六大功能，新春新開始",subtitle:"農曆新年後開學，以全新方式處理校務。",titleColor:"#111827",subtitleColor:"#6b7280",accentColor:"#dc2626",items:[
+  {icon:"🧧",title:"電子點名\n新學期即啟用",titleColor:"#111827",desc:"農曆新年假期完成設定，開學第一天即可全面電子點名。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-attendance",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🌸",title:"活動回條\n家長一鍵回覆",titleColor:"#111827",desc:"開學活動、家長日邀請，透過家長入口一鍵發送及回覆。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"📂",title:"學生資料\n新年更新不再麻煩",titleColor:"#111827",desc:"年度資料更新在同一平台完成，資料集中管理，不再多個表格對照。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-reports",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🏮",title:"家校溝通\n新春第一天開始",titleColor:"#111827",desc:"家長入口讓家校溝通更直接，開學通知、緊急聯絡一站搞定。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"📚",title:"教學資源\n新學期整理好",titleColor:"#111827",desc:"農曆假期整理教材，新學期開始即可分享給科組同事，減少重複工作。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/teaching-resources",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"💰",title:"靈活方案\n只付用得着的",titleColor:"#111827",desc:"按學校規模選擇功能模組，新春優惠期間訂閱可享額外折扣。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/plans",linkText:"查看方案 →",linkColor:"#dc2626"}
+ ]},
+ security:{bg:"#fff7ed",borderColor:"#fed7aa",title:"資料安全，新年一樣有保障",subtitle:"角色權限・操作記錄・資料保護",titleColor:"#111827",subtitleColor:"#6b7280",intro:"農曆假期期間，學校資料依然受到妥善保護。系統全年運作，確保敏感資訊在假期中也不會出現管理漏洞。",introColor:"#4b5563",cardBorder:"#fdba74",items:[
+  {icon:"🔐",title:"角色權限，全年運作",titleColor:"#9a3412",desc:"不同職務的教職員只能存取其負責範圍的資料，農曆假期期間亦如常執行。",descColor:"#6b7280"},
+  {icon:"🏥",title:"敏感資料，嚴格保護",titleColor:"#9a3412",desc:"健康記錄等敏感資料按職務設定存取權限，確保資料只供有需要的人員查閱。",descColor:"#6b7280"},
+  {icon:"🗄️",title:"資料庫層面保護",titleColor:"#9a3412",desc:"權限控制落實至資料庫層面，不依賴畫面隱藏，底層數據全面保護。",descColor:"#6b7280"},
+  {icon:"📝",title:"操作記錄，新年後可審查",titleColor:"#9a3412",desc:"重要資料操作均有記錄，方便新年後審查及跟進任何異常情況。",descColor:"#6b7280"}
+ ],noteText:"農曆新年前預訂，可安排假期後快速示範，確保開學即用。歡迎預約示範了解詳情。",noteLinkText:"歡迎預約示範了解詳情",noteLinkUrl:"https://omnistompboxs.myshopify.com/pages/contact",noteLinkColor:"#dc2626",noteColor:"#9a3412",noteBg:"#fff7ed",noteBorder:"#fed7aa"},
+ midCta:{bg:"#fef2f2",borderColor:"#fecaca",highlight:"🧧 新春前訂閱，\n開學第一天就不同。",highlightColor:"#991b1b",text:"農曆假期是最好的過渡時機——趁放假前完成設定，讓教職員開學後以全新方式處理日常校務。",textColor:"#374151",btn:{text:"🧧 查看新春優惠方案",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"}},
+ services:{title:"新春前，我們能為你做什麼",titleColor:"#111827",items:[
+  {icon:"🧧",title:"年前快速示範",titleColor:"#111827",desc:"30 分鐘示範，年前確認方案",descColor:"#6b7280"},
+  {icon:"🌸",title:"假期後快速部署",titleColor:"#111827",desc:"年初三後可完成設定，開學即用",descColor:"#6b7280"},
+  {icon:"💰",title:"新春限定優惠",titleColor:"#111827",desc:"農曆新年期間訂閱享專屬折扣",descColor:"#6b7280"}
+ ],note:"新春優惠有效期至農曆正月十五，名額有限，先到先得。",noteColor:"#9ca3af"},
+ finalCta:{bgFrom:"#7f1d1d",bgTo:"#92400e",title:"🧧 新年新開始，\n學校行政換個方式",titleColor:"#ffffff",text:"農曆新年前完成採購，開學第一天即可全面啟用。歡迎預約示範，了解如何快速上線。",textColor:"#fca5a5",btn:{text:"🧧 立即查詢新春優惠",link:"https://omnistompboxs.myshopify.com/pages/contact",textColor:"#7f1d1d"}},
+ footer:{bg:"#1c0a00",logoText:"OmniStompboxs 🧧",logoColor:"#fef2f2",desc:"企業雲端 ERP 及學校管理系統\n恭賀新禧，萬事如意！",descColor:"#9a3412",email:"omnistompboxsystem@gmail.com",website:"omnistompboxs.myshopify.com",contactColor:"#9a3412",links:[{text:"新春優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},{text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}],linkColor:"#78350f",copyright:"© 2027 OmniStompboxs. All rights reserved. 🧧 恭賀新禧！",copyrightColor:"#92400e"}
+}
+
+}; // end TEMPLATES
 
 // ═══════════════════════════════════════
-// HELPERS
+// ACTIVE STATE
 // ═══════════════════════════════════════
-const q=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const qb=s=>q(s).replace(/\n/g,"<br>");
+let D=dc(TEMPLATES.school);
+let currentTpl='school';
+const TPL_COLORS={school:'#1e3a5f',christmas:'#dc2626',cny:'#991b1b'};
+
+function loadTpl(key){
+ if(!confirm('切換範本會清除目前編輯內容，確定繼續？'))return;
+ currentTpl=key;
+ D=dc(TEMPLATES[key]);
+ document.querySelectorAll('.tbtn').forEach(b=>{
+  b.classList.remove('on');
+  b.style.background='';b.style.color='';b.style.borderColor='';
+ });
+ const el=document.getElementById('tpl_'+key);
+ el.classList.add('on');
+ el.style.background=TPL_COLORS[key];
+ el.style.color='#fff';
+ el.style.borderColor=TPL_COLORS[key];
+ buildEd();rf();
+}
 
 // ═══════════════════════════════════════
 // EMAIL HTML GENERATORS
@@ -168,7 +265,7 @@ function genEmail(){
  return`<!DOCTYPE html>
 <html lang="zh-HK">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>OmniStompboxs School</title>
+<title>OmniStompboxs</title>
 <style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f0f2f5;}.w{max-width:640px;margin:0 auto;background:#fff;}@media(max-width:520px){.w{width:100%!important;}table td{display:block!important;width:100%!important;padding:0 0 14px 0!important;}}</style>
 </head>
 <body>{{ open_tracking_block }}
@@ -196,9 +293,10 @@ function sm(m){
 // EXPORT / IMPORT
 // ═══════════════════════════════════════
 function ex(){
+ const fname=`edm-${currentTpl}.html`;
  const b=new Blob([genEmail()],{type:"text/html;charset=utf-8"});
  const u=URL.createObjectURL(b),a=document.createElement("a");
- a.href=u;a.download="edm-school.html";
+ a.href=u;a.download=fname;
  document.body.appendChild(a);a.click();
  document.body.removeChild(a);URL.revokeObjectURL(u);
 }
@@ -208,7 +306,7 @@ function im(ev){
  r.onload=e=>{
   const m=e.target.result.match(/<!--\s*EDM-DATA:([\s\S]*?)-->/);
   if(!m){alert("找不到資料，請確認此 HTML 由本工具導出。");return;}
-  try{Object.assign(D,JSON.parse(m[1].trim().replace(/--\\>/g,"-->")));buildEd();rf();}
+  try{D=dc(JSON.parse(m[1].trim().replace(/--\\>/g,"-->")));buildEd();rf();}
   catch(x){alert("資料解析失敗。");}
  };
  r.readAsText(file);ev.target.value="";
@@ -228,7 +326,6 @@ function buildEd(){
  const T=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}">${lbl}</label><textarea id="${id}" oninput="upd('${id}',this.value)" rows="3">${q(gfn())}</textarea>`;};
  const C=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}" style="display:flex;align-items:center;gap:5px;"><input type="color" id="${id}" value="${gfn()}" oninput="upd('${id}',this.value)">${lbl}</label>`;};
 
- // NAV
  h+=`<hr><h4>🧭 導航欄</h4>`;
  h+=C("n_bg","背景色",()=>D.nav.bg,v=>D.nav.bg=v);
  h+=I("n_lt","Logo 文字",()=>D.nav.logoText,v=>D.nav.logoText=v);
@@ -242,7 +339,6 @@ function buildEd(){
   h+=`</div>`;
  });
 
- // HERO
  h+=`<hr><h4>🎯 Hero</h4>`;
  h+=`<div class="row">${C("h_bf","漸層起色",()=>D.hero.bgFrom,v=>D.hero.bgFrom=v)}${C("h_bt","漸層終色",()=>D.hero.bgTo,v=>D.hero.bgTo=v)}</div>`;
  h+=I("h_ew","Eyebrow",()=>D.hero.eyebrow,v=>D.hero.eyebrow=v);
@@ -263,7 +359,6 @@ function buildEd(){
  h+=I("h_ol","連結",()=>D.hero.btnOutline.link,v=>D.hero.btnOutline.link=v);
  h+=`<div class="row">${C("h_oc","文字色",()=>D.hero.btnOutline.color,v=>D.hero.btnOutline.color=v)}${C("h_ob","邊框色",()=>D.hero.btnOutline.borderColor,v=>D.hero.btnOutline.borderColor=v)}</div>`;
 
- // INTRO
  h+=`<hr><h4>📝 簡介</h4>`;
  h+=T("i_1","段落一",()=>D.intro.text1,v=>D.intro.text1=v);
  h+=T("i_2","段落二",()=>D.intro.text2,v=>D.intro.text2=v);
@@ -273,7 +368,6 @@ function buildEd(){
  h+=I("i_bt","按鈕 B 文字",()=>D.intro.btnB.text,v=>D.intro.btnB.text=v);
  h+=I("i_bl","按鈕 B 連結",()=>D.intro.btnB.link,v=>D.intro.btnB.link=v);
 
- // FEATURES
  h+=`<hr><h4>✨ 六大功能</h4>`;
  h+=I("f_ti","區塊標題",()=>D.features.title,v=>D.features.title=v);
  h+=I("f_su","副標題",()=>D.features.subtitle,v=>D.features.subtitle=v);
@@ -288,7 +382,6 @@ function buildEd(){
   h+=`</div>`;
  });
 
- // SECURITY
  h+=`<hr><h4>🔐 安全管理</h4>`;
  h+=I("s_ti","區塊標題",()=>D.security.title,v=>D.security.title=v);
  h+=I("s_su","副標題",()=>D.security.subtitle,v=>D.security.subtitle=v);
@@ -304,7 +397,6 @@ function buildEd(){
  h+=I("s_nl","連結文字（需與備注一致）",()=>D.security.noteLinkText,v=>D.security.noteLinkText=v);
  h+=I("s_nu","連結 URL",()=>D.security.noteLinkUrl,v=>D.security.noteLinkUrl=v);
 
- // MID CTA
  h+=`<hr><h4>💡 中部號召</h4>`;
  h+=T("mc_hi","Highlight（Enter 換行）",()=>D.midCta.highlight,v=>D.midCta.highlight=v);
  h+=C("mc_hc","Highlight 顏色",()=>D.midCta.highlightColor,v=>D.midCta.highlightColor=v);
@@ -313,7 +405,6 @@ function buildEd(){
  h+=I("mc_bl","按鈕連結",()=>D.midCta.btn.link,v=>D.midCta.btn.link=v);
  h+=C("mc_bc","按鈕顏色",()=>D.midCta.btn.color,v=>D.midCta.btn.color=v);
 
- // SERVICES
  h+=`<hr><h4>🛎 服務項目</h4>`;
  h+=I("sv_ti","標題",()=>D.services.title,v=>D.services.title=v);
  D.services.items.forEach((it,i)=>{
@@ -325,7 +416,6 @@ function buildEd(){
  });
  h+=I("sv_no","備注",()=>D.services.note,v=>D.services.note=v);
 
- // FINAL CTA
  h+=`<hr><h4>🚀 最終號召</h4>`;
  h+=`<div class="row">${C("fc_bf","漸層起",()=>D.finalCta.bgFrom,v=>D.finalCta.bgFrom=v)}${C("fc_bt","漸層終",()=>D.finalCta.bgTo,v=>D.finalCta.bgTo=v)}</div>`;
  h+=T("fc_ti","標題（Enter 換行）",()=>D.finalCta.title,v=>D.finalCta.title=v);
@@ -335,7 +425,6 @@ function buildEd(){
  h+=I("fc_bl","按鈕連結",()=>D.finalCta.btn.link,v=>D.finalCta.btn.link=v);
  h+=C("fc_bc","按鈕文字顏色",()=>D.finalCta.btn.textColor,v=>D.finalCta.btn.textColor=v);
 
- // FOOTER
  h+=`<hr><h4>📌 頁尾</h4>`;
  h+=C("ft_bg","背景色",()=>D.footer.bg,v=>D.footer.bg=v);
  h+=I("ft_lt","Logo 文字",()=>D.footer.logoText,v=>D.footer.logoText=v);
