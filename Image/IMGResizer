@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>IMG Resizer + IG Grid Split</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinning{animation:spin .8s linear infinite;display:inline-block}
+  input[type=range]{accent-color:#2563eb;cursor:pointer}
+  input[type=color]{-webkit-appearance:none;appearance:none;border:2px solid #e5e7eb;border-radius:50%;padding:0;cursor:pointer;overflow:hidden}
+  .hidden{display:none!important}
+  .drag-over{outline:2px solid #3b82f6;transform:scale(1.05)}
+  .dragging{opacity:.3;transform:scale(.95)}
+</style>
+</head>
+<body class="bg-gray-100 min-h-screen text-sm text-gray-800 font-sans">
+
+<input type="file" id="ba-file-input" multiple accept="image/*" style="display:none" onchange="baAddFiles(this.files);this.value=''">
+<input type="file" id="gs-file-input" accept="image/*" style="display:none" onchange="gsUpload(this.files[0]);this.value=''">
+
+<!-- ═══ HEADER ═══ -->
+<header class="sticky top-0 z-20 bg-white border-b border-gray-200 px-6 flex items-center justify-between" style="height:56px">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </div>
+    <div>
+      <div class="font-bold text-gray-900 leading-tight">IMG Resizer</div>
+      <div class="text-xs text-gray-500 leading-tight">批量調整 + IG 格線分割</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-3">
+    <div id="hdr-count" class="text-xs px-2.5 py-1 rounded-full font-mono font-semibold bg-gray-100 text-gray-500">0 / 20</div>
+    <div id="hdr-status" class="flex items-center gap-3"></div>
+  </div>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<main class="max-w-3xl mx-auto px-4 py-8 space-y-4">
+
+  <!-- Tool A Label -->
+  <div class="flex items-center gap-3 px-1">
+    <div class="h-px flex-1 bg-gray-200"></div>
+    <span class="text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">工具 A — 批量調整尺寸</span>
+    <div class="h-px flex-1 bg-gray-200"></div>
+  </div>
+
+  <!-- ══ STEP 1: SETTINGS ══ -->
+  <section class="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">1</div>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      <span class="font-semibold text-gray-800">命名 ＆ 尺寸設定</span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1.5">品牌</label>
+            <input type="text" id="ba-brand" placeholder="Brand" oninput="baUpdateNaming()"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 transition">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1.5">SKU</label>
+            <input type="text" id="ba-sku" placeholder="e.g. E3451" oninput="baUpdateNaming()"
+              class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-200 transition">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1.5">Start Number Offset</label>
+          <select id="ba-offset" onchange="BA.offset=+this.value;baUpdateNaming()"
+            class="w-full border border-gray-200 rounded-xl px-3 py-2.5 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-200 transition cursor-pointer">
+            <option value="0">從 01 開始（預設）</option>
+            <option value="1">從 02 開始 (+1)</option>
+            <option value="2">從 03 開始 (+2)</option>
+            <option value="3">從 04 開始 (+3)</option>
+            <option value="4">從 05 開始 (+4)</option>
+            <option value="5">從 06 開始 (+5)</option>
+            <option value="6">從 07 開始 (+6)</option>
+            <option value="7">從 08 開始 (+7)</option>
+            <option value="8">從 09 開始 (+8)</option>
+            <option value="9">從 10 開始 (+9)</option>
+            <option value="10">從 11 開始 (+10)</option>
+            <option value="15">從 16 開始 (+15)</option>
+            <option value="20">從 21 開始 (+20)</option>
+          </select>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1.5">命名預覽</label>
+          <div class="border border-gray-200 rounded-xl px-4 h-11 flex items-center bg-gray-50 overflow-hidden">
+            <span id="ba-name-preview" class="text-sm font-mono text-blue-600 truncate">01.jpg</span>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 uppercase tracking-widest mb-1.5">ZIP 檔名</label>
+          <div class="border border-gray-200 rounded-xl px-4 h-11 flex items-center gap-2 bg-gray-50 overflow-hidden">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+              <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+            </svg>
+            <span id="ba-zip-preview" class="text-sm font-mono text-purple-600 truncate">images.zip</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resolution -->
+    <div>
+      <label class="block text-xs text-gray-400 uppercase tracking-widest mb-2">解析度</label>
+      <div id="ba-res-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+    </div>
+
+    <!-- Mode -->
+    <div>
+      <label class="block text-xs text-gray-400 uppercase tracking-widest mb-2">模式</label>
+      <div id="ba-mode-grid" class="grid grid-cols-3 gap-3"></div>
+    </div>
+
+    <!-- Fit BG -->
+    <div id="ba-fitbg-row" class="hidden border border-purple-200 bg-purple-50 rounded-xl px-4 py-3">
+      <div class="flex flex-wrap items-center gap-4">
+        <div>
+          <div class="text-xs font-semibold text-purple-700 mb-0.5">Fit 補背景色</div>
+          <div class="text-xs text-gray-400">圖片等比縮放置中，四邊補色</div>
+        </div>
+        <div class="flex items-center gap-2 ml-auto">
+          <span class="text-xs text-gray-400">補色：</span>
+          <div id="ba-bg-presets" class="flex items-center gap-1.5"></div>
+          <input type="color" id="ba-bg-custom" value="#ffffff" oninput="baSetBg(this.value)" class="w-7 h-7" title="自訂顏色">
+        </div>
+      </div>
+    </div>
+
+    <!-- Zoom -->
+    <div id="ba-zoom-row" class="border border-blue-200 bg-blue-50 rounded-xl px-4 py-3">
+      <div class="flex items-center gap-4">
+        <div class="flex-shrink-0">
+          <div class="text-xs font-semibold text-blue-700 mb-0.5">Zoom <span id="ba-zoom-val">1.0</span>×</div>
+          <div class="text-xs text-gray-400">放大後裁切填滿</div>
+        </div>
+        <input type="range" id="ba-zoom" min="1.0" max="2.0" step="0.1" value="1.0"
+          oninput="BA.zoom=parseFloat(this.value);document.getElementById('ba-zoom-val').textContent=BA.zoom.toFixed(1)"
+          class="flex-1">
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STEP 2: UPLOAD ══ -->
+  <section>
+    <div class="flex items-center gap-2 mb-3 px-1">
+      <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">2</div>
+      <span class="font-semibold text-gray-800">上傳圖片</span>
+      <span class="text-xs text-gray-400">最多 20 張</span>
+      <span id="ba-uploading-badge" class="hidden items-center gap-1 text-xs text-blue-500 ml-1">
+        <span class="spinning text-blue-500">↻</span> 處理縮圖中…
+      </span>
+      <button id="ba-clear-btn" onclick="baClearAll()" disabled
+        class="ml-auto flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border font-semibold transition-all border-gray-200 text-gray-400 cursor-not-allowed">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        一鍵清除
+      </button>
+    </div>
+
+    <div id="ba-upload-zone"
+      ondragover="event.preventDefault();if(!BA.dragSrc)this.classList.add('border-blue-400','bg-blue-50')"
+      ondragleave="this.classList.remove('border-blue-400','bg-blue-50')"
+      ondrop="event.preventDefault();this.classList.remove('border-blue-400','bg-blue-50');if(!BA.dragSrc&&BA.images.length<20)baAddFiles(event.dataTransfer.files)"
+      onclick="document.getElementById('ba-file-input').click()"
+      class="border-2 border-dashed border-gray-300 rounded-2xl py-10 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+      <div class="flex flex-col items-center gap-3 pointer-events-none">
+        <div class="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-gray-700">拖到這邊上傳</div>
+          <div id="ba-upload-sub" class="text-xs text-gray-400 mt-1">或點擊選擇檔案 · JPG / PNG · 可多選 · 尚可上傳 20 張</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ba-limit-zone" class="hidden border-2 border-dashed border-red-300 bg-red-50 rounded-2xl py-8 text-center">
+      <div class="flex flex-col items-center gap-2">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <div class="font-semibold text-red-500">已達上限 20 張</div>
+        <div class="text-xs text-gray-400 mb-1">請先清除圖片再上傳</div>
+        <button onclick="baClearAll()" class="text-xs text-red-500 border border-red-300 bg-white hover:bg-red-50 px-4 py-2 rounded-xl font-semibold transition">一鍵清除，重新開始</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ STEP 3: PREVIEW ══ -->
+  <section id="ba-preview-sec" class="hidden">
+    <div class="flex items-center gap-2 mb-3 px-1">
+      <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">3</div>
+      <span class="font-semibold text-gray-800">全部預覽</span>
+      <div id="ba-mode-badge"></div>
+      <span class="flex items-center gap-1 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="5" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="19" r="1" fill="currentColor"/>
+          <circle cx="15" cy="5" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="19" r="1" fill="currentColor"/>
+        </svg>
+        拖拉可排序
+      </span>
+      <button onclick="baClearAll()" class="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+        全部清除
+      </button>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-2xl p-4">
+      <div id="ba-img-grid" class="grid grid-cols-4 md:grid-cols-5 gap-2"></div>
+    </div>
+  </section>
+
+  <!-- ══ STEP 4: DOWNLOAD ══ -->
+  <section id="ba-download-sec" class="hidden bg-white border border-gray-200 rounded-2xl p-5 space-y-3">
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">4</div>
+      <span class="font-semibold text-gray-800">下載</span>
+      <span id="ba-dl-info" class="text-xs text-gray-400"></span>
+      <span id="ba-dl-zipname" class="ml-auto text-xs font-mono text-purple-500 truncate max-w-xs"></span>
+    </div>
+
+    <div id="ba-dl-prog" class="hidden space-y-1">
+      <span id="ba-prog-label" class="text-xs font-mono text-blue-500"></span>
+      <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div id="ba-prog-bar" class="h-full rounded-full transition-all duration-300" style="width:0%"></div>
+      </div>
+    </div>
+
+    <button id="ba-dl-clear" onclick="baClearAll()"
+      class="w-full flex items-center justify-center gap-2 border border-gray-200 hover:bg-gray-50 active:scale-95 transition-all px-5 py-2.5 rounded-xl font-semibold text-gray-600">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      清除重來
+    </button>
+
+    <div class="grid grid-cols-3 gap-3">
+      <button id="ba-btn-merge" onclick="baMergeLong()"
+        class="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-bold transition-all bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 active:scale-95">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+        </svg>
+        <span id="ba-btn-merge-txt" class="leading-none text-xs">Merge Long</span>
+      </button>
+      <button id="ba-btn-zip" onclick="baDownloadZip()"
+        class="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-bold transition-all bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 active:scale-95">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+        </svg>
+        <span id="ba-btn-zip-txt" class="leading-none text-xs">下載 ZIP</span>
+      </button>
+      <button id="ba-btn-dl" onclick="baDownloadAll()"
+        class="flex flex-col items-center justify-center gap-2 py-4 rounded-xl font-bold transition-all bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 active:scale-95">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span id="ba-btn-dl-txt" class="leading-none text-xs">逐張下載</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══ DIVIDER ═══ -->
+  <div class="py-4">
+    <div class="flex items-center gap-3">
+      <div class="h-px flex-1 bg-gray-200"></div>
+      <span class="text-xs font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">工具 B — IG 格線分割</span>
+      <div class="h-px flex-1 bg-gray-200"></div>
+    </div>
+  </div>
+
+  <!-- ══ TOOL B: GRID SPLIT ══ -->
+  <section class="bg-white border border-gray-200 rounded-2xl p-6 space-y-5">
+    <div class="flex items-center gap-2">
+      <div class="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">5</div>
+      <span class="font-semibold text-gray-800">IG 格線分割</span>
+      <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">每格 1080 × 1350</span>
+    </div>
+
+    <!-- Upload zone (before upload) -->
+    <div id="gs-upload-zone"
+      ondragover="event.preventDefault();this.classList.add('border-blue-400','bg-blue-50')"
+      ondragleave="this.classList.remove('border-blue-400','bg-blue-50')"
+      ondrop="event.preventDefault();this.classList.remove('border-blue-400','bg-blue-50');if(event.dataTransfer.files[0])gsUpload(event.dataTransfer.files[0])"
+      onclick="document.getElementById('gs-file-input').click()"
+      class="border-2 border-dashed border-gray-300 rounded-2xl py-10 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all">
+      <div class="flex flex-col items-center gap-3 pointer-events-none">
+        <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-gray-700">上傳原圖</div>
+          <div class="text-xs text-gray-400 mt-1">單張圖片 · JPG / PNG · 建議高解析度</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings & Preview (after upload) -->
+    <div id="gs-settings" class="hidden space-y-5">
+
+      <!-- File info -->
+      <div class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+        <div class="flex items-center gap-3">
+          <img id="gs-thumb" src="" alt="" class="w-10 h-10 rounded-lg object-cover border border-gray-200">
+          <div>
+            <div id="gs-file-name" class="font-medium text-gray-700 truncate max-w-xs"></div>
+            <div id="gs-file-dim" class="text-xs text-gray-400 mt-0.5"></div>
+          </div>
+        </div>
+        <button onclick="gsReset()" class="flex-shrink-0 flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition ml-3">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          更換
+        </button>
+      </div>
+
+      <!-- Tile count -->
+      <div>
+        <label class="block text-xs text-gray-400 uppercase tracking-widest mb-2">分割格數</label>
+        <div class="grid grid-cols-3 gap-3">
+          <button onclick="gsSetTiles(3)" id="gs-btn-3"
+            class="flex flex-col items-center justify-center py-5 rounded-xl border-2 font-bold transition-all border-blue-500 bg-blue-50 text-blue-600">
+            <span class="text-3xl font-mono leading-none">3</span>
+            <span class="text-xs text-blue-400 mt-1">3 × 1 格</span>
+            <span class="text-xs text-gray-400 mt-0.5">3240 × 1350</span>
+          </button>
+          <button onclick="gsSetTiles(6)" id="gs-btn-6"
+            class="flex flex-col items-center justify-center py-5 rounded-xl border-2 font-bold transition-all border-gray-200 text-gray-400 hover:border-gray-300">
+            <span class="text-3xl font-mono leading-none">6</span>
+            <span class="text-xs mt-1 opacity-60">3 × 2 格</span>
+            <span class="text-xs opacity-40 mt-0.5">3240 × 2700</span>
+          </button>
+          <button onclick="gsSetTiles(9)" id="gs-btn-9"
+            class="flex flex-col items-center justify-center py-5 rounded-xl border-2 font-bold transition-all border-gray-200 text-gray-400 hover:border-gray-300">
+            <span class="text-3xl font-mono leading-none">9</span>
+            <span class="text-xs mt-1 opacity-60">3 × 3 格</span>
+            <span class="text-xs opacity-40 mt-0.5">3240 × 4050</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Split progress -->
+      <div id="gs-split-prog" class="hidden space-y-1">
+        <div class="text-xs text-blue-500 font-mono">切割處理中…</div>
+        <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <div id="gs-prog-bar" class="h-full bg-blue-500 rounded-full transition-all duration-200" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Preview grid -->
+      <div id="gs-preview-container" class="hidden space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="text-xs text-gray-400 uppercase tracking-widest">分割預覽</label>
+          <span class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">數字 = 發佈順序</span>
+        </div>
+
+        <!-- Grid -->
+        <div id="gs-preview-grid" class="rounded-xl overflow-hidden border border-gray-200 grid grid-cols-3 gap-px bg-gray-200"></div>
+
+        <!-- Legend -->
+        <div class="flex items-center gap-3 text-xs text-gray-500 px-1">
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-xs">1</div>
+            <span>最先發佈</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-xs">N</div>
+            <span>最後發佈</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <div class="w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-white font-bold text-xs">·</div>
+            <span>中間格</span>
+          </div>
+        </div>
+
+        <!-- Posting tip -->
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5">
+          <div class="text-xs font-semibold text-amber-700 mb-1.5">📱 IG 發佈順序提示</div>
+          <div id="gs-posting-tip" class="text-xs text-amber-600 leading-relaxed"></div>
+        </div>
+
+        <!-- Profile layout diagram -->
+        <div id="gs-diagram" class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+          <div class="text-xs font-semibold text-gray-500 mb-2">發佈後 IG Profile 外觀（最新在左上）</div>
+          <div id="gs-diagram-grid" class="font-mono text-xs text-gray-500 leading-relaxed"></div>
+        </div>
+      </div>
+
+      <!-- Download button -->
+      <button id="gs-dl-btn" onclick="gsDownloadZip()" disabled
+        class="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-all bg-gray-100 text-gray-400 cursor-not-allowed">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+        </svg>
+        <span id="gs-dl-txt">下載 ZIP（請先預覽）</span>
+      </button>
+    </div>
+  </section>
+
+</main>
+<footer class="text-center py-6 text-xs text-gray-400">Design by Tabris Yuen, 2026</footer>
+
+<!-- ═══════════════════════ SCRIPT ═══════════════════════ -->
+<script>
+// ════════ CONSTANTS ════════
+const MAX_IMAGES = 20;
+const RES_OPTIONS = [
+  {value:'1080x1080',w:1080,h:1080,label:'1 : 1',  sub:'1080 × 1080'},
+  {value:'1920x1080',w:1920,h:1080,label:'16 : 9', sub:'1920 × 1080'},
+  {value:'1080x1350',w:1080,h:1350,label:'4 : 5',  sub:'1080 × 1350'},
+  {value:'1080x1920',w:1080,h:1920,label:'9 : 16', sub:'1080 × 1920'},
+];
+const BG_PRESETS = ['#ffffff','#f3f4f6','#1f2937','#000000'];
+const MODE_OPTS = [
+  {value:'crop',   label:'Crop',   sub:'裁切填滿', aClass:'border-blue-500 bg-blue-50 text-blue-600',    dot:'bg-blue-500',
+   icon:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>`},
+  {value:'fit',    label:'Fit',    sub:'等比置中', aClass:'border-purple-500 bg-purple-50 text-purple-600', dot:'bg-purple-500',
+   icon:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`},
+  {value:'rename', label:'Rename', sub:'只重命名', aClass:'border-amber-500 bg-amber-50 text-amber-600',   dot:'bg-amber-500',
+   icon:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`},
+];
+
+// ════════ BATCH RESIZER STATE ════════
+const BA = {
+  brand:'', sku:'', offset:0,
+  res:'1080x1080', mode:'crop',
+  fitBg:'#ffffff', zoom:1.0,
+  images:[], idCounter:0,
+  isUploading:false, isDownloading:false, isZipping:false, isMerging:false,
+  dragSrc:null, dragOver:null,
+};
+
+// ════════ GRID SPLIT STATE ════════
+const GS = {
+  file:null, tiles:3, thumbUrl:null,
+  tileBlobs:[], isSplitting:false, isZipping:false,
+};
+
+// ════════ UTILITIES ════════
+function esc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function buildPrefix(b,s){ b=b.trim();s=s.trim(); return b&&s?`${b}-${s}`:b||s||''; }
+function buildImageName(b,s,i,off=0){ const p=buildPrefix(b,s); return p?`${p}-${pad2(i+1+off)}.jpg`:`${pad2(i+1+off)}.jpg`; }
+function buildZipName(b,s){ const p=buildPrefix(b,s); return p?`${p}.zip`:'images.zip'; }
+
+function pLimit(n){
+  let active=0; const q=[];
+  const next=()=>{ while(active<n&&q.length){ active++; const {fn,res,rej}=q.shift(); Promise.resolve().then(fn).then(v=>{res(v);active--;next();},e=>{rej(e);active--;next();}); } };
+  return fn=>new Promise((res,rej)=>{q.push({fn,res,rej});next();});
+}
+
+function triggerDownload(url, filename){
+  const a=Object.assign(document.createElement('a'),{href:url,download:filename});
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>document.body.removeChild(a),100);
+}
+
+function loadImage(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload =()=>{URL.revokeObjectURL(url);res(img);};
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('load fail'));};
+    img.src=url;
+  });
+}
+
+// ════════ CANVAS PROCESSOR ════════
+async function processCanvas(type, file, opts={}){
+  const img=await loadImage(file);
+  let canvas,ctx;
+  if(type==='thumbnail'){
+    const MAX=200,r=Math.min(MAX/img.width,MAX/img.height,1);
+    const w=Math.max(1,Math.round(img.width*r)),h=Math.max(1,Math.round(img.height*r));
+    canvas=Object.assign(document.createElement('canvas'),{width:w,height:h});
+    canvas.getContext('2d').drawImage(img,0,0,w,h);
+  } else if(type==='resize'){
+    const {size,fitBg='#ffffff',zoom=1.0}=opts;
+    canvas=Object.assign(document.createElement('canvas'),{width:size.w,height:size.h});
+    ctx=canvas.getContext('2d');
+    if(size.fit==='cover'){
+      const sc=Math.max(size.w/img.width,size.h/img.height)*zoom;
+      ctx.drawImage(img,(size.w-img.width*sc)/2,(size.h-img.height*sc)/2,img.width*sc,img.height*sc);
+    } else {
+      ctx.fillStyle=fitBg; ctx.fillRect(0,0,size.w,size.h);
+      const r=Math.min(size.w/img.width,size.h/img.height);
+      const w=Math.round(img.width*r),h=Math.round(img.height*r);
+      ctx.drawImage(img,Math.round((size.w-w)/2),Math.round((size.h-h)/2),w,h);
+    }
+  } else if(type==='merge'){
+    const {targetW}=opts;
+    const r=targetW/img.width,h=Math.max(1,Math.round(img.height*r));
+    canvas=Object.assign(document.createElement('canvas'),{width:targetW,height:h});
+    canvas.getContext('2d').drawImage(img,0,0,targetW,h);
+  } else if(type==='rename'){
+    canvas=Object.assign(document.createElement('canvas'),{width:img.width,height:img.height});
+    canvas.getContext('2d').drawImage(img,0,0);
+  }
+  return new Promise((res,rej)=>canvas.toBlob(b=>b?res(b):rej(new Error('toBlob fail')),'image/jpeg',0.92));
+}
+
+function getCurrentSize(){
+  const r=RES_OPTIONS.find(x=>x.value===BA.res)||RES_OPTIONS[0];
+  return {w:r.w,h:r.h,fit:BA.mode==='fit'?'contain':'cover',ratio:`${r.w} / ${r.h}`};
+}
+function getBlobForImage(img){
+  if(BA.mode==='rename') return processCanvas('rename',img.file);
+  return processCanvas('resize',img.file,{size:getCurrentSize(),fitBg:BA.fitBg,zoom:BA.zoom});
+}
+
+// ════════ BA: NAMING ════════
+function baUpdateNaming(){
+  BA.brand=document.getElementById('ba-brand').value;
+  BA.sku  =document.getElementById('ba-sku').value;
+  document.getElementById('ba-name-preview').textContent=buildImageName(BA.brand,BA.sku,0,BA.offset);
+  document.getElementById('ba-zip-preview').textContent =buildZipName(BA.brand,BA.sku);
+  if(BA.images.length){ baRenderGrid(); baDLInfo(); }
+}
+
+// ════════ BA: RESOLUTION GRID ════════
+function baInitResGrid(){
+  document.getElementById('ba-res-grid').innerHTML=RES_OPTIONS.map(res=>{
+    const a=BA.res===res.value;
+    return `<button onclick="baSetRes('${res.value}')"
+      class="flex flex-col items-center justify-center py-3.5 rounded-xl border-2 transition-all ${a?'border-blue-500 bg-blue-50 text-blue-600':'border-gray-200 text-gray-400 hover:border-gray-300'}">
+      <span class="text-base font-bold font-mono leading-tight">${res.label}</span>
+      <span class="text-xs font-mono opacity-50 mt-0.5">${res.sub}</span>
+      ${a?'<div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1"></div>':''}
+    </button>`;
+  }).join('');
+}
+function baSetRes(val){
+  BA.res=val; baInitResGrid();
+  if(BA.images.length){ baRenderGrid(); baDLInfo(); }
+}
+
+// ════════ BA: MODE GRID ════════
+function baInitModeGrid(){
+  document.getElementById('ba-mode-grid').innerHTML=MODE_OPTS.map(m=>{
+    const a=BA.mode===m.value;
+    return `<button onclick="baSetMode('${m.value}')"
+      class="flex flex-col items-center justify-center gap-1.5 py-4 rounded-xl border-2 transition-all ${a?m.aClass:'border-gray-200 text-gray-400 hover:border-gray-300'}">
+      ${m.icon}
+      <span class="font-bold text-sm">${m.label}</span>
+      <span class="text-xs opacity-50">${m.sub}</span>
+      ${a?`<div class="w-1.5 h-1.5 rounded-full ${m.dot}"></div>`:''}
+    </button>`;
+  }).join('');
+}
+function baSetMode(val){
+  BA.mode=val; baInitModeGrid();
+  document.getElementById('ba-fitbg-row').classList.toggle('hidden',val!=='fit');
+  document.getElementById('ba-zoom-row').classList.toggle('hidden',val==='fit'||val==='rename');
+  if(BA.images.length){ baRenderGrid(); baDLInfo(); }
+}
+
+// ════════ BA: BG PRESETS ════════
+function baRefreshBgPresets(){
+  document.getElementById('ba-bg-presets').innerHTML=BG_PRESETS.map(c=>
+    `<button onclick="baSetBg('${c}')"
+      class="w-6 h-6 rounded-full border-2 transition-all ${BA.fitBg===c?'border-blue-500 scale-110':'border-gray-300'}"
+      style="background:${c}"></button>`
+  ).join('');
+}
+function baSetBg(c){
+  BA.fitBg=c;
+  document.getElementById('ba-bg-custom').value=c;
+  baRefreshBgPresets();
+  if(BA.images.length) baRenderGrid();
+}
+
+// ════════ BA: UPLOAD ════════
+async function baAddFiles(files){
+  const remaining=MAX_IMAGES-BA.images.length;
+  const valid=Array.from(files).filter(f=>f.type.startsWith('image/')).slice(0,remaining);
+  if(!valid.length) return;
+  BA.isUploading=true; baUpdateUploadUI();
+  try {
+    const limit=pLimit(3);
+    const newImgs=await Promise.all(valid.map(file=>limit(async()=>{
+      const tb=await processCanvas('thumbnail',file);
+      return {id:++BA.idCounter,file,thumbUrl:URL.createObjectURL(tb)};
+    })));
+    BA.images.push(...newImgs);
+  } catch(e){ console.error(e); }
+  BA.isUploading=false; baUpdateUploadUI();
+  baRenderGrid(); baShowDownloadSection(); baUpdateHeader();
+}
+
+function baUpdateUploadUI(){
+  const isLimit=BA.images.length>=MAX_IMAGES;
+  document.getElementById('ba-upload-zone').classList.toggle('hidden',isLimit);
+  document.getElementById('ba-limit-zone').classList.toggle('hidden',!isLimit);
+
+  const badge=document.getElementById('hdr-count');
+  badge.textContent=`${BA.images.length} / ${MAX_IMAGES}`;
+  badge.className=`text-xs px-2.5 py-1 rounded-full font-mono font-semibold ${isLimit?'bg-red-100 text-red-500':'bg-gray-100 text-gray-500'}`;
+
+  const sub=document.getElementById('ba-upload-sub');
+  if(sub) sub.textContent=`或點擊選擇檔案 · JPG / PNG · 可多選 · 尚可上傳 ${MAX_IMAGES-BA.images.length} 張`;
+
+  const uploadBadge=document.getElementById('ba-uploading-badge');
+  uploadBadge.classList.toggle('hidden',!BA.isUploading);
+  uploadBadge.classList.toggle('flex',BA.isUploading);
+
+  const clearBtn=document.getElementById('ba-clear-btn');
+  if(BA.images.length>0){
+    clearBtn.disabled=false;
+    clearBtn.className='ml-auto flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border font-semibold transition-all border-red-200 text-red-500 bg-red-50 hover:bg-red-100 cursor-pointer';
+  } else {
+    clearBtn.disabled=true;
+    clearBtn.className='ml-auto flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border font-semibold transition-all border-gray-200 text-gray-400 cursor-not-allowed';
+  }
+}
+
+function baClearAll(){
+  BA.images.forEach(img=>URL.revokeObjectURL(img.thumbUrl));
+  BA.images=[];
+  baUpdateUploadUI(); baRenderGrid(); baShowDownloadSection(); baUpdateHeader();
+}
+
+// ════════ BA: RENDER IMAGE GRID ════════
+function baRenderGrid(){
+  const sec =document.getElementById('ba-preview-sec');
+  const grid=document.getElementById('ba-img-grid');
+  const badge=document.getElementById('ba-mode-badge');
+
+  if(!BA.images.length){ sec.classList.add('hidden'); grid.innerHTML=''; return; }
+  sec.classList.remove('hidden');
+
+  const size=getCurrentSize();
+  const isFit=BA.mode==='fit', isRename=BA.mode==='rename';
+
+  if(isRename)       badge.innerHTML='<span class="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Rename Only</span>';
+  else if(isFit)     badge.innerHTML='<span class="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">Fit 模式</span>';
+  else               badge.innerHTML='';
+
+  grid.innerHTML=BA.images.map((img,index)=>{
+    const fname=buildImageName(BA.brand,BA.sku,index,BA.offset);
+    const ratio=isRename?'1 / 1':size.ratio;
+    const objFit=(!isRename&&isFit)?'contain':'cover';
+    const bgColor=(!isRename&&isFit)?BA.fitBg:'#f9fafb';
+    const scale=(!isRename&&!isFit)?`scale(${BA.zoom})`:'none';
+
+    return `<div id="card-${img.id}"
+      draggable="true"
+      ondragstart="baDragStart(event,${img.id})"
+      ondragover="baDragOver(event,${img.id})"
+      ondrop="baDrop(event,${img.id})"
+      ondragend="baDragEnd()"
+      class="relative group rounded-xl overflow-hidden ring-1 ring-gray-200 select-none transition-all duration-150"
+      style="cursor:grab">
+      <div class="w-full relative overflow-hidden" style="aspect-ratio:${ratio};background:${bgColor}">
+        <img src="${img.thumbUrl}" alt="" draggable="false"
+          class="w-full h-full pointer-events-none"
+          style="object-fit:${objFit};transform:${scale}">
+        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 pointer-events-none group-hover:pointer-events-auto">
+          <div class="w-6 h-6 bg-gray-500/80 rounded-full flex items-center justify-center cursor-grab">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="5" r="1" fill="white"/><circle cx="9" cy="12" r="1" fill="white"/><circle cx="9" cy="19" r="1" fill="white"/>
+              <circle cx="15" cy="5" r="1" fill="white"/><circle cx="15" cy="12" r="1" fill="white"/><circle cx="15" cy="19" r="1" fill="white"/>
+            </svg>
+          </div>
+          <button onmousedown="event.stopPropagation()" onclick="baDeleteImage(${img.id})"
+            class="w-6 h-6 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="absolute top-1 left-1 bg-black/60 text-white rounded px-1 font-mono font-bold pointer-events-none" style="font-size:9px;padding-top:2px;padding-bottom:2px">
+          ${pad2(index+1+BA.offset)}
+        </div>
+      </div>
+      <div class="bg-gray-50 px-1.5 py-1 border-t border-gray-100">
+        <div class="font-mono text-blue-600 truncate" style="font-size:9px">${esc(fname)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function baDeleteImage(id){
+  const img=BA.images.find(x=>x.id===id);
+  if(img) URL.revokeObjectURL(img.thumbUrl);
+  BA.images=BA.images.filter(x=>x.id!==id);
+  baUpdateUploadUI(); baRenderGrid();
+  if(!BA.images.length) baShowDownloadSection();
+  baUpdateHeader();
+}
+
+// ════════ BA: DRAG REORDER ════════
+function baDragStart(e,id){
+  BA.dragSrc=id;
+  e.dataTransfer.effectAllowed='move';
+  const ghost=document.createElement('canvas'); ghost.width=ghost.height=1;
+  e.dataTransfer.setDragImage(ghost,0,0);
+  const card=document.getElementById(`card-${id}`);
+  if(card){ card.style.opacity='0.3'; card.style.transform='scale(0.95)'; card.style.cursor='grabbing'; }
+}
+function baDragOver(e,id){
+  e.preventDefault(); e.stopPropagation();
+  e.dataTransfer.dropEffect='move';
+  if(BA.dragOver!==id){
+    if(BA.dragOver){
+      const prev=document.getElementById(`card-${BA.dragOver}`);
+      if(prev){ prev.style.outline=''; prev.style.transform=prev===document.getElementById(`card-${BA.dragSrc}`)?'scale(0.95)':''; }
+    }
+    if(id!==BA.dragSrc){
+      const card=document.getElementById(`card-${id}`);
+      if(card){ card.style.outline='2px solid #3b82f6'; card.style.transform='scale(1.05)'; }
+    }
+    BA.dragOver=id;
+  }
+}
+function baDrop(e,targetId){
+  e.preventDefault(); e.stopPropagation();
+  if(BA.dragSrc&&BA.dragSrc!==targetId){
+    const arr=[...BA.images];
+    const fi=arr.findIndex(x=>x.id===BA.dragSrc);
+    const ti=arr.findIndex(x=>x.id===targetId);
+    if(fi>=0&&ti>=0){ const [item]=arr.splice(fi,1); arr.splice(ti,0,item); BA.images=arr; }
+  }
+  BA.dragSrc=null; BA.dragOver=null;
+  baRenderGrid();
+}
+function baDragEnd(){
+  if(BA.dragSrc){ const c=document.getElementById(`card-${BA.dragSrc}`); if(c){c.style.opacity='';c.style.transform='';c.style.cursor='grab';} }
+  if(BA.dragOver){ const c=document.getElementById(`card-${BA.dragOver}`); if(c){c.style.outline='';c.style.transform='';} }
+  BA.dragSrc=null; BA.dragOver=null;
+}
+
+// ════════ BA: DOWNLOAD SECTION ════════
+function baShowDownloadSection(){
+  document.getElementById('ba-download-sec').classList.toggle('hidden',!BA.images.length);
+  baDLInfo();
+}
+function baDLInfo(){
+  const r=RES_OPTIONS.find(x=>x.value===BA.res)||RES_OPTIONS[0];
+  const mode=BA.mode==='rename'?'Rename Only':`${r.w}×${r.h} · ${BA.mode==='fit'?'Fit':'Crop'}`;
+  const info=document.getElementById('ba-dl-info');
+  const zpnm=document.getElementById('ba-dl-zipname');
+  if(info) info.textContent=`${BA.images.length} 張 · ${mode}${BA.offset>0?' · 從 '+pad2(1+BA.offset)+' 開始':''}`;
+  if(zpnm) zpnm.textContent=buildZipName(BA.brand,BA.sku);
+}
+
+function baIsBusy(){ return BA.isDownloading||BA.isZipping||BA.isMerging; }
+function baSetBusy(b){
+  ['ba-btn-merge','ba-btn-zip','ba-btn-dl','ba-dl-clear'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.disabled=b;
+  });
+}
+function baShowProgress(label,pct,color){
+  const prog=document.getElementById('ba-dl-prog');
+  if(pct===null){ prog.classList.add('hidden'); return; }
+  prog.classList.remove('hidden');
+  document.getElementById('ba-prog-label').textContent=label;
+  document.getElementById('ba-prog-label').className=`text-xs font-mono text-${color}-500`;
+  const bar=document.getElementById('ba-prog-bar');
+  bar.style.width=pct+'%';
+  bar.className=`h-full rounded-full transition-all duration-300 bg-${color}-500`;
+}
+
+// ════════ BA: DOWNLOAD ALL ════════
+async function baDownloadAll(){
+  if(!BA.images.length||baIsBusy()) return;
+  BA.isDownloading=true; baSetBusy(true);
+  try{
+    const limit=pLimit(3);
+    const blobs=await Promise.all(BA.images.map(img=>limit(()=>getBlobForImage(img))));
+    for(let i=0;i<blobs.length;i++){
+      const url=URL.createObjectURL(blobs[i]);
+      triggerDownload(url,buildImageName(BA.brand,BA.sku,i,BA.offset));
+      baShowProgress(`逐張下載 ${i+1} / ${BA.images.length}`,((i+1)/BA.images.length)*100,'blue');
+      await new Promise(r=>setTimeout(r,220));
+      URL.revokeObjectURL(url);
+    }
+  }catch(e){console.error(e);}
+  BA.isDownloading=false; baSetBusy(false); baShowProgress(null);
+}
+
+// ════════ BA: DOWNLOAD ZIP ════════
+async function baDownloadZip(){
+  if(!BA.images.length||baIsBusy()) return;
+  if(typeof JSZip==='undefined'){ alert('JSZip 未載入，請確認網絡連線後重試。'); return; }
+  BA.isZipping=true; baSetBusy(true);
+  try{
+    const zip=new JSZip(); const limit=pLimit(3); let done=0;
+    await Promise.all(BA.images.map((img,i)=>limit(async()=>{
+      zip.file(buildImageName(BA.brand,BA.sku,i,BA.offset),await getBlobForImage(img));
+      baShowProgress(`壓縮中 ${++done} / ${BA.images.length}`,(done/BA.images.length)*100,'purple');
+    })));
+    const content=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+    const url=URL.createObjectURL(content);
+    triggerDownload(url,buildZipName(BA.brand,BA.sku));
+    URL.revokeObjectURL(url);
+  }catch(e){console.error(e);}
+  BA.isZipping=false; baSetBusy(false); baShowProgress(null);
+}
+
+// ════════ BA: MERGE LONG ════════
+async function baMergeLong(){
+  if(!BA.images.length||BA.mode==='rename'||baIsBusy()) return;
+  BA.isMerging=true; baSetBusy(true);
+  try{
+    const size=getCurrentSize(); const limit=pLimit(3); let done=0;
+    const scaledBlobs=await Promise.all(BA.images.map(img=>limit(async()=>{
+      const b=await processCanvas('merge',img.file,{targetW:size.w});
+      baShowProgress(`合併長圖 ${++done} / ${BA.images.length}`,(done/BA.images.length)*100,'green');
+      return b;
+    })));
+    const bitmaps=await Promise.all(scaledBlobs.map(b=>createImageBitmap(b)));
+    const totalH=bitmaps.reduce((s,bm)=>s+bm.height,0);
+    const merged=Object.assign(document.createElement('canvas'),{width:size.w,height:totalH});
+    const ctx=merged.getContext('2d');
+    let y=0; for(const bm of bitmaps){ctx.drawImage(bm,0,y);y+=bm.height;bm.close();}
+    const blob=await new Promise(res=>merged.toBlob(res,'image/jpeg',0.92));
+    const url=URL.createObjectURL(blob);
+    const p=buildPrefix(BA.brand,BA.sku);
+    triggerDownload(url,`${p?p+'-':''}long.jpg`);
+    URL.revokeObjectURL(url);
+  }catch(e){console.error(e);}
+  BA.isMerging=false; baSetBusy(false); baShowProgress(null);
+}
+
+function baUpdateHeader(){
+  const s=document.getElementById('hdr-status');
+  s.innerHTML=BA.images.length>0
+    ?`<div class="flex items-center gap-1.5"><div class="w-2 h-2 bg-green-400 rounded-full"></div><span class="text-xs text-gray-500">${BA.images.length} 張已載入</span></div>`
+    :'';
+}
+
+// ════════ GS: GRID SPLIT ════════
+async function gsUpload(file){
+  if(!file||!file.type.startsWith('image/')) return;
+  GS.file=file;
+  const tb=await processCanvas('thumbnail',file);
+  if(GS.thumbUrl) URL.revokeObjectURL(GS.thumbUrl);
+  GS.thumbUrl=URL.createObjectURL(tb);
+  document.getElementById('gs-thumb').src=GS.thumbUrl;
+  document.getElementById('gs-file-name').textContent=file.name;
+  const img=await loadImage(file);
+  document.getElementById('gs-file-dim').textContent=`${img.width} × ${img.height} px`;
+  document.getElementById('gs-upload-zone').classList.add('hidden');
+  document.getElementById('gs-settings').classList.remove('hidden');
+  await gsSplitAndPreview();
+}
+
+function gsReset(){
+  if(GS.thumbUrl) URL.revokeObjectURL(GS.thumbUrl);
+  GS.tileBlobs.forEach(t=>{if(t.thumbUrl)URL.revokeObjectURL(t.thumbUrl);});
+  GS.file=null; GS.thumbUrl=null; GS.tileBlobs=[];
+  document.getElementById('gs-upload-zone').classList.remove('hidden');
+  document.getElementById('gs-settings').classList.add('hidden');
+  document.getElementById('gs-preview-container').classList.add('hidden');
+  const btn=document.getElementById('gs-dl-btn');
+  btn.disabled=true;
+  btn.className='w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-all bg-gray-100 text-gray-400 cursor-not-allowed';
+  document.getElementById('gs-dl-txt').textContent='下載 ZIP（請先預覽）';
+}
+
+function gsSetTiles(n){
+  GS.tiles=n;
+  ['3','6','9'].forEach(x=>{
+    const btn=document.getElementById(`gs-btn-${x}`);
+    if(+x===n){
+      btn.className='flex flex-col items-center justify-center py-5 rounded-xl border-2 font-bold transition-all border-blue-500 bg-blue-50 text-blue-600';
+    } else {
+      btn.className='flex flex-col items-center justify-center py-5 rounded-xl border-2 font-bold transition-all border-gray-200 text-gray-400 hover:border-gray-300';
+    }
+  });
+  gsSplitAndPreview();
+}
+
+async function gsSplitAndPreview(){
+  if(!GS.file) return;
+  GS.tileBlobs.forEach(t=>{if(t.thumbUrl)URL.revokeObjectURL(t.thumbUrl);});
+  GS.tileBlobs=[];
+  const rows=GS.tiles/3;
+  const TW=1080,TH=1350,totalW=TW*3,totalH=TH*rows;
+  document.getElementById('gs-split-prog').classList.remove('hidden');
+  document.getElementById('gs-preview-container').classList.add('hidden');
+  document.getElementById('gs-dl-btn').disabled=true;
+  document.getElementById('gs-prog-bar').style.width='0%';
+  try{
+    const img=await loadImage(GS.file);
+    const full=document.createElement('canvas');
+    full.width=totalW; full.height=totalH;
+    const ctx=full.getContext('2d');
+    const sc=Math.max(totalW/img.width,totalH/img.height);
+    const dw=img.width*sc,dh=img.height*sc;
+    ctx.drawImage(img,(totalW-dw)/2,(totalH-dh)/2,dw,dh);
+
+    const tileBlobs=[];
+    for(let row=0;row<rows;row++){
+      for(let col=0;col<3;col++){
+        const tc=document.createElement('canvas'); tc.width=TW; tc.height=TH;
+        tc.getContext('2d').drawImage(full,col*TW,row*TH,TW,TH,0,0,TW,TH);
+        // posting order: right-to-left, bottom-to-top
+        const postOrder=(rows-1-row)*3+(2-col)+1;
+        const blob=await new Promise(res=>tc.toBlob(res,'image/jpeg',0.92));
+        // thumbnail for preview
+        const PW=300,pr=PW/TW;
+        const tc2=document.createElement('canvas'); tc2.width=PW; tc2.height=Math.round(TH*pr);
+        tc2.getContext('2d').drawImage(tc,0,0,PW,Math.round(TH*pr));
+        const tBlob=await new Promise(res=>tc2.toBlob(res,'image/jpeg',0.85));
+        const thumbUrl=URL.createObjectURL(tBlob);
+        tileBlobs.push({blob,postOrder,row,col,thumbUrl});
+        document.getElementById('gs-prog-bar').style.width=`${((row*3+col+1)/GS.tiles)*100}%`;
+      }
+    }
+    GS.tileBlobs=tileBlobs;
+    gsRenderPreview(rows);
+  }catch(e){console.error('Split failed:',e);}
+  document.getElementById('gs-split-prog').classList.add('hidden');
+}
+
+function gsRenderPreview(rows){
+  const container=document.getElementById('gs-preview-container');
+  const grid=document.getElementById('gs-preview-grid');
+  const sorted=[...GS.tileBlobs].sort((a,b)=>(a.row-b.row)||a.col-b.col);
+
+  grid.innerHTML=sorted.map(tile=>{
+    const isFirst=tile.postOrder===1,isLast=tile.postOrder===GS.tiles;
+    const badgeBg=isFirst?'bg-orange-500':isLast?'bg-green-500':'bg-black/60';
+    return `<div class="relative overflow-hidden" style="aspect-ratio:1080/1350">
+      <img src="${tile.thumbUrl}" alt="" class="w-full h-full object-cover">
+      <div class="absolute top-1.5 left-1.5 ${badgeBg} text-white rounded-full px-2 py-0.5 font-bold font-mono" style="font-size:11px">
+        ${isFirst?'📤 ':isLast?'✅ ':''}${pad2(tile.postOrder)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Posting tip
+  const tip=document.getElementById('gs-posting-tip');
+  if(rows===1){
+    tip.textContent='由右至左發佈：先發 post_01（右格），最後發 post_03（左格）。完成後 profile 由左至右顯示完整橫幅。';
+  } else {
+    tip.textContent=`由下至上、由右至左逐格發佈（先發 post_01，最後發 post_${pad2(GS.tiles)}）。${GS.tiles} 格全部發佈後，profile 將呈現完整拼圖效果。`;
+  }
+
+  // Diagram
+  const diagram=document.getElementById('gs-diagram-grid');
+  let d='';
+  if(rows===1){
+    d='┌──────────┬──────────┬──────────┐\n│ post_03  │ post_02  │ post_01  │  ← 最先發佈在右\n└──────────┴──────────┴──────────┘';
+  } else if(rows===2){
+    d='┌──────────┬──────────┬──────────┐\n│ post_06  │ post_05  │ post_04  │  ← 最後發佈\n├──────────┼──────────┼──────────┤\n│ post_03  │ post_02  │ post_01  │  ← 最先發佈\n└──────────┴──────────┴──────────┘';
+  } else {
+    d='┌──────────┬──────────┬──────────┐\n│ post_09  │ post_08  │ post_07  │  ← 最後發佈\n├──────────┼──────────┼──────────┤\n│ post_06  │ post_05  │ post_04  │\n├──────────┼──────────┼──────────┤\n│ post_03  │ post_02  │ post_01  │  ← 最先發佈\n└──────────┴──────────┴──────────┘';
+  }
+  diagram.textContent=d;
+
+  container.classList.remove('hidden');
+
+  const btn=document.getElementById('gs-dl-btn');
+  btn.disabled=false;
+  btn.className='w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-all bg-blue-600 text-white hover:bg-blue-700 active:scale-95 cursor-pointer';
+  document.getElementById('gs-dl-txt').textContent=`下載 ZIP（${GS.tiles} 格 · 含發佈說明）`;
+}
+
+async function gsDownloadZip(){
+  if(!GS.tileBlobs.length||GS.isZipping) return;
+  if(typeof JSZip==='undefined'){ alert('JSZip 未載入，請確認網絡連線後重試。'); return; }
+  GS.isZipping=true;
+  const btn=document.getElementById('gs-dl-btn');
+  btn.disabled=true;
+  document.getElementById('gs-dl-txt').textContent='打包中…';
+  try{
+    const zip=new JSZip();
+    const rows=GS.tiles/3;
+    const totalStr=pad2(GS.tiles);
+    [...GS.tileBlobs].sort((a,b)=>a.postOrder-b.postOrder).forEach(t=>{
+      zip.file(`post_${pad2(t.postOrder)}.jpg`,t.blob);
+    });
+
+    // Build diagram string for README
+    let layoutStr='';
+    if(rows===1) layoutStr='[ post_03 ][ post_02 ][ post_01 ]';
+    else if(rows===2) layoutStr='[ post_06 ][ post_05 ][ post_04 ]\n[ post_03 ][ post_02 ][ post_01 ]';
+    else layoutStr='[ post_09 ][ post_08 ][ post_07 ]\n[ post_06 ][ post_05 ][ post_04 ]\n[ post_03 ][ post_02 ][ post_01 ]';
+
+    const readme=[
+      'IG Grid Split — 發佈指引',
+      '=========================',
+      `格數   : ${GS.tiles} 格（${rows} 行 × 3 列）`,
+      `格尺寸 : 1080 × 1350 px（IG 4:5 直式）`,
+      `日期   : ${new Date().toLocaleDateString('zh-HK')}`,
+      '',
+      '━━━ 發佈順序 ━━━',
+      `按 post_01.jpg → post_${totalStr}.jpg 的順序逐一發佈到 IG。`,
+      `（先發 post_01，最後發 post_${totalStr}）`,
+      '',
+      '━━━ 發佈後 IG Profile 外觀（最新在左上角）━━━',
+      layoutStr,
+      '',
+      '━━━ 注意事項 ━━━',
+      '• 每格之間建議相隔數分鐘，確保 IG 排列正確',
+      '• 所有帖子發佈後才會顯示完整拼圖效果',
+      '• 中間不要插入其他帖子，否則拼圖效果會被破壞',
+      '• 建議在 IG 草稿中準備好所有帖子後一次過按順序發佈',
+    ].join('\n');
+    zip.file('README_發佈指引.txt',readme);
+
+    const content=await zip.generateAsync({type:'blob',compression:'DEFLATE'});
+    const url=URL.createObjectURL(content);
+    triggerDownload(url,`ig_grid_${GS.tiles}tiles.zip`);
+    URL.revokeObjectURL(url);
+  }catch(e){console.error(e);}
+  GS.isZipping=false;
+  btn.disabled=false;
+  btn.className='w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold transition-all bg-blue-600 text-white hover:bg-blue-700 active:scale-95 cursor-pointer';
+  document.getElementById('gs-dl-txt').textContent=`下載 ZIP（${GS.tiles} 格 · 含發佈說明）`;
+}
+
+// ════════ INIT ════════
+baInitResGrid();
+baInitModeGrid();
+baRefreshBgPresets();
+baUpdateNaming();
+// default state: crop shows zoom, hides fitbg
+document.getElementById('ba-fitbg-row').classList.add('hidden');
+</script>
+</body>
+</html>
