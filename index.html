@@ -36,6 +36,7 @@
   .badge-indigo{background:#e0e7ff;color:#4338ca;}
   .badge-orange{background:#fff7ed;color:#c2410c;}
   .badge-gray{background:#f1f5f9;color:#94a3b8;}
+  .badge-gold{background:#fef9c3;color:#a16207;}
   .card-title{font-size:14.5px;font-weight:800;color:#0f172a;}
   .card-desc{font-size:12.5px;color:#64748b;line-height:1.7;flex:1;}
   .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid #f1f5f9;margin-top:4px;}
@@ -57,7 +58,7 @@
 
 <nav class="tab-bar" id="tabBar">
   <button class="tab-btn active" data-tab="all" onclick="switchTab(this,'all')">
-    <span class="tab-icon">🗂️</span> 全部 <span class="tab-count" id="cnt-all">6</span>
+    <span class="tab-icon">🗂️</span> 全部 <span class="tab-count" id="cnt-all"></span>
   </button>
   <button class="tab-btn" data-tab="edm" onclick="switchTab(this,'edm')">
     <span class="tab-icon">📧</span> EDM 電郵 <span class="tab-count" id="cnt-edm"></span>
@@ -70,6 +71,9 @@
   </button>
   <button class="tab-btn" data-tab="system" onclick="switchTab(this,'system')">
     <span class="tab-icon">🛠️</span> 系統工具 <span class="tab-count" id="cnt-system"></span>
+  </button>
+  <button class="tab-btn" data-tab="presentation" onclick="switchTab(this,'presentation')">
+    <span class="tab-icon">📊</span> 匯報 <span class="tab-count" id="cnt-presentation"></span>
   </button>
 </nav>
 
@@ -113,6 +117,14 @@
       <p>資料處理、圖片調整及開發輔助工具</p>
     </div>
     <div class="grid" id="grid-system"></div>
+  </div>
+
+  <div class="section" id="tab-presentation">
+    <div class="section-header">
+      <h2>📊 匯報</h2>
+      <p>業務簡報、策略提案與年度計劃簡報，支援 PDF / PPTX 匯出</p>
+    </div>
+    <div class="grid" id="grid-presentation"></div>
   </div>
 
 </main>
@@ -181,6 +193,16 @@
       badgeText: "可用",
       category: "system"
     },
+    {
+      icon: "📈",
+      title: "XIAOMA 2027 整合營銷方案",
+      desc: "XIAOMA 全球 2027 年度整合營銷與業績增長方案簡報，涵蓋 8 大市場戰略定位、三平台廣告策略、C2B／B2C 雙向漏斗與全年落地路線圖，支援 PDF / PPTX 匯出。",
+      tag: "Presentation / XIAOMA2027.html",
+      href: "Presentation/XIAOMA2027.html",
+      badge: "badge-gold",
+      badgeText: "簡報",
+      category: "presentation"
+    },
   ];
 
   function renderCard(tool) {
@@ -200,7 +222,7 @@
   }
 
   function buildGrids() {
-    const categories = ["all", "edm", "cs", "email", "system"];
+    const categories = ["all", "edm", "cs", "email", "system", "presentation"];
     categories.forEach(cat => {
       const list = cat === "all" ? tools : tools.filter(t => t.category === cat);
       const grid = document.getElementById(`grid-${cat}`);
