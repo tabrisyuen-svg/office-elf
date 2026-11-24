@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OmniStompboxs EDM Builder</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,'Microsoft JhengHei',sans-serif;background:#f3f4f6;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+#tb{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0;flex-wrap:wrap}
+#main{display:flex;flex:1;overflow:hidden;min-height:0}
+#ed{width:360px;background:#fff;overflow-y:auto;border-right:1px solid #e5e7eb;padding:14px;flex-shrink:0}
+#pw{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:24px 20px 60px;background:#f3f4f6}
+#fr{border:none;background:#fff;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,.12);display:block;transition:all .25s;width:600px;min-height:800px}
+#fr.mb{width:375px;border-radius:28px;box-shadow:0 0 0 8px #1f2937,0 0 0 11px #374151,0 8px 32px rgba(0,0,0,.4)!important}
+label{display:block;font-size:11px;color:#666;margin:5px 0 2px}
+input[type=text],textarea{width:100%;padding:4px 6px;border:1px solid #ddd;border-radius:4px;font-size:12px;font-family:inherit}
+textarea{resize:vertical;min-height:48px;line-height:1.5}
+input[type=color]{width:30px;height:26px;padding:1px;border:1px solid #ddd;border-radius:4px;cursor:pointer;vertical-align:middle}
+hr{border:none;border-top:1px solid #e5e7eb;margin:12px 0}
+h4{font-size:12px;font-weight:bold;color:#374151;margin:0 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.c{margin-bottom:8px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fafafa}
+.ct{font-size:11px;font-weight:bold;color:#374151;margin-bottom:4px}
+.btn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;white-space:nowrap}
+.bg{background:#16a34a;color:#fff}
+.bp{background:#7c3aed;color:#fff}
+.bm{padding:6px 12px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;background:#fff;color:#6b7280}
+.bm.on{background:#1e3a5f;color:#fff;border-color:#1e3a5f}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.tbtn{padding:5px 11px;border:1.5px solid #d1d5db;border-radius:20px;cursor:pointer;font-size:11px;font-weight:bold;background:#fff;color:#6b7280;transition:all .15s;white-space:nowrap}
+.tbtn.on{color:#fff!important;border-color:transparent!important}
+</style>
+</head>
+<body>
+<div id="tb">
+  <strong style="color:#1e3a5f;font-size:14px">📧 OmniStompboxs EDM Builder</strong>
+  <div style="flex:1"></div>
+  <button class="bm on" id="bd" onclick="sm('d')">🖥 600px</button>
+  <button class="bm" id="bm2" onclick="sm('m')">📱 375px</button>
+  <input type="file" id="fi" accept=".html" style="display:none" onchange="im(event)">
+  <button class="btn bp" onclick="document.getElementById('fi').click()">📂 載入</button>
+  <button class="btn bg" onclick="ex()">⬇ 導出 HTML</button>
+</div>
+<div id="main">
+  <div id="ed">
+    <div style="margin-bottom:8px;">
+      <div style="font-size:10px;color:#9ca3af;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;font-weight:bold;">選擇範本</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;">
+        <button class="tbtn on" id="tpl_school" style="background:#1e3a5f;color:#fff;border-color:#1e3a5f" onclick="loadTpl('school')">🎓 校務系統</button>
+        <button class="tbtn" id="tpl_school_v2" onclick="loadTpl('school_v2')">🏫 校務 2.0</button>
+        <button class="tbtn" id="tpl_christmas" onclick="loadTpl('christmas')">🎄 聖誕節</button>
+        <button class="tbtn" id="tpl_cny" onclick="loadTpl('cny')">🧧 農曆新年</button>
+      </div>
+    </div>
+    <div style="background:#e0f2fe;border:1px solid #bae6fd;color:#0369a1;padding:7px 10px;border-radius:6px;font-size:11px;line-height:1.65;margin-bottom:8px">
+      📚 9 個區塊 ・ 🛍️ Shopify Liquid 相容 ・ 切換範本將載入預設內容
+    </div>
+    <div id="ef"></div>
+  </div>
+  <div id="pw">
+    <iframe id="fr" onload="rsz()"></iframe>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+const q=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const qb=s=>q(s).replace(/\n/g,"<br>");
+function dc(o){return JSON.parse(JSON.stringify(o));}
+
+// ═══════════════════════════════════════
+// TEMPLATES
+// ═══════════════════════════════════════
+const TEMPLATES={
+
+// ── 🎓 校務系統 ──────────────────────────
+school:{
+ nav:{bg:"#111827",logoText:"OmniStompboxs",logoTextColor:"#ffffff",logoLink:"https://omnistompboxs.myshopify.com/",menuTextColor:"#9ca3af",menus:[{text:"官方網站",link:"https://omnistompboxs.myshopify.com/"},{text:"聯絡我們",link:"https://omnistompboxs.myshopify.com/pages/contact"},{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"}]},
+ hero:{bgFrom:"#111827",bgTo:"#1e3a5f",eyebrow:"OmniStompboxs School",eyebrowColor:"#60a5fa",title:"點名要整理，回條要追，\n學生資料分散各處？",titleColor:"#ffffff",accentText:"分散各處？",accentColor:"#60a5fa",text:"每天點名要整理，活動回條要追收，學生資料又分散在不同表格——把這些整合到同一個平台，讓老師多花時間在學生身上。",textColor:"#94a3b8",tags:["#電子點名","#電子回條","#家校溝通","#校務自動化"],btnPrimary:{text:"瀏覽校務功能",link:"https://omnistompboxs.myshopify.com/pages/highlights",color:"#2563eb"},btnOutline:{text:"預約示範",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#60a5fa",borderColor:"#3b82f6"}},
+ intro:{text1:"當教職員花太多時間找資料、重複輸入和逐一跟進，真正需要關注的學生與教學工作，往往被行政瑣事擠走。",text2:"OmniStompboxs School 將校務管理、教學支援與家校溝通集中在同一個雲端平台，以可視化、自動化及多方協作，協助學校理順日常工作。若您有功能查詢、訂閱方案或示範安排，歡迎聯絡我們！",textColor:"#555555",brandText:"OmniStompboxs School",brandColor:"#1d4ed8",btnA:{text:"瀏覽產品",link:"https://omnistompboxs.myshopify.com/pages/highlights",color:"#2563eb"},btnB:{text:"聯絡在線客服",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#2563eb",borderColor:"#2563eb"}},
+ features:{title:"六大功能，覆蓋校務日常",subtitle:"從點名、回條到家校溝通，一個平台集中處理。",titleColor:"#111827",subtitleColor:"#6b7280",accentColor:"#2563eb",items:[
+  {icon:"📋",title:"電子點名\n異常更易跟進",titleColor:"#111827",desc:"集中查看出席記錄，配合異常通知，減少人手整理，協助教職員掌握需要跟進的情況。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-attendance",linkText:"了解更多 →",linkColor:"#2563eb"},
+  {icon:"📬",title:"活動與電子回條\n進度一眼看清",titleColor:"#111827",desc:"由活動安排到家長回覆，集中管理相關記錄，減少紙本收發及逐一核對。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#2563eb"},
+  {icon:"🗂️",title:"學生資料集中\n支援更有連貫",titleColor:"#111827",desc:"整合學生檔案、學習及出席記錄，讓獲授權的教職員更方便查閱，接續跟進學生需要。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-reports",linkText:"了解更多 →",linkColor:"#2563eb"},
+  {icon:"📚",title:"教學資源與課堂安排\n有序管理",titleColor:"#111827",desc:"集中整理教材、課堂及教學資源，減少分散儲存與重複查找，方便教職員協作。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/teaching-resources",linkText:"了解更多 →",linkColor:"#2563eb"},
+  {icon:"🧑‍💻",title:"學生自主練習\n教師持續跟進",titleColor:"#111827",desc:"透過學生專屬入口，配合錯題複習、口語練習及學習記錄，支援課後自主學習。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/student-portal",linkText:"了解更多 →",linkColor:"#2563eb"},
+  {icon:"👨‍👩‍👧",title:"家長專屬入口\n家校溝通更直接",titleColor:"#111827",desc:"讓家長查看相關資訊及處理電子回條，學校亦更容易掌握回覆與跟進進度。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#2563eb"}
+ ]},
+ security:{bg:"#f8faff",borderColor:"#e0e9ff",title:"校務資料，按角色妥善管理",subtitle:"登入驗證・存取規則・操作記錄",titleColor:"#111827",subtitleColor:"#6b7280",intro:"學生檔案、健康記錄與家長聯絡資料，需要清晰的存取界線。OmniStompboxs School 透過角色權限及資料存取控制，協助學校管理敏感資訊。",introColor:"#4b5563",cardBorder:"#c7d9f8",items:[
+  {icon:"🔐",title:"不同崗位，設定不同權限",titleColor:"#1e3a5f",desc:"按教師、校務人員及管理員的工作需要，設定可查閱與操作的資料範圍。",descColor:"#6b7280"},
+  {icon:"🏥",title:"敏感健康資料，分級存取",titleColor:"#1e3a5f",desc:"健康及醫療記錄按職務設定存取權限，讓獲授權人員查閱相關資訊，減少不必要的資料接觸。",descColor:"#6b7280"},
+  {icon:"🗄️",title:"資料庫層面的權限控制",titleColor:"#1e3a5f",desc:"配合行級安全策略（RLS），在資料庫層限制不同帳號可存取的記錄，而不只是在畫面上隱藏內容。",descColor:"#6b7280"},
+  {icon:"📝",title:"重要操作，保留跟進線索",titleColor:"#1e3a5f",desc:"透過敏感資料的查閱與修改記錄，協助管理員追查操作及跟進異常情況。",descColor:"#6b7280"}
+ ],noteText:"安全不只是一項功能，而是日常校務管理的一部分。歡迎預約示範，查看不同角色的權限設定與資料存取流程。",noteLinkText:"預約示範",noteLinkUrl:"https://omnistompboxs.myshopify.com/pages/contact",noteLinkColor:"#1d4ed8",noteColor:"#1e40af",noteBg:"#eff6ff",noteBorder:"#bfdbfe"},
+ midCta:{bg:"#eff6ff",borderColor:"#dbeafe",highlight:"不是再多一套工具，\n而是讓日常工作更有條理。",highlightColor:"#1e40af",text:"校長及管理層看清整體，教職員專注工作，學生與家長透過各自入口參與。系統可按學校需要配置，並按角色設定資料存取權限。",textColor:"#374151",btn:{text:"查看訂閱計劃",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#2563eb"}},
+ services:{title:"我們能為學校提供什麼",titleColor:"#111827",items:[
+  {icon:"🧑‍🏫",title:"預約到校示範",titleColor:"#111827",desc:"安排專人示範，即場體驗完整操作流程",descColor:"#6b7280"},
+  {icon:"📐",title:"按校需要配置",titleColor:"#111827",desc:"系統可按學校流程與架構靈活配置",descColor:"#6b7280"},
+  {icon:"📋",title:"靈活訂閱方案",titleColor:"#111827",desc:"按需要選擇功能模組，只付用得着的部份",descColor:"#6b7280"}
+ ],note:"可依校務需求提供年級分層與功能建議。",noteColor:"#9ca3af"},
+ finalCta:{bgFrom:"#111827",bgTo:"#1e3a5f",title:"從學校最想改善的\n一項流程開始",titleColor:"#ffffff",text:"歡迎預約示範，看看 OmniStompboxs School 如何配合你們的日常運作。可依校務需求提供年級分層與功能建議。",textColor:"#94a3b8",btn:{text:"預約校務系統示範",link:"https://omnistompboxs.myshopify.com/pages/contact",textColor:"#1e3a5f"}},
+ footer:{bg:"#0f172a",logoText:"OmniStompboxs",logoColor:"#f1f5f9",desc:"企業雲端 ERP 及學校管理系統\n專注於可視化、自動化、多方協作",descColor:"#64748b",email:"omnistompboxsystem@gmail.com",website:"omnistompboxs.myshopify.com",contactColor:"#64748b",links:[{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"},{text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},{text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}],linkColor:"#475569",copyright:"© 2026 OmniStompboxs. All rights reserved.",copyrightColor:"#334155"}
+},
+
+// ── 🏫 校務 2.0 ──────────────────────────
+school_v2:{
+ _tpl:"school_v2",
+ meta:{
+  subject:"點名、回條、家校溝通，讓日常校務更有條理",
+  preheader:"由電子點名到學生與家長平台，集中資料、減少重複整理，按學校需要配置。"
+ },
+ nav:{
+  bg:"#FFFFFF",
+  borderColor:"#DEE5DA",
+  logoText:"OmniStompboxs",
+  logoTextColor:"#272A2E",
+  logoLink:"https://omnistompboxs.myshopify.com/"
+ },
+ hero:{
+  bg:"#E9F0E6",
+  title:"點名要整理，回條要追，\n學生資料分散各處？",
+  titleColor:"#272A2E",
+  text:"把日常校務集中在同一個平台，讓教職員少一點來回核對，多一點時間跟進學生。",
+  textColor:"#5E636B",
+  btnText:"預約校務系統示範 →",
+  btnLink:"https://omnistompboxs.myshopify.com/pages/contact",
+  btnColor:"#55784A"
+ },
+ gif:{
+  altText:"校務系統示意：電子點名狀態更新、電子回條進度、校務總覽",
+  caption:"示意畫面，實際介面以系統為準。"
+ },
+ features:{
+  title:"六個校務應用場景，一個平台串連",
+  titleColor:"#272A2E",
+  accentColor:"#55784A",
+  linkText:"查看校務功能 →",
+  linkUrl:"https://omnistompboxs.myshopify.com/pages/highlights",
+  items:[
+   {num:"01",title:"電子點名",desc:"集中查看出席及異常記錄，方便跟進。"},
+   {num:"02",title:"活動與電子回條",desc:"整理活動、回條及繳費狀態。"},
+   {num:"03",title:"學生資料",desc:"集中學習、出席及相關支援記錄。"},
+   {num:"04",title:"教材與課堂管理",desc:"整理教材、功課、課程進度及教學數據。"},
+   {num:"05",title:"學生平台",desc:"配合錯題複習、中英文口語練習及閱讀輔助。"},
+   {num:"06",title:"家長平台",desc:"查看相關資訊，處理請假及電子回條。"}
+  ]
+ },
+ security:{
+  bg:"#E9F0E6",
+  borderColor:"#DEE5DA",
+  title:"不同崗位，看清自己需要的資料",
+  titleColor:"#272A2E",
+  text:"按教職員及管理員角色設定資料存取範圍；健康資料分層管理，相關操作記錄按模組配置確認。",
+  textColor:"#5E636B"
+ },
+ finalCta:{
+  bg:"#F8F8F6",
+  borderColor:"#DEE5DA",
+  title:"從學校最想改善的\n一項流程開始",
+  titleColor:"#272A2E",
+  text:"毋須一次採用所有模組。告訴我們學校的日常需要，我們會按角色與工作流程安排示範，討論合適的模組及配置。",
+  textColor:"#5E636B",
+  btnText:"預約校務系統示範 →",
+  btnLink:"https://omnistompboxs.myshopify.com/pages/contact",
+  btnColor:"#55784A"
+ },
+ footer:{
+  bg:"#F8F8F6",
+  logoText:"OmniStompboxs",
+  logoColor:"#272A2E",
+  desc:"企業雲端 ERP 及學校管理系統\n專注於可視化、自動化、多方協作",
+  descColor:"#5E636B",
+  email:"omnistompboxsystem@gmail.com",
+  website:"omnistompboxs.myshopify.com",
+  contactColor:"#5E636B",
+  links:[
+   {text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"},
+   {text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},
+   {text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}
+  ],
+  linkColor:"#55784A",
+  copyright:"© 2026 OmniStompboxs. All rights reserved.",
+  copyrightColor:"#5E636B"
+ }
+},
+
+// ── 🎄 聖誕節 ────────────────────────────
+christmas:{
+ nav:{bg:"#7f1d1d",logoText:"OmniStompboxs 🎄",logoTextColor:"#fef2f2",logoLink:"https://omnistompboxs.myshopify.com/",menuTextColor:"#fca5a5",menus:[{text:"聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"聯絡我們",link:"https://omnistompboxs.myshopify.com/pages/contact"},{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"}]},
+ hero:{bgFrom:"#7f1d1d",bgTo:"#14532d",eyebrow:"🎄 聖誕限定優惠 2026",eyebrowColor:"#fbbf24",title:"送份真正有用的禮物\n給學校同事",titleColor:"#ffffff",accentText:"真正有用的禮物",accentColor:"#fbbf24",text:"趁聖誕前完成採購，新學年開學即用。預訂 OmniStompboxs 校務管理系統，享聖誕專屬優惠，省卻下學年的行政煩惱。",textColor:"#fca5a5",tags:["#聖誕優惠","#限時特惠","#校務系統","#新年開學"],btnPrimary:{text:"🎁 查看聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnOutline:{text:"預約示範",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#fbbf24",borderColor:"#f59e0b"}},
+ intro:{text1:"每到年尾，行政工作堆積、師生資料要更新、新學期的準備又要開始——這些工作，其實可以提早做好準備。",text2:"OmniStompboxs School 讓學校在聖誕假期後，以更有條理的方式迎接新學年。現在訂閱，聖誕前確認方案，一月開學即可全面啟用。",textColor:"#4b5563",brandText:"OmniStompboxs School",brandColor:"#dc2626",btnA:{text:"🎄 聖誕優惠詳情",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnB:{text:"即時查詢",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#dc2626",borderColor:"#dc2626"}},
+ features:{title:"🎁 六大功能，送給學校最好的禮物",subtitle:"讓新學年從第一天起就更有效率。",titleColor:"#111827",subtitleColor:"#6b7280",accentColor:"#dc2626",items:[
+  {icon:"🎅",title:"電子點名\n開學即用",titleColor:"#111827",desc:"聖誕前完成設定，開學第一天點名即可全面電子化，數據自動整理。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-attendance",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🎄",title:"活動回條\n家長一鍵回覆",titleColor:"#111827",desc:"農曆新年活動、開學典禮回條，全部電子化處理，不再逐張收紙。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"⭐",title:"學生資料集中\n新學年更新更快",titleColor:"#111827",desc:"年度資料更新在同一平台完成，不需要多個表格互相對照。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-reports",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🔔",title:"家校通知\n假期都能發送",titleColor:"#111827",desc:"重要通知透過家長入口發送，假期緊急聯絡不再靠人手逐個傳訊。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🎁",title:"教學資源\n新學期整理好",titleColor:"#111827",desc:"趁聖誕假期整理教材、更新課程資源，新學年開始即可分享給全科同事。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/teaching-resources",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🌟",title:"靈活訂閱方案\n按需付費",titleColor:"#111827",desc:"按學校規模與功能需求選擇方案，不需要為用不着的功能多付。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/plans",linkText:"查看方案 →",linkColor:"#dc2626"}
+ ]},
+ security:{bg:"#fff7ed",borderColor:"#fed7aa",title:"資料安全，節日一樣有保障",subtitle:"角色權限・操作記錄・資料保護",titleColor:"#111827",subtitleColor:"#6b7280",intro:"即使在聖誕假期，學校的學生資料和行政記錄都受到妥善保護。系統全年運作，讓管理員隨時掌握資料存取情況。",introColor:"#4b5563",cardBorder:"#fdba74",items:[
+  {icon:"🔐",title:"角色權限，放假都生效",titleColor:"#9a3412",desc:"不同職務的教職員只能查看和操作其負責範圍的資料，假期期間亦如常執行。",descColor:"#6b7280"},
+  {icon:"🏥",title:"健康資料，嚴格分級",titleColor:"#9a3412",desc:"學生健康記錄按職務設定存取限制，確保敏感資訊只供有需要的人員查閱。",descColor:"#6b7280"},
+  {icon:"🗄️",title:"資料庫層級保護",titleColor:"#9a3412",desc:"權限控制落實至資料庫層面，不依賴畫面隱藏，確保底層數據安全。",descColor:"#6b7280"},
+  {icon:"📝",title:"操作記錄，全年追蹤",titleColor:"#9a3412",desc:"重要資料的查閱與修改均有記錄，方便節後審查及異常跟進。",descColor:"#6b7280"}
+ ],noteText:"聖誕節前預訂，可安排假期後示範，確保開學第一天順利使用。歡迎預約示範了解詳情。",noteLinkText:"歡迎預約示範了解詳情",noteLinkUrl:"https://omnistompboxs.myshopify.com/pages/contact",noteLinkColor:"#dc2626",noteColor:"#9a3412",noteBg:"#fff7ed",noteBorder:"#fed7aa"},
+ midCta:{bg:"#fef2f2",borderColor:"#fecaca",highlight:"🎄 聖誕前訂閱，\n新學年即刻用得着。",highlightColor:"#991b1b",text:"聖誕假期是最好的時機——趁老師較空閒，完成系統設定和資料整理，讓開學第一天從容不迫。",textColor:"#374151",btn:{text:"🎁 查看聖誕優惠方案",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"}},
+ services:{title:"聖誕前，我們能為你做什麼",titleColor:"#111827",items:[
+  {icon:"🎅",title:"聖誕前快速示範",titleColor:"#111827",desc:"30 分鐘示範，聖誕前確認方案",descColor:"#6b7280"},
+  {icon:"🎄",title:"假期後快速部署",titleColor:"#111827",desc:"1 月初可完成設定，開學即用",descColor:"#6b7280"},
+  {icon:"🌟",title:"聖誕限定優惠",titleColor:"#111827",desc:"現在訂閱享專屬折扣，詳情請查詢",descColor:"#6b7280"}
+ ],note:"優惠有效期至 2026 年 12 月 31 日，名額有限。",noteColor:"#9ca3af"},
+ finalCta:{bgFrom:"#7f1d1d",bgTo:"#14532d",title:"🎄 給學校同事\n最實用的聖誕禮物",titleColor:"#ffffff",text:"聖誕前完成採購，新學年開學即用。歡迎預約示範，了解如何在假期後快速上線。",textColor:"#fca5a5",btn:{text:"🎁 立即查詢聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/contact",textColor:"#7f1d1d"}},
+ footer:{bg:"#1c0a00",logoText:"OmniStompboxs 🎄",logoColor:"#fef2f2",desc:"企業雲端 ERP 及學校管理系統\n祝大家聖誕快樂，新年進步！",descColor:"#9a3412",email:"omnistompboxsystem@gmail.com",website:"omnistompboxs.myshopify.com",contactColor:"#9a3412",links:[{text:"聖誕優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},{text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}],linkColor:"#78350f",copyright:"© 2026 OmniStompboxs. All rights reserved. 🎄 Merry Christmas!",copyrightColor:"#92400e"}
+},
+
+// ── 🧧 農曆新年 ──────────────────────────
+cny:{
+ nav:{bg:"#7f1d1d",logoText:"OmniStompboxs 🧧",logoTextColor:"#fef2f2",logoLink:"https://omnistompboxs.myshopify.com/",menuTextColor:"#fca5a5",menus:[{text:"新春優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"聯絡我們",link:"https://omnistompboxs.myshopify.com/pages/contact"},{text:"關於我們",link:"https://omnistompboxs.myshopify.com/pages/about"}]},
+ hero:{bgFrom:"#7f1d1d",bgTo:"#92400e",eyebrow:"🧧 農曆新年限定優惠",eyebrowColor:"#fbbf24",title:"新年新開始，\n校務管理換個新方法",titleColor:"#ffffff",accentText:"換個新方法",accentColor:"#fbbf24",text:"農曆新年是換個新方式的好時機。趁開學前完成系統部署，讓新學期的行政工作更有條理，把時間留給學生。",textColor:"#fca5a5",tags:["#新春優惠","#農曆新年","#校務系統","#新學期"],btnPrimary:{text:"🧧 查看新春優惠",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnOutline:{text:"預約示範",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#fbbf24",borderColor:"#f59e0b"}},
+ intro:{text1:"每年農曆新年後，學校都要重新起步——更新學生資料、安排新學期活動、跟進家長回條，行政工作接踵而來。",text2:"OmniStompboxs School 讓你在新春前完成部署，開學第一天就以嶄新方式處理校務。現在訂閱，享農曆新年專屬優惠。",textColor:"#4b5563",brandText:"OmniStompboxs School",brandColor:"#dc2626",btnA:{text:"🧧 新春優惠詳情",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"},btnB:{text:"即時查詢",link:"https://omnistompboxs.myshopify.com/pages/contact",color:"#dc2626",borderColor:"#dc2626"}},
+ features:{title:"🧧 六大功能，新春新開始",subtitle:"農曆新年後開學，以全新方式處理校務。",titleColor:"#111827",subtitleColor:"#6b7280",accentColor:"#dc2626",items:[
+  {icon:"🧧",title:"電子點名\n新學期即啟用",titleColor:"#111827",desc:"農曆新年假期完成設定，開學第一天即可全面電子點名。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-attendance",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🌸",title:"活動回條\n家長一鍵回覆",titleColor:"#111827",desc:"開學活動、家長日邀請，透過家長入口一鍵發送及回覆。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"📂",title:"學生資料\n新年更新不再麻煩",titleColor:"#111827",desc:"年度資料更新在同一平台完成，資料集中管理，不再多個表格對照。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/school-reports",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"🏮",title:"家校溝通\n新春第一天開始",titleColor:"#111827",desc:"家長入口讓家校溝通更直接，開學通知、緊急聯絡一站搞定。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/parent-portal",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"📚",title:"教學資源\n新學期整理好",titleColor:"#111827",desc:"農曆假期整理教材，新學期開始即可分享給科組同事，減少重複工作。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/teaching-resources",linkText:"了解更多 →",linkColor:"#dc2626"},
+  {icon:"💰",title:"靈活方案\n只付用得着的",titleColor:"#111827",desc:"按學校規模選擇功能模組，新春優惠期間訂閱可享額外折扣。",descColor:"#6b7280",link:"https://omnistompboxs.myshopify.com/pages/plans",linkText:"查看方案 →",linkColor:"#dc2626"}
+ ]},
+ security:{bg:"#fff7ed",borderColor:"#fed7aa",title:"資料安全，新年一樣有保障",subtitle:"角色權限・操作記錄・資料保護",titleColor:"#111827",subtitleColor:"#6b7280",intro:"農曆假期期間，學校資料依然受到妥善保護。系統全年運作，確保敏感資訊在假期中也不會出現管理漏洞。",introColor:"#4b5563",cardBorder:"#fdba74",items:[
+  {icon:"🔐",title:"角色權限，全年運作",titleColor:"#9a3412",desc:"不同職務的教職員只能存取其負責範圍的資料，農曆假期期間亦如常執行。",descColor:"#6b7280"},
+  {icon:"🏥",title:"敏感資料，嚴格保護",titleColor:"#9a3412",desc:"健康記錄等敏感資料按職務設定存取權限，確保資料只供有需要的人員查閱。",descColor:"#6b7280"},
+  {icon:"🗄️",title:"資料庫層面保護",titleColor:"#9a3412",desc:"權限控制落實至資料庫層面，不依賴畫面隱藏，底層數據全面保護。",descColor:"#6b7280"},
+  {icon:"📝",title:"操作記錄，新年後可審查",titleColor:"#9a3412",desc:"重要資料操作均有記錄，方便新年後審查及跟進任何異常情況。",descColor:"#6b7280"}
+ ],noteText:"農曆新年前預訂，可安排假期後快速示範，確保開學即用。歡迎預約示範了解詳情。",noteLinkText:"歡迎預約示範了解詳情",noteLinkUrl:"https://omnistompboxs.myshopify.com/pages/contact",noteLinkColor:"#dc2626",noteColor:"#9a3412",noteBg:"#fff7ed",noteBorder:"#fed7aa"},
+ midCta:{bg:"#fef2f2",borderColor:"#fecaca",highlight:"🧧 新春前訂閱，\n開學第一天就不同。",highlightColor:"#991b1b",text:"農曆假期是最好的過渡時機——趁放假前完成設定，讓教職員開學後以全新方式處理日常校務。",textColor:"#374151",btn:{text:"🧧 查看新春優惠方案",link:"https://omnistompboxs.myshopify.com/pages/plans",color:"#dc2626"}},
+ services:{title:"新春前，我們能為你做什麼",titleColor:"#111827",items:[
+  {icon:"🧧",title:"年前快速示範",titleColor:"#111827",desc:"30 分鐘示範，年前確認方案",descColor:"#6b7280"},
+  {icon:"🌸",title:"假期後快速部署",titleColor:"#111827",desc:"年初三後可完成設定，開學即用",descColor:"#6b7280"},
+  {icon:"💰",title:"新春限定優惠",titleColor:"#111827",desc:"農曆新年期間訂閱享專屬折扣",descColor:"#6b7280"}
+ ],note:"新春優惠有效期至農曆正月十五，名額有限，先到先得。",noteColor:"#9ca3af"},
+ finalCta:{bgFrom:"#7f1d1d",bgTo:"#92400e",title:"🧧 新年新開始，\n學校行政換個方式",titleColor:"#ffffff",text:"農曆新年前完成採購，開學第一天即可全面啟用。歡迎預約示範，了解如何快速上線。",textColor:"#fca5a5",btn:{text:"🧧 立即查詢新春優惠",link:"https://omnistompboxs.myshopify.com/pages/contact",textColor:"#7f1d1d"}},
+ footer:{bg:"#1c0a00",logoText:"OmniStompboxs 🧧",logoColor:"#fef2f2",desc:"企業雲端 ERP 及學校管理系統\n恭賀新禧，萬事如意！",descColor:"#9a3412",email:"omnistompboxsystem@gmail.com",website:"omnistompboxs.myshopify.com",contactColor:"#9a3412",links:[{text:"新春優惠",link:"https://omnistompboxs.myshopify.com/pages/plans"},{text:"私隱政策",link:"https://omnistompboxs.myshopify.com/pages/privacy"},{text:"服務條款",link:"https://omnistompboxs.myshopify.com/pages/terms"}],linkColor:"#78350f",copyright:"© 2027 OmniStompboxs. All rights reserved. 🧧 恭賀新禧！",copyrightColor:"#92400e"}
+}
+
+}; // end TEMPLATES
+
+// ═══════════════════════════════════════
+// ACTIVE STATE
+// ═══════════════════════════════════════
+let D=dc(TEMPLATES.school);
+let currentTpl='school';
+const TPL_COLORS={school:'#1e3a5f',school_v2:'#55784A',christmas:'#dc2626',cny:'#991b1b'};
+
+function loadTpl(key){
+ if(!confirm('切換範本會清除目前編輯內容，確定繼續？'))return;
+ currentTpl=key;
+ D=dc(TEMPLATES[key]);
+ document.querySelectorAll('.tbtn').forEach(b=>{
+  b.classList.remove('on');
+  b.style.background='';b.style.color='';b.style.borderColor='';
+ });
+ const el=document.getElementById('tpl_'+key);
+ el.classList.add('on');
+ el.style.background=TPL_COLORS[key];
+ el.style.color='#fff';
+ el.style.borderColor=TPL_COLORS[key];
+ buildEd();rf();
+}
+
+// ═══════════════════════════════════════
+// V1 EMAIL GENERATORS (school / christmas / cny)
+// ═══════════════════════════════════════
+function gNav(n){
+ return`<div style="background:${n.bg};padding:14px 28px;display:flex;justify-content:space-between;align-items:center;">
+<a href="${q(n.logoLink)}" style="color:${n.logoTextColor};font-weight:700;font-size:15px;text-decoration:none;">${q(n.logoText)}</a>
+<div style="display:flex;gap:20px;">${n.menus.map(m=>`<a href="${q(m.link)}" style="color:${n.menuTextColor};text-decoration:none;font-size:13px;">${q(m.text)}</a>`).join("")}</div>
+</div>`;
+}
+
+function gHero(h){
+ const tags=h.tags.filter(Boolean).map(t=>`<span style="background:rgba(96,165,250,.12);color:#93c5fd;padding:5px 14px;border-radius:20px;font-size:12px;border:1px solid rgba(96,165,250,.25);display:inline-block;margin:3px;">${q(t)}</span>`).join("");
+ const idx=h.title.lastIndexOf(h.accentText);
+ const th=idx<0?qb(h.title):qb(h.title.slice(0,idx))+`<span style="color:${h.accentColor}">${q(h.accentText)}</span>`+qb(h.title.slice(idx+h.accentText.length));
+ return`<div style="background:linear-gradient(145deg,${h.bgFrom} 0%,${h.bgTo} 100%);padding:56px 40px 48px;text-align:center;">
+<div style="color:${h.eyebrowColor};font-size:11px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:18px;font-weight:600;">${q(h.eyebrow)}</div>
+<h1 style="color:${h.titleColor};font-size:26px;font-weight:800;line-height:1.5;margin:0 0 18px;">${th}</h1>
+<p style="color:${h.textColor};font-size:14.5px;line-height:1.8;max-width:460px;margin:0 auto 24px;">${q(h.text)}</p>
+${tags?`<div style="margin-bottom:32px;">${tags}</div>`:""}
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+<a href="${q(h.btnPrimary.link)}" style="display:inline-block;background:${h.btnPrimary.color};color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:700;font-size:14px;">${q(h.btnPrimary.text)}</a>
+<a href="${q(h.btnOutline.link)}" style="display:inline-block;background:transparent;color:${h.btnOutline.color};padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;border:1.5px solid ${h.btnOutline.borderColor};">${q(h.btnOutline.text)}</a>
+</div></div>`;
+}
+
+function gIntro(i){
+ const t2=q(i.text2).replace(q(i.brandText),`<strong style="color:${i.brandColor}">${q(i.brandText)}</strong>`);
+ return`<div style="padding:36px 40px 28px;text-align:center;border-bottom:1px solid #e5e7eb;">
+<p style="color:${i.textColor};font-size:14.5px;line-height:1.85;margin:0 0 14px;">${q(i.text1)}</p>
+<p style="color:${i.textColor};font-size:14.5px;line-height:1.85;">${t2}</p>
+<div style="margin-top:22px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+<a href="${q(i.btnA.link)}" style="display:inline-block;background:${i.btnA.color};color:#fff;padding:10px 22px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:700;">${q(i.btnA.text)}</a>
+<a href="${q(i.btnB.link)}" style="display:inline-block;background:transparent;color:${i.btnB.color};padding:10px 20px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;border:1.5px solid ${i.btnB.borderColor};">${q(i.btnB.text)}</a>
+</div></div>`;
+}
+
+function gFeatures(f){
+ const rows=[];for(let i=0;i<f.items.length;i+=2)rows.push(f.items.slice(i,i+2));
+ const card=it=>`<div style="border:1px solid #e5e7eb;border-top:3px solid ${f.accentColor};border-radius:10px;padding:22px 20px;background:#f9fafb;"><div style="font-size:22px;margin-bottom:10px;">${q(it.icon)}</div><h3 style="color:${it.titleColor};font-size:14px;font-weight:700;margin:0 0 8px;line-height:1.4;">${qb(it.title)}</h3><p style="color:${it.descColor};font-size:13px;line-height:1.75;margin:0 0 10px;">${q(it.desc)}</p><a href="${q(it.link)}" style="color:${it.linkColor};font-size:12.5px;font-weight:600;text-decoration:none;">${q(it.linkText)}</a></div>`;
+ return`<div style="padding:44px 40px 36px;">
+<div style="text-align:center;margin-bottom:28px;"><h2 style="color:${f.titleColor};font-size:18px;font-weight:800;margin:0 0 6px;">${q(f.title)}</h2><p style="color:${f.subtitleColor};font-size:13.5px;margin:0;">${q(f.subtitle)}</p></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+${rows.map(row=>`<tr><td width="50%" valign="top" style="padding-right:7px;padding-bottom:14px;vertical-align:top;">${card(row[0])}</td>${row[1]?`<td width="50%" valign="top" style="padding-left:7px;padding-bottom:14px;vertical-align:top;">${card(row[1])}</td>`:`<td width="50%"></td>`}</tr>`).join("")}
+</table></div>`;
+}
+
+function gSecurity(s){
+ const rows=[];for(let i=0;i<s.items.length;i+=2)rows.push(s.items.slice(i,i+2));
+ const card=it=>`<div style="border:1px solid ${s.cardBorder};border-radius:10px;padding:22px 20px;background:#fff;"><div style="font-size:22px;margin-bottom:10px;">${q(it.icon)}</div><h3 style="color:${it.titleColor};font-size:14px;font-weight:700;margin:0 0 8px;line-height:1.4;">${q(it.title)}</h3><p style="color:${it.descColor};font-size:13px;line-height:1.75;margin:0;">${q(it.desc)}</p></div>`;
+ const nParts=q(s.noteText).split(q(s.noteLinkText));
+ const nHtml=nParts.join(`<a href="${q(s.noteLinkUrl)}" style="color:${s.noteLinkColor};font-weight:700;text-decoration:none;">${q(s.noteLinkText)}</a>`);
+ return`<div style="padding:44px 40px 36px;background:${s.bg};border-top:1px solid ${s.borderColor};border-bottom:1px solid ${s.borderColor};">
+<div style="text-align:center;margin-bottom:26px;"><h2 style="color:${s.titleColor};font-size:18px;font-weight:800;margin:0 0 6px;">${q(s.title)}</h2><p style="color:${s.subtitleColor};font-size:13.5px;margin:0 0 12px;">${q(s.subtitle)}</p><p style="color:${s.introColor};font-size:13.5px;line-height:1.8;max-width:480px;margin:0 auto;">${q(s.intro)}</p></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+${rows.map(row=>`<tr><td width="50%" valign="top" style="padding-right:7px;padding-bottom:14px;vertical-align:top;">${card(row[0])}</td>${row[1]?`<td width="50%" valign="top" style="padding-left:7px;padding-bottom:14px;vertical-align:top;">${card(row[1])}</td>`:`<td width="50%"></td>`}</tr>`).join("")}
+</table>
+<div style="text-align:center;margin-top:22px;padding:16px 20px;background:${s.noteBg};border-radius:8px;border:1px solid ${s.noteBorder};"><p style="color:${s.noteColor};font-size:13px;line-height:1.75;margin:0;">${nHtml}</p></div>
+</div>`;
+}
+
+function gMidCta(mc){return`<div style="background:${mc.bg};padding:36px 40px;text-align:center;border-top:1px solid ${mc.borderColor};border-bottom:1px solid ${mc.borderColor};"><div style="color:${mc.highlightColor};font-weight:800;font-size:17px;margin-bottom:14px;line-height:1.5;">${qb(mc.highlight)}</div><p style="color:${mc.textColor};font-size:14px;line-height:1.8;max-width:480px;margin:0 auto 22px;">${q(mc.text)}</p><a href="${q(mc.btn.link)}" style="display:inline-block;background:${mc.btn.color};color:#fff;padding:10px 22px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:700;">${q(mc.btn.text)}</a></div>`;}
+
+function gServices(sv){
+ const cells=sv.items.map(it=>`<td width="33%" valign="top" style="text-align:center;padding:0 12px;vertical-align:top;"><div style="font-size:26px;margin-bottom:10px;">${q(it.icon)}</div><h4 style="color:${it.titleColor};font-size:13.5px;font-weight:700;margin:0 0 6px;">${q(it.title)}</h4><p style="color:${it.descColor};font-size:12.5px;line-height:1.6;margin:0;">${q(it.desc)}</p></td>`).join("");
+ return`<div style="padding:44px 40px 36px;"><h2 style="color:${sv.titleColor};font-size:18px;font-weight:800;text-align:center;margin:0 0 28px;">${q(sv.title)}</h2><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>${cells}</tr></table><p style="text-align:center;color:${sv.noteColor};font-size:12px;margin:20px 0 0;">${q(sv.note)}</p></div>`;
+}
+
+function gFinalCta(fc){return`<div style="background:linear-gradient(145deg,${fc.bgFrom} 0%,${fc.bgTo} 100%);padding:48px 40px;text-align:center;"><h2 style="color:${fc.titleColor};font-size:21px;font-weight:800;margin:0 0 14px;line-height:1.4;">${qb(fc.title)}</h2><p style="color:${fc.textColor};font-size:14px;line-height:1.8;max-width:460px;margin:0 auto 26px;">${q(fc.text)}</p><a href="${q(fc.btn.link)}" style="display:inline-block;background:#fff;color:${fc.btn.textColor};padding:13px 32px;border-radius:6px;text-decoration:none;font-weight:800;font-size:14px;">${q(fc.btn.text)}</a></div>`;}
+
+function gFooter(ft){
+ const ls=ft.links.map(l=>`<a href="${q(l.link)}" style="color:${ft.linkColor};font-size:12px;text-decoration:none;margin:0 9px;">${q(l.text)}</a>`).join("");
+ return`<div style="background:${ft.bg};padding:32px 40px;text-align:center;"><div style="color:${ft.logoColor};font-weight:800;font-size:15px;margin-bottom:8px;">${q(ft.logoText)}</div><div style="color:${ft.descColor};font-size:12.5px;margin-bottom:14px;line-height:1.7;">${qb(ft.desc)}</div><div style="color:${ft.contactColor};font-size:12px;margin-bottom:18px;line-height:1.9;">查詢電郵：${q(ft.email)}<br>官方網站：${q(ft.website)}</div><div style="margin-bottom:16px;">${ls}</div><div style="color:${ft.copyrightColor};font-size:11px;margin-bottom:12px;">${q(ft.copyright)}</div><div style="font-size:11px;color:#9CA3AF;">{{ unsubscribe_link }}</div></div>`;
+}
+
+// ═══════════════════════════════════════
+// V2 EMAIL GENERATORS (🏫 校務 2.0)
+// ═══════════════════════════════════════
+function gNavV2(n){
+ return`<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+<tr><td style="background:${n.bg};padding:16px 32px;border-bottom:1px solid ${n.borderColor};">
+<a href="${q(n.logoLink)}" style="color:${n.logoTextColor};font-weight:800;font-size:16px;text-decoration:none;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(n.logoText)}</a>
+</td></tr>
+</table>`;
+}
+
+function gHeroV2(h){
+ return`<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+<tr><td style="background:${h.bg};padding:52px 32px 48px;text-align:center;">
+<h1 style="color:${h.titleColor};font-size:28px;font-weight:800;line-height:1.5;margin:0 0 20px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${qb(h.title)}</h1>
+<p style="color:${h.textColor};font-size:16px;line-height:1.75;max-width:460px;margin:0 auto 32px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(h.text)}</p>
+<a href="${q(h.btnLink)}" style="display:inline-block;background:${h.btnColor};color:#ffffff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(h.btnText)}</a>
+</td></tr>
+</table>`;
+}
+
+function gGifV2(g){
+ return`<!-- GIF_POSITION: Replace the static block below with an animated GIF when ready.
+     Concept: 電子點名狀態更新 → 電子回條進度 → 校務總覽
+     Suggested tag: <img src="YOUR_GIF_URL" width="540" alt="..." style="display:block;width:100%;max-width:540px;height:auto;border-radius:8px;border:1px solid #DEE5DA;">
+     Ensure the first frame of the GIF is self-explanatory without animation.
+     Remove this comment block when replacing with actual GIF. -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+<tr><td style="padding:28px 32px 4px;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="background:#F8F8F6;border:1px solid #DEE5DA;border-radius:8px;">
+<tr>
+<td width="33%" valign="top" style="padding:18px 14px;text-align:center;border-right:1px solid #DEE5DA;">
+<div style="font-size:13px;font-weight:700;color:#55784A;margin-bottom:5px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">電子點名</div>
+<div style="font-size:12px;color:#5E636B;line-height:1.5;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">出席狀態更新</div>
+</td>
+<td width="33%" valign="top" style="padding:18px 14px;text-align:center;border-right:1px solid #DEE5DA;">
+<div style="font-size:13px;font-weight:700;color:#55784A;margin-bottom:5px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">電子回條</div>
+<div style="font-size:12px;color:#5E636B;line-height:1.5;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">回覆進度追蹤</div>
+</td>
+<td width="33%" valign="top" style="padding:18px 14px;text-align:center;">
+<div style="font-size:13px;font-weight:700;color:#55784A;margin-bottom:5px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">校務總覽</div>
+<div style="font-size:12px;color:#5E636B;line-height:1.5;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">集中資料查閱</div>
+</td>
+</tr>
+</table>
+<p style="color:#5E636B;font-size:12px;margin:8px 0 0;text-align:center;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(g.caption)}</p>
+</td></tr>
+</table>`;
+}
+
+function gFeaturesV2(f){
+ const rows=[];for(let i=0;i<f.items.length;i+=2)rows.push(f.items.slice(i,i+2));
+ const card=it=>`<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation" style="border:1px solid #DEE5DA;border-top:3px solid ${f.accentColor};border-radius:8px;background:#FFFFFF;">
+<tr><td style="padding:20px 18px;">
+<div style="font-size:11px;font-weight:700;color:${f.accentColor};letter-spacing:1.5px;margin-bottom:8px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(it.num)}</div>
+<h3 style="color:#272A2E;font-size:15px;font-weight:700;margin:0 0 8px;line-height:1.4;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(it.title)}</h3>
+<p style="color:#5E636B;font-size:13px;line-height:1.7;margin:0;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(it.desc)}</p>
+</td></tr>
+</table>`;
+ return`<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+<tr><td style="padding:44px 32px 32px;background:#FFFFFF;">
+<h2 style="color:${f.titleColor};font-size:20px;font-weight:800;text-align:center;margin:0 0 28px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(f.title)}</h2>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+${rows.map(row=>`<tr>
+<td class="v2ch" width="50%" valign="top" style="padding-right:8px;padding-bottom:14px;vertical-align:top;">${card(row[0])}</td>
+${row[1]?`<td class="v2ch" width="50%" valign="top" style="padding-left:8px;padding-bottom:14px;vertical-align:top;">${card(row[1])}</td>`:`<td width="50%"></td>`}
+</tr>`).join("")}
+</table>
+<p style="text-align:center;margin:12px 0 0;"><a href="${q(f.linkUrl)}" style="color:${f.accentColor};font-size:14px;font-weight:700;text-decoration:none;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(f.linkText)}</a></p>
+</td></tr>
+</table>`;
+}
+
+function gSecurityV2(s){
+ return`<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+<tr><td style="background:${s.bg};border-top:1px solid ${s.borderColor};border-bottom:1px solid ${s.borderColor};padding:36px 32px;text-align:center;">
+<h2 style="color:${s.titleColor};font-size:18px;font-weight:800;margin:0 0 14px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(s.title)}</h2>
+<p style="color:${s.textColor};font-size:15px;line-height:1.75;max-width:480px;margin:0 auto;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(s.text)}</p>
+</td></tr>
+</table>`;
+}
+
+function gFinalCtaV2(fc){
+ return`<table width="100%" cellpadding="0" cellspacing="0" border="0" role="presentation">
+<tr><td style="background:${fc.bg};border-top:1px solid ${fc.borderColor};padding:52px 32px 48px;text-align:center;">
+<h2 style="color:${fc.titleColor};font-size:22px;font-weight:800;margin:0 0 16px;line-height:1.5;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${qb(fc.title)}</h2>
+<p style="color:${fc.textColor};font-size:16px;line-height:1.75;max-width:460px;margin:0 auto 32px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(fc.text)}</p>
+<a href="${q(fc.btnLink)}" style="display:inline-block;background:${fc.btnColor};color:#ffffff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;font-family:Arial,'Microsoft JhengHei','PingFang TC',sans-serif;">${q(fc.btnText)}</a>
+</td></tr>
+</table>`;
+}
+
+function genEmailV2(){
+ const ph=q(D.meta.preheader);
+ const data=JSON.stringify(D).replace(/-->/g,"--\\>");
+ return`<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
+<title>OmniStompboxs</title>
+<style>
+body{margin:0;padding:0;background:#F8F8F6;}
+#v2w{background:#FFFFFF;}
+@media only screen and (max-width:620px){
+ #v2w{width:100%!important;}
+ .v2ch{display:block!important;width:100%!important;padding-right:0!important;padding-left:0!important;padding-bottom:14px!important;}
+ h1{font-size:22px!important;line-height:1.4!important;}
+ h2{font-size:18px!important;}
+}
+</style>
+</head>
+<body style="margin:0;padding:0;background:#F8F8F6;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;color:#F8F8F6;line-height:1px;">${ph}&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;&nbsp;&#8203;</div>
+<!--[if mso]><table width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table id="v2w" width="600" align="center" cellpadding="0" cellspacing="0" border="0" role="presentation" style="margin:0 auto;max-width:600px;background:#FFFFFF;">
+<tr><td>
+${gNavV2(D.nav)}
+${gHeroV2(D.hero)}
+${gGifV2(D.gif)}
+${gFeaturesV2(D.features)}
+${gSecurityV2(D.security)}
+${gFinalCtaV2(D.finalCta)}
+${gFooter(D.footer)}
+</td></tr>
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+{{ open_tracking_block }}
+</body>
+<!-- EDM-DATA:${data} -->
+</html>`;
+}
+
+// ═══════════════════════════════════════
+// MAIN GENERATOR (routes by template)
+// ═══════════════════════════════════════
+function genEmail(){
+ if(currentTpl==='school_v2') return genEmailV2();
+ const data=JSON.stringify(D).replace(/-->/g,"--\\>");
+ return`<!DOCTYPE html>
+<html lang="zh-HK">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OmniStompboxs</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f0f2f5;}.w{max-width:640px;margin:0 auto;background:#fff;}@media(max-width:520px){.w{width:100%!important;}table td{display:block!important;width:100%!important;padding:0 0 14px 0!important;}}</style>
+</head>
+<body>{{ open_tracking_block }}
+<div class="w">${gNav(D.nav)}${gHero(D.hero)}${gIntro(D.intro)}${gFeatures(D.features)}${gSecurity(D.security)}${gMidCta(D.midCta)}${gServices(D.services)}${gFinalCta(D.finalCta)}${gFooter(D.footer)}</div>
+</body>
+<!-- EDM-DATA:${data} -->
+</html>`;
+}
+
+// ═══════════════════════════════════════
+// PREVIEW
+// ═══════════════════════════════════════
+function rsz(){
+ const f=document.getElementById("fr");
+ try{f.style.height=Math.max(800,f.contentDocument.documentElement.scrollHeight+40)+"px";}catch(x){}
+}
+function rf(){document.getElementById("fr").srcdoc=genEmail();}
+function sm(m){
+ const f=document.getElementById("fr"),bd=document.getElementById("bd"),bm=document.getElementById("bm2");
+ if(m==="m"){f.style.width="375px";f.classList.add("mb");bd.classList.remove("on");bm.classList.add("on");}
+ else{f.style.width="600px";f.classList.remove("mb");bd.classList.add("on");bm.classList.remove("on");}
+}
+
+// ═══════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════
+function ex(){
+ const fname=`edm-${currentTpl}.html`;
+ const b=new Blob([genEmail()],{type:"text/html;charset=utf-8"});
+ const u=URL.createObjectURL(b),a=document.createElement("a");
+ a.href=u;a.download=fname;
+ document.body.appendChild(a);a.click();
+ document.body.removeChild(a);URL.revokeObjectURL(u);
+}
+function im(ev){
+ const file=ev.target.files[0];if(!file)return;
+ const r=new FileReader();
+ r.onload=e=>{
+  const m=e.target.result.match(/<!--\s*EDM-DATA:([\s\S]*?)-->/);
+  if(!m){alert("找不到資料，請確認此 HTML 由本工具導出。");return;}
+  try{
+   D=dc(JSON.parse(m[1].trim().replace(/--\\>/g,"-->")));
+   if(D._tpl && TEMPLATES[D._tpl]){
+    currentTpl=D._tpl;
+    document.querySelectorAll('.tbtn').forEach(b=>{b.classList.remove('on');b.style.background='';b.style.color='';b.style.borderColor='';});
+    const tplBtn=document.getElementById('tpl_'+currentTpl);
+    if(tplBtn){tplBtn.classList.add('on');tplBtn.style.background=TPL_COLORS[currentTpl];tplBtn.style.color='#fff';tplBtn.style.borderColor=TPL_COLORS[currentTpl];}
+   }
+   buildEd();rf();
+  }
+  catch(x){alert("資料解析失敗。");}
+ };
+ r.readAsText(file);ev.target.value="";
+}
+
+// ═══════════════════════════════════════
+// EDITOR
+// ═══════════════════════════════════════
+const FM={};
+function reg(id,get,set){FM[id]={get,set};}
+function upd(id,v){if(FM[id]){FM[id].set(v);rf();}}
+
+function buildEd(){
+ if(currentTpl==='school_v2'){buildEdV2();return;}
+ for(const k in FM)delete FM[k];
+ let h="";
+ const I=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}">${lbl}</label><input type="text" id="${id}" value="${q(gfn())}" oninput="upd('${id}',this.value)">`;};
+ const T=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}">${lbl}</label><textarea id="${id}" oninput="upd('${id}',this.value)" rows="3">${q(gfn())}</textarea>`;};
+ const C=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}" style="display:flex;align-items:center;gap:5px;"><input type="color" id="${id}" value="${gfn()}" oninput="upd('${id}',this.value)">${lbl}</label>`;};
+
+ h+=`<hr><h4>🧭 導航欄</h4>`;
+ h+=C("n_bg","背景色",()=>D.nav.bg,v=>D.nav.bg=v);
+ h+=I("n_lt","Logo 文字",()=>D.nav.logoText,v=>D.nav.logoText=v);
+ h+=C("n_lc","Logo 顏色",()=>D.nav.logoTextColor,v=>D.nav.logoTextColor=v);
+ h+=I("n_ll","Logo 連結",()=>D.nav.logoLink,v=>D.nav.logoLink=v);
+ h+=C("n_mc","選單文字顏色",()=>D.nav.menuTextColor,v=>D.nav.menuTextColor=v);
+ D.nav.menus.forEach((m,i)=>{
+  h+=`<div class="c"><div class="ct">選單 ${i+1}</div>`;
+  h+=I(`nm${i}t`,"文字",()=>D.nav.menus[i].text,v=>D.nav.menus[i].text=v);
+  h+=I(`nm${i}l`,"連結",()=>D.nav.menus[i].link,v=>D.nav.menus[i].link=v);
+  h+=`</div>`;
+ });
+
+ h+=`<hr><h4>🎯 Hero</h4>`;
+ h+=`<div class="row">${C("h_bf","漸層起色",()=>D.hero.bgFrom,v=>D.hero.bgFrom=v)}${C("h_bt","漸層終色",()=>D.hero.bgTo,v=>D.hero.bgTo=v)}</div>`;
+ h+=I("h_ew","Eyebrow",()=>D.hero.eyebrow,v=>D.hero.eyebrow=v);
+ h+=C("h_ewc","Eyebrow 顏色",()=>D.hero.eyebrowColor,v=>D.hero.eyebrowColor=v);
+ h+=T("h_ti","標題（Enter 換行）",()=>D.hero.title,v=>D.hero.title=v);
+ h+=C("h_tic","標題顏色",()=>D.hero.titleColor,v=>D.hero.titleColor=v);
+ h+=I("h_at","Accent 文字",()=>D.hero.accentText,v=>D.hero.accentText=v);
+ h+=C("h_ac","Accent 顏色",()=>D.hero.accentColor,v=>D.hero.accentColor=v);
+ h+=T("h_tx","副標題",()=>D.hero.text,v=>D.hero.text=v);
+ h+=C("h_txc","副標題顏色",()=>D.hero.textColor,v=>D.hero.textColor=v);
+ D.hero.tags.forEach((t,i)=>{h+=I(`ht${i}`,`Hashtag ${i+1}`,()=>D.hero.tags[i],v=>D.hero.tags[i]=v);});
+ h+=`<div style="font-size:11px;font-weight:bold;color:#374151;margin:6px 0 2px;">▸ 主按鈕</div>`;
+ h+=I("h_pt","文字",()=>D.hero.btnPrimary.text,v=>D.hero.btnPrimary.text=v);
+ h+=I("h_pl","連結",()=>D.hero.btnPrimary.link,v=>D.hero.btnPrimary.link=v);
+ h+=C("h_pc","顏色",()=>D.hero.btnPrimary.color,v=>D.hero.btnPrimary.color=v);
+ h+=`<div style="font-size:11px;font-weight:bold;color:#374151;margin:6px 0 2px;">▸ 輪廓按鈕</div>`;
+ h+=I("h_ot","文字",()=>D.hero.btnOutline.text,v=>D.hero.btnOutline.text=v);
+ h+=I("h_ol","連結",()=>D.hero.btnOutline.link,v=>D.hero.btnOutline.link=v);
+ h+=`<div class="row">${C("h_oc","文字色",()=>D.hero.btnOutline.color,v=>D.hero.btnOutline.color=v)}${C("h_ob","邊框色",()=>D.hero.btnOutline.borderColor,v=>D.hero.btnOutline.borderColor=v)}</div>`;
+
+ h+=`<hr><h4>📝 簡介</h4>`;
+ h+=T("i_1","段落一",()=>D.intro.text1,v=>D.intro.text1=v);
+ h+=T("i_2","段落二",()=>D.intro.text2,v=>D.intro.text2=v);
+ h+=`<div class="row">${C("i_tc","文字色",()=>D.intro.textColor,v=>D.intro.textColor=v)}${C("i_bc","品牌色",()=>D.intro.brandColor,v=>D.intro.brandColor=v)}</div>`;
+ h+=I("i_at","按鈕 A 文字",()=>D.intro.btnA.text,v=>D.intro.btnA.text=v);
+ h+=I("i_al","按鈕 A 連結",()=>D.intro.btnA.link,v=>D.intro.btnA.link=v);
+ h+=I("i_bt","按鈕 B 文字",()=>D.intro.btnB.text,v=>D.intro.btnB.text=v);
+ h+=I("i_bl","按鈕 B 連結",()=>D.intro.btnB.link,v=>D.intro.btnB.link=v);
+
+ h+=`<hr><h4>✨ 六大功能</h4>`;
+ h+=I("f_ti","區塊標題",()=>D.features.title,v=>D.features.title=v);
+ h+=I("f_su","副標題",()=>D.features.subtitle,v=>D.features.subtitle=v);
+ h+=C("f_ac","卡片頂色",()=>D.features.accentColor,v=>D.features.accentColor=v);
+ D.features.items.forEach((it,i)=>{
+  h+=`<div class="c"><div class="ct">功能 ${i+1} ${q(it.icon)}</div>`;
+  h+=I(`fi${i}ic`,"Icon",()=>D.features.items[i].icon,v=>D.features.items[i].icon=v);
+  h+=T(`fi${i}ti`,"標題",()=>D.features.items[i].title,v=>D.features.items[i].title=v);
+  h+=T(`fi${i}de`,"描述",()=>D.features.items[i].desc,v=>D.features.items[i].desc=v);
+  h+=I(`fi${i}li`,"連結 URL",()=>D.features.items[i].link,v=>D.features.items[i].link=v);
+  h+=I(`fi${i}lt`,"連結文字",()=>D.features.items[i].linkText,v=>D.features.items[i].linkText=v);
+  h+=`</div>`;
+ });
+
+ h+=`<hr><h4>🔐 安全管理</h4>`;
+ h+=I("s_ti","區塊標題",()=>D.security.title,v=>D.security.title=v);
+ h+=I("s_su","副標題",()=>D.security.subtitle,v=>D.security.subtitle=v);
+ h+=T("s_in","簡介",()=>D.security.intro,v=>D.security.intro=v);
+ D.security.items.forEach((it,i)=>{
+  h+=`<div class="c"><div class="ct">安全項 ${i+1}</div>`;
+  h+=I(`si${i}ic`,"Icon",()=>D.security.items[i].icon,v=>D.security.items[i].icon=v);
+  h+=I(`si${i}ti`,"標題",()=>D.security.items[i].title,v=>D.security.items[i].title=v);
+  h+=T(`si${i}de`,"描述",()=>D.security.items[i].desc,v=>D.security.items[i].desc=v);
+  h+=`</div>`;
+ });
+ h+=T("s_nt","備注文字",()=>D.security.noteText,v=>D.security.noteText=v);
+ h+=I("s_nl","連結文字（需與備注一致）",()=>D.security.noteLinkText,v=>D.security.noteLinkText=v);
+ h+=I("s_nu","連結 URL",()=>D.security.noteLinkUrl,v=>D.security.noteLinkUrl=v);
+
+ h+=`<hr><h4>💡 中部號召</h4>`;
+ h+=T("mc_hi","Highlight（Enter 換行）",()=>D.midCta.highlight,v=>D.midCta.highlight=v);
+ h+=C("mc_hc","Highlight 顏色",()=>D.midCta.highlightColor,v=>D.midCta.highlightColor=v);
+ h+=T("mc_tx","說明文字",()=>D.midCta.text,v=>D.midCta.text=v);
+ h+=I("mc_bt","按鈕文字",()=>D.midCta.btn.text,v=>D.midCta.btn.text=v);
+ h+=I("mc_bl","按鈕連結",()=>D.midCta.btn.link,v=>D.midCta.btn.link=v);
+ h+=C("mc_bc","按鈕顏色",()=>D.midCta.btn.color,v=>D.midCta.btn.color=v);
+
+ h+=`<hr><h4>🛎 服務項目</h4>`;
+ h+=I("sv_ti","標題",()=>D.services.title,v=>D.services.title=v);
+ D.services.items.forEach((it,i)=>{
+  h+=`<div class="c"><div class="ct">服務 ${i+1}</div>`;
+  h+=I(`sv${i}ic`,"Icon",()=>D.services.items[i].icon,v=>D.services.items[i].icon=v);
+  h+=I(`sv${i}ti`,"標題",()=>D.services.items[i].title,v=>D.services.items[i].title=v);
+  h+=T(`sv${i}de`,"描述",()=>D.services.items[i].desc,v=>D.services.items[i].desc=v);
+  h+=`</div>`;
+ });
+ h+=I("sv_no","備注",()=>D.services.note,v=>D.services.note=v);
+
+ h+=`<hr><h4>🚀 最終號召</h4>`;
+ h+=`<div class="row">${C("fc_bf","漸層起",()=>D.finalCta.bgFrom,v=>D.finalCta.bgFrom=v)}${C("fc_bt","漸層終",()=>D.finalCta.bgTo,v=>D.finalCta.bgTo=v)}</div>`;
+ h+=T("fc_ti","標題（Enter 換行）",()=>D.finalCta.title,v=>D.finalCta.title=v);
+ h+=C("fc_tc","標題顏色",()=>D.finalCta.titleColor,v=>D.finalCta.titleColor=v);
+ h+=T("fc_tx","說明文字",()=>D.finalCta.text,v=>D.finalCta.text=v);
+ h+=I("fc_bt2","按鈕文字",()=>D.finalCta.btn.text,v=>D.finalCta.btn.text=v);
+ h+=I("fc_bl","按鈕連結",()=>D.finalCta.btn.link,v=>D.finalCta.btn.link=v);
+ h+=C("fc_bc","按鈕文字顏色",()=>D.finalCta.btn.textColor,v=>D.finalCta.btn.textColor=v);
+
+ h+=`<hr><h4>📌 頁尾</h4>`;
+ h+=C("ft_bg","背景色",()=>D.footer.bg,v=>D.footer.bg=v);
+ h+=I("ft_lt","Logo 文字",()=>D.footer.logoText,v=>D.footer.logoText=v);
+ h+=C("ft_lc","Logo 顏色",()=>D.footer.logoColor,v=>D.footer.logoColor=v);
+ h+=T("ft_de","描述（Enter 換行）",()=>D.footer.desc,v=>D.footer.desc=v);
+ h+=I("ft_em","查詢電郵",()=>D.footer.email,v=>D.footer.email=v);
+ h+=I("ft_ws","官方網站",()=>D.footer.website,v=>D.footer.website=v);
+ D.footer.links.forEach((l,i)=>{
+  h+=I(`ftl${i}t`,`連結 ${i+1} 文字`,()=>D.footer.links[i].text,v=>D.footer.links[i].text=v);
+  h+=I(`ftl${i}l`,`連結 ${i+1} URL`,()=>D.footer.links[i].link,v=>D.footer.links[i].link=v);
+ });
+ h+=I("ft_cp","版權文字",()=>D.footer.copyright,v=>D.footer.copyright=v);
+ h+=C("ft_cpc","版權顏色",()=>D.footer.copyrightColor,v=>D.footer.copyrightColor=v);
+ h+=`<div style="height:48px"></div>`;
+ document.getElementById("ef").innerHTML=h;
+}
+
+function buildEdV2(){
+ for(const k in FM)delete FM[k];
+ let h="";
+ const I=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}">${lbl}</label><input type="text" id="${id}" value="${q(gfn())}" oninput="upd('${id}',this.value)">`;};
+ const T=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}">${lbl}</label><textarea id="${id}" oninput="upd('${id}',this.value)" rows="3">${q(gfn())}</textarea>`;};
+ const C=(id,lbl,gfn,sfn)=>{reg(id,gfn,sfn);return`<label for="${id}" style="display:flex;align-items:center;gap:5px;"><input type="color" id="${id}" value="${gfn()}" oninput="upd('${id}',this.value)">${lbl}</label>`;};
+
+ h+=`<hr><h4>📋 主旨及預覽</h4>`;
+ h+=I("v2_subj","電郵主旨",()=>D.meta.subject,v=>D.meta.subject=v);
+ h+=T("v2_pre","預覽文字",()=>D.meta.preheader,v=>D.meta.preheader=v);
+
+ h+=`<hr><h4>🧭 導航欄</h4>`;
+ h+=C("v2_nbg","背景色",()=>D.nav.bg,v=>D.nav.bg=v);
+ h+=I("v2_nlt","Logo 文字",()=>D.nav.logoText,v=>D.nav.logoText=v);
+ h+=C("v2_nlc","Logo 顏色",()=>D.nav.logoTextColor,v=>D.nav.logoTextColor=v);
+ h+=I("v2_nll","Logo 連結",()=>D.nav.logoLink,v=>D.nav.logoLink=v);
+
+ h+=`<hr><h4>🎯 Hero</h4>`;
+ h+=C("v2_hbg","背景色",()=>D.hero.bg,v=>D.hero.bg=v);
+ h+=T("v2_hti","標題（Enter 換行）",()=>D.hero.title,v=>D.hero.title=v);
+ h+=C("v2_htc","標題顏色",()=>D.hero.titleColor,v=>D.hero.titleColor=v);
+ h+=T("v2_htx","說明文字",()=>D.hero.text,v=>D.hero.text=v);
+ h+=C("v2_hxc","文字顏色",()=>D.hero.textColor,v=>D.hero.textColor=v);
+ h+=I("v2_hbt","按鈕文字",()=>D.hero.btnText,v=>D.hero.btnText=v);
+ h+=I("v2_hbl","按鈕連結",()=>D.hero.btnLink,v=>D.hero.btnLink=v);
+ h+=C("v2_hbc","按鈕顏色",()=>D.hero.btnColor,v=>D.hero.btnColor=v);
+
+ h+=`<hr><h4>🖼 示意區（GIF 預留位）</h4>`;
+ h+=I("v2_galt","圖片 Alt 文字",()=>D.gif.altText,v=>D.gif.altText=v);
+ h+=I("v2_gcap","圖片說明",()=>D.gif.caption,v=>D.gif.caption=v);
+
+ h+=`<hr><h4>✨ 六個應用場景</h4>`;
+ h+=I("v2_fti","區塊標題",()=>D.features.title,v=>D.features.title=v);
+ h+=C("v2_fac","強調色",()=>D.features.accentColor,v=>D.features.accentColor=v);
+ h+=I("v2_flt","底部連結文字",()=>D.features.linkText,v=>D.features.linkText=v);
+ h+=I("v2_fll","底部連結 URL",()=>D.features.linkUrl,v=>D.features.linkUrl=v);
+ D.features.items.forEach((it,i)=>{
+  h+=`<div class="c"><div class="ct">場景 ${it.num}</div>`;
+  h+=I(`v2fi${i}ti`,"標題",()=>D.features.items[i].title,v=>D.features.items[i].title=v);
+  h+=T(`v2fi${i}de`,"描述",()=>D.features.items[i].desc,v=>D.features.items[i].desc=v);
+  h+=`</div>`;
+ });
+
+ h+=`<hr><h4>🔐 資料權限</h4>`;
+ h+=C("v2_sbg","背景色",()=>D.security.bg,v=>D.security.bg=v);
+ h+=I("v2_sti","標題",()=>D.security.title,v=>D.security.title=v);
+ h+=C("v2_stc","標題顏色",()=>D.security.titleColor,v=>D.security.titleColor=v);
+ h+=T("v2_stx","內文",()=>D.security.text,v=>D.security.text=v);
+
+ h+=`<hr><h4>🚀 結尾行動</h4>`;
+ h+=C("v2_fcbg","背景色",()=>D.finalCta.bg,v=>D.finalCta.bg=v);
+ h+=T("v2_fcti","標題（Enter 換行）",()=>D.finalCta.title,v=>D.finalCta.title=v);
+ h+=C("v2_fctc","標題顏色",()=>D.finalCta.titleColor,v=>D.finalCta.titleColor=v);
+ h+=T("v2_fctx","內文",()=>D.finalCta.text,v=>D.finalCta.text=v);
+ h+=I("v2_fcbt","按鈕文字",()=>D.finalCta.btnText,v=>D.finalCta.btnText=v);
+ h+=I("v2_fcbl","按鈕連結",()=>D.finalCta.btnLink,v=>D.finalCta.btnLink=v);
+ h+=C("v2_fcbc","按鈕顏色",()=>D.finalCta.btnColor,v=>D.finalCta.btnColor=v);
+
+ h+=`<hr><h4>📌 頁尾</h4>`;
+ h+=C("v2_ftbg","背景色",()=>D.footer.bg,v=>D.footer.bg=v);
+ h+=I("v2_ftlt","Logo 文字",()=>D.footer.logoText,v=>D.footer.logoText=v);
+ h+=C("v2_ftlc","Logo 顏色",()=>D.footer.logoColor,v=>D.footer.logoColor=v);
+ h+=T("v2_ftde","描述（Enter 換行）",()=>D.footer.desc,v=>D.footer.desc=v);
+ h+=I("v2_ftem","查詢電郵",()=>D.footer.email,v=>D.footer.email=v);
+ h+=I("v2_ftws","官方網站",()=>D.footer.website,v=>D.footer.website=v);
+ D.footer.links.forEach((l,i)=>{
+  h+=I(`v2ftl${i}t`,`連結 ${i+1} 文字`,()=>D.footer.links[i].text,v=>D.footer.links[i].text=v);
+  h+=I(`v2ftl${i}l`,`連結 ${i+1} URL`,()=>D.footer.links[i].link,v=>D.footer.links[i].link=v);
+ });
+ h+=I("v2_ftcp","版權文字",()=>D.footer.copyright,v=>D.footer.copyright=v);
+ h+=C("v2_ftcc","版權顏色",()=>D.footer.copyrightColor,v=>D.footer.copyrightColor=v);
+ h+=`<div style="height:48px"></div>`;
+ document.getElementById("ef").innerHTML=h;
+}
+
+buildEd();
+rf();
+</script>
+</body>
+</html>
