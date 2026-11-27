@@ -23,8 +23,7 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
   transition:opacity .38s ease,transform .38s ease;transform:translateX(28px);z-index:0}
 .slide.active{opacity:1;pointer-events:all;transform:translateX(0);z-index:1}
 .slide.exiting{opacity:0;transform:translateX(-28px);z-index:0}
-/* SLIDE HEADER */
-.sh{position:absolute;top:0;left:0;right:0;height:54px;background:#fff;
+.sh{position:absolute;top:0;left:0;right:0;height:52px;background:#fff;
   border-bottom:1px solid var(--bdr);display:flex;align-items:center;
   justify-content:space-between;padding:0 32px;z-index:5}
 .sh-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;
@@ -35,28 +34,39 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
   letter-spacing:1.4px;color:var(--txt2);text-transform:uppercase}
 .sh-brand{font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;
   letter-spacing:2px;color:var(--gold)}
-/* SLIDE FOOTER */
-.sf{position:absolute;bottom:0;left:0;right:0;height:22px;background:var(--bgg);
+.sf{position:absolute;bottom:0;left:0;right:0;height:20px;background:var(--bgg);
   border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 32px}
 .sf-txt{font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:500;color:var(--txt3);letter-spacing:.3px}
-/* CONTENT AREA */
-.sc{position:absolute;top:54px;bottom:22px;left:0;right:0;overflow:hidden}
-/* REUSABLE COMPONENTS */
+/* sc leaves room for summary bar */
+.sc{position:absolute;top:52px;bottom:105px;left:0;right:0;overflow:hidden}
+/* Summary bar */
+.slide-summary{
+  position:absolute;bottom:20px;left:0;right:0;height:85px;
+  background:var(--bg);border-top:2px solid rgba(166,124,82,.3);
+  display:flex;align-items:stretch;z-index:6;
+}
+.sum-col{flex:1;padding:9px 24px;display:flex;flex-direction:column;gap:4px;}
+.sum-col+.sum-col{border-left:1px solid var(--bdr);}
+.sum-label{font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;
+  letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);flex-shrink:0;}
+.sum-text{font-size:12px;color:var(--txt);line-height:1.45;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;}
+/* Components */
 .con-bar{background:linear-gradient(135deg,rgba(166,124,82,.1),rgba(166,124,82,.04));
   border-left:3px solid var(--gold);padding:7px 14px;border-radius:0 6px 6px 0}
-.con-label{font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;
+.con-label{font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;
   color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:2px}
-.con-text{font-size:12px;font-weight:600;color:var(--txt);line-height:1.45}
+.con-text{font-size:14px;font-weight:600;color:var(--txt);line-height:1.45}
 .card{background:#fff;border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;
   box-shadow:0 2px 6px rgba(0,0,0,.04)}
 .card-g{background:#fff;border:1px solid var(--gold-b);border-radius:8px;padding:9px 11px;
   box-shadow:0 2px 8px rgba(166,124,82,.07)}
-.slabel{font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;
-  color:var(--gold);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:3px}
-.ctitle{font-size:11px;font-weight:700;color:var(--txt);margin-bottom:3px;line-height:1.4}
-.cbody{font-size:9.5px;color:var(--txt2);line-height:1.6}
+.slabel{font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;
+  color:var(--gold);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:4px}
+.ctitle{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:4px;line-height:1.4}
+.cbody{font-size:13px;color:var(--txt2);line-height:1.6}
 .m{font-family:Montserrat,sans-serif;font-weight:700}
-/* CONTROLS */
+/* Controls */
 #ctrl{position:fixed;bottom:0;left:0;width:100%;height:46px;
   background:rgba(10,10,10,.97);backdrop-filter:blur(16px);
   border-top:1px solid rgba(166,124,82,.2);display:flex;align-items:center;
@@ -77,6 +87,20 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 #prog{position:fixed;bottom:46px;left:0;height:2px;background:var(--gold);
   transition:width .38s ease;z-index:999;box-shadow:0 0 8px rgba(166,124,82,.5)}
 .ngrp,.expgrp{display:flex;align-items:center;gap:10px}
+/* Platform column reusable */
+.plat-col{flex:1;border-radius:9px;padding:11px 14px;display:flex;flex-direction:column;gap:0;}
+.plat-head{display:flex;align-items:center;gap:8px;padding-bottom:9px;margin-bottom:9px;}
+.plat-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-family:Montserrat,sans-serif;font-size:12px;font-weight:900;
+  color:#fff;flex-shrink:0;}
+.plat-role{border-radius:6px;padding:6px 12px;font-size:11.5px;font-weight:700;margin-bottom:10px;flex-shrink:0;}
+.plat-pt{flex:1;display:flex;flex-direction:column;justify-content:center;
+  padding:10px 0;border-top:1px solid;}
+.plat-pt-title{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:5px;line-height:1.3;}
+.plat-pt-body{font-size:13px;color:var(--txt2);line-height:1.6;}
+.plat-metric{padding:8px 10px;border-radius:6px;border:1px solid;flex-shrink:0;margin-top:10px;}
+.plat-metric-label{font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;letter-spacing:.8px;}
+.plat-metric-val{font-family:Montserrat,sans-serif;font-size:21px;font-weight:900;line-height:1.1;}
 </style>
 </head>
 <body>
@@ -87,18 +111,16 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 <div class="slide active" id="s1" data-title="封面 · XIAOMA 全球 2027 整合營銷方案">
   <div style="position:absolute;inset:0;background:#181818;overflow:hidden;">
     <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(166,124,82,.18) 1px,transparent 1px);background-size:28px 28px;"></div>
-    <!-- Gold frame -->
     <div style="position:absolute;inset:22px;border:1px solid rgba(166,124,82,.3);border-radius:2px;pointer-events:none;"></div>
     <div style="position:absolute;top:21px;left:21px;width:18px;height:18px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);"></div>
     <div style="position:absolute;top:21px;right:21px;width:18px;height:18px;border-top:2px solid var(--gold);border-right:2px solid var(--gold);"></div>
     <div style="position:absolute;bottom:21px;left:21px;width:18px;height:18px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold);"></div>
     <div style="position:absolute;bottom:21px;right:21px;width:18px;height:18px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);"></div>
-    <!-- Content -->
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;">
       <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;color:rgba(166,124,82,.65);border:1px solid rgba(166,124,82,.28);padding:4px 16px;border-radius:100px;">GLOBAL GROWTH &amp; PERFORMANCE MARKETING BLUEPRINT</div>
       <div style="font-family:Montserrat,sans-serif;font-size:62px;font-weight:900;letter-spacing:8px;color:#fff;line-height:1;text-align:center;">XIAO<span style="color:var(--gold);">MA</span></div>
       <div style="font-size:19px;font-weight:700;color:rgba(255,255,255,.88);text-align:center;line-height:1.45;">《XIAOMA 全球 2027 年度整合營銷與業績增長方案》</div>
-      <div style="font-size:12px;font-weight:300;color:rgba(255,255,255,.45);letter-spacing:1px;text-align:center;">全球區域差異化佈局與高淨值雙向漏斗增長策略</div>
+      <div style="font-size:13px;font-weight:300;color:rgba(255,255,255,.45);letter-spacing:1px;text-align:center;">全球區域差異化佈局與高淨值雙向漏斗增長策略</div>
       <div style="width:280px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
       <div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:500;color:rgba(255,255,255,.38);letter-spacing:1.2px;">彙報人：Tabris Yuen &nbsp;|&nbsp; 2026 年 11 月</div>
     </div>
@@ -109,126 +131,100 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 <div class="slide" id="s2" data-title="市場洞察 — 2027 破局點">
   <div class="sh"><div class="sh-left"><div class="sh-num">02</div><div class="sh-title">Market Insights — 2027 破局點</div></div><div class="sh-brand">XIAOMA</div></div>
   <div class="sc" style="display:flex;">
-    <!-- Left 55% -->
-    <div style="width:55%;border-right:1px solid var(--bdr);padding:14px 18px 10px 28px;display:flex;flex-direction:column;gap:9px;background:var(--bg);">
+    <div style="width:55%;border-right:1px solid var(--bdr);padding:12px 18px 10px 26px;display:flex;flex-direction:column;gap:9px;background:var(--bg);">
       <div class="slabel">2026 權威市場數據支撐</div>
-      <!-- Market Size Card -->
       <div class="card" style="flex-shrink:0;">
         <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;">GLOBAL SECONDHAND LUXURY MARKET 2026</div>
         <div style="display:flex;align-items:center;gap:14px;margin-bottom:9px;">
-          <div><div style="font-family:Montserrat,sans-serif;font-size:30px;font-weight:900;color:var(--gold);line-height:1;">$44.6B</div><div style="font-size:9px;color:var(--txt3);">全球二手奢侈品市場規模</div></div>
+          <div><div style="font-family:Montserrat,sans-serif;font-size:30px;font-weight:900;color:var(--gold);line-height:1;">$44.6B</div><div style="font-size:11px;color:var(--txt3);">全球二手奢侈品市場規模</div></div>
           <div style="border-left:1px solid var(--bdr);padding-left:12px;">
             <div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:#27AE60;">↑ 2–3×</div>
-            <div style="font-size:8.5px;color:var(--txt3);">vs 一手市場增速</div>
+            <div style="font-size:10px;color:var(--txt3);">vs 一手市場增速</div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:4px;">
           <div style="display:flex;align-items:center;gap:7px;">
-            <div style="font-size:8.5px;color:var(--txt2);width:65px;flex-shrink:0;">全球市場</div>
-            <div style="flex:1;height:13px;background:#F3F0EB;border-radius:7px;overflow:hidden;"><div style="width:100%;height:100%;background:linear-gradient(90deg,#A67C52,#C4975F);border-radius:7px;"></div></div>
-            <div style="font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:700;color:var(--gold);width:38px;text-align:right;">$44.6B</div>
+            <div style="font-size:10px;color:var(--txt2);width:65px;flex-shrink:0;">全球市場</div>
+            <div style="flex:1;height:14px;background:#F3F0EB;border-radius:7px;overflow:hidden;"><div style="width:100%;height:100%;background:linear-gradient(90deg,#A67C52,#C4975F);border-radius:7px;"></div></div>
+            <div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:var(--gold);width:40px;text-align:right;">$44.6B</div>
           </div>
           <div style="display:flex;align-items:center;gap:7px;">
-            <div style="font-size:8.5px;color:var(--txt2);width:65px;flex-shrink:0;">亞太區</div>
-            <div style="flex:1;height:13px;background:#F3F0EB;border-radius:7px;overflow:hidden;"><div style="width:22.7%;height:100%;background:linear-gradient(90deg,#C4975F,#DEB896);border-radius:7px;"></div></div>
-            <div style="font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:700;color:var(--gold);width:38px;text-align:right;">$10.1B</div>
+            <div style="font-size:10px;color:var(--txt2);width:65px;flex-shrink:0;">亞太區</div>
+            <div style="flex:1;height:14px;background:#F3F0EB;border-radius:7px;overflow:hidden;"><div style="width:22.7%;height:100%;background:linear-gradient(90deg,#C4975F,#DEB896);border-radius:7px;"></div></div>
+            <div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:var(--gold);width:40px;text-align:right;">$10.1B</div>
           </div>
           <div style="display:flex;align-items:center;gap:7px;">
-            <div style="font-size:8.5px;color:var(--txt2);width:65px;flex-shrink:0;">日本份額</div>
-            <div style="flex:1;height:13px;background:#F3F0EB;border-radius:7px;overflow:hidden;"><div style="width:31.6%;height:100%;background:linear-gradient(90deg,#6B9E7C,#8DC4A0);border-radius:7px;"></div></div>
-            <div style="font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:700;color:#5A8C6C;width:38px;text-align:right;">31.6%</div>
+            <div style="font-size:10px;color:var(--txt2);width:65px;flex-shrink:0;">日本份額</div>
+            <div style="flex:1;height:14px;background:#F3F0EB;border-radius:7px;overflow:hidden;"><div style="width:31.6%;height:100%;background:linear-gradient(90deg,#6B9E7C,#8DC4A0);border-radius:7px;"></div></div>
+            <div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:#5A8C6C;width:40px;text-align:right;">31.6%</div>
           </div>
         </div>
       </div>
-      <!-- Birkin Premium Card -->
       <div class="card" style="flex-shrink:0;">
         <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">BIRKIN 二級市場溢價趨勢（理性常態化）</div>
         <div style="display:flex;align-items:flex-end;gap:8px;">
           <div style="display:flex;align-items:flex-end;gap:5px;flex:1;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
-              <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);">2.2×</div>
-              <div style="width:30px;height:46px;background:linear-gradient(0deg,#A67C52,#C4975F);border-radius:3px 3px 0 0;"></div>
-              <div style="font-size:7.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">2022</div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
-              <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);">2.0×</div>
-              <div style="width:30px;height:42px;background:linear-gradient(0deg,#B4896A,#CEAA84);border-radius:3px 3px 0 0;"></div>
-              <div style="font-size:7.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">2023</div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
-              <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);">1.7×</div>
-              <div style="width:30px;height:36px;background:linear-gradient(0deg,#C4A07A,#DEC094);border-radius:3px 3px 0 0;"></div>
-              <div style="font-size:7.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">2024</div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
-              <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);">1.5×</div>
-              <div style="width:30px;height:32px;background:linear-gradient(0deg,#D4B08A,#E8CCA6);border-radius:3px 3px 0 0;"></div>
-              <div style="font-size:7.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">2025</div>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;">
-              <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:900;color:var(--gold);">1.4×</div>
-              <div style="width:30px;height:30px;background:linear-gradient(0deg,#D4B08A,#E8CCA6);border-radius:3px 3px 0 0;border:2px solid var(--gold);"></div>
-              <div style="font-size:7.5px;color:var(--gold);font-family:Montserrat,sans-serif;font-weight:700;">2026</div>
-            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;"><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);">2.2×</div><div style="width:30px;height:46px;background:linear-gradient(0deg,#A67C52,#C4975F);border-radius:3px 3px 0 0;"></div><div style="font-size:8px;color:var(--txt3);font-family:Montserrat,sans-serif;">2022</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;"><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);">2.0×</div><div style="width:30px;height:42px;background:linear-gradient(0deg,#B4896A,#CEAA84);border-radius:3px 3px 0 0;"></div><div style="font-size:8px;color:var(--txt3);font-family:Montserrat,sans-serif;">2023</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;"><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);">1.7×</div><div style="width:30px;height:36px;background:linear-gradient(0deg,#C4A07A,#DEC094);border-radius:3px 3px 0 0;"></div><div style="font-size:8px;color:var(--txt3);font-family:Montserrat,sans-serif;">2024</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;"><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);">1.5×</div><div style="width:30px;height:32px;background:linear-gradient(0deg,#D4B08A,#E8CCA6);border-radius:3px 3px 0 0;"></div><div style="font-size:8px;color:var(--txt3);font-family:Montserrat,sans-serif;">2025</div></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:1px;"><div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:900;color:var(--gold);">1.4×</div><div style="width:30px;height:30px;background:linear-gradient(0deg,#D4B08A,#E8CCA6);border-radius:3px 3px 0 0;border:2px solid var(--gold);"></div><div style="font-size:8px;color:var(--gold);font-family:Montserrat,sans-serif;font-weight:700;">2026</div></div>
           </div>
-          <div style="border-left:1px solid var(--bdr);padding-left:10px;text-align:right;flex-shrink:0;">
-            <div style="font-size:8px;color:var(--txt3);line-height:1.6;">理性<br>常態化<br>趨勢</div>
-          </div>
+          <div style="border-left:1px solid var(--bdr);padding-left:10px;text-align:right;flex-shrink:0;"><div style="font-size:10px;color:var(--txt3);line-height:1.6;">理性<br>常態化<br>趨勢</div></div>
         </div>
       </div>
-      <!-- Stats Row -->
       <div style="display:flex;gap:8px;flex-shrink:0;">
         <div class="card" style="flex:1;text-align:center;border-color:var(--gold-b);">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">Mini Kelly II</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">Mini Kelly II</div>
           <div style="font-family:Montserrat,sans-serif;font-size:24px;font-weight:900;color:var(--gold);line-height:1;">282%</div>
-          <div style="font-size:8.5px;color:var(--txt3);">最高保值率</div>
+          <div style="font-size:11px;color:var(--txt3);">最高保值率</div>
         </div>
         <div class="card" style="flex:1;text-align:center;border-color:var(--gold-b);">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">Birkin 25</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">Birkin 25</div>
           <div style="font-family:Montserrat,sans-serif;font-size:24px;font-weight:900;color:var(--gold);line-height:1;">#1</div>
-          <div style="font-size:8.5px;color:var(--txt3);">流動性最強爆款</div>
+          <div style="font-size:11px;color:var(--txt3);">流動性最強爆款</div>
         </div>
         <div class="card" style="flex:1;text-align:center;border-color:rgba(39,174,96,.3);">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">HK Retail '26</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">HK Retail '26</div>
           <div style="font-family:Montserrat,sans-serif;font-size:24px;font-weight:900;color:#27AE60;line-height:1;">+22.6%</div>
-          <div style="font-size:8.5px;color:var(--txt3);">香港奢侈品零售復甦</div>
+          <div style="font-size:11px;color:var(--txt3);">香港奢侈品零售復甦</div>
         </div>
       </div>
     </div>
-    <!-- Right 45% -->
-    <div style="width:45%;padding:14px 24px 10px 18px;display:flex;flex-direction:column;gap:8px;">
+    <div style="width:45%;padding:12px 22px 10px 18px;display:flex;flex-direction:column;gap:9px;">
       <div class="con-bar"><div class="con-label">核心結論</div><div class="con-text">告別盲目溢價期，2027 增長關鍵在於<br>「全球區域套利」與「雙向精準獲客」</div></div>
-      <!-- Card 1: Moat + Competitive -->
       <div class="card-g">
         <div class="slabel">護城河 &amp; 競品定位</div>
         <div class="ctitle">充分發揮「日系鑑定 ＋ 8 大地標」護城河</div>
-        <div class="cbody" style="margin-bottom:6px;">市場洗牌期加速小代購出清，放大東京總部鑑定權威與全球合規牌照（香港 DPMS A類）優勢，搶佔高淨值客群信任。</div>
-        <div style="padding:6px 9px;background:rgba(166,124,82,.06);border-radius:5px;border:1px dashed var(--gold-b);">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--gold);letter-spacing:.8px;margin-bottom:3px;">▶ COMPETITIVE ADVANTAGE</div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.6;">相較 <strong>Vestiaire Collective</strong>（缺乏亞洲頂級實體鑑定體驗）或 <strong>The RealReal</strong>（偏重北美大眾市場），XIAOMA 憑藉東京銀座匠人鑑定 ＋ 全球 8 大金融地標實體店，建立國際競品難以複製的信任護城河。</div>
+        <div class="cbody" style="margin-bottom:7px;">市場洗牌期加速小代購出清，放大東京總部鑑定權威與全球合規牌照（香港 DPMS A類）優勢，搶佔高淨值客群信任。</div>
+        <div style="padding:7px 10px;background:rgba(166,124,82,.06);border-radius:5px;border:1px dashed var(--gold-b);">
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:var(--gold);letter-spacing:.8px;margin-bottom:4px;">▶ COMPETITIVE ADVANTAGE</div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.6;">相較 <strong>Vestiaire Collective</strong>（缺乏亞洲頂級實體鑑定）或 <strong>The RealReal</strong>（偏重北美大眾市場），XIAOMA 憑藉東京銀座匠人鑑定 ＋ 全球 8 大金融地標實體店，建立國際競品難以複製的信任護城河。</div>
         </div>
       </div>
-      <!-- Card 2: Precision -->
       <div class="card">
         <div class="slabel">策略轉向</div>
         <div class="ctitle">從「被動等客」轉向「精準效果投放」</div>
         <div class="cbody">透過數據驅動的付費媒體矩陣，加速高價孤品周轉率，並低成本搶佔一手 C2B 貨源。</div>
       </div>
-      <!-- Baseline Assumptions -->
       <div style="background:#F3F0EB;border:1px solid var(--bdr);border-radius:8px;padding:9px 11px;">
-        <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--txt3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;">2027 增長基準線推演 / BASELINE ASSUMPTIONS</div>
+        <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:var(--txt3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;">2027 BASELINE ASSUMPTIONS</div>
         <div style="display:flex;gap:8px;">
-          <div style="flex:1;padding:7px 9px;background:#fff;border-radius:5px;border:1px solid var(--bdr);">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#C4575B;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">▼ AS-IS 現狀</div>
-            <div style="font-size:9px;color:var(--txt2);line-height:1.6;">ROAS <strong class="m">1.8×–2.5×</strong>（未打通離線轉化回傳）；表單到店轉化率 <strong class="m">8%–12%</strong>；存在 <strong class="m">20–30%</strong> 跨渠道歸因盲區。</div>
+          <div style="flex:1;padding:8px 10px;background:#fff;border-radius:5px;border:1px solid var(--bdr);">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#C4575B;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">▼ AS-IS 現狀</div>
+            <div style="font-size:12px;color:var(--txt2);line-height:1.6;">ROAS <strong class="m">1.8×–2.5×</strong>；表單到店轉化率 <strong class="m">8%–12%</strong>；存在 <strong class="m">20–30%</strong> 跨渠道歸因盲區。</div>
           </div>
-          <div style="flex:1;padding:7px 9px;background:#fff;border-radius:5px;border:1px solid var(--gold-b);">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#27AE60;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;">▲ TO-BE 目標</div>
-            <div style="font-size:9px;color:var(--txt2);line-height:1.6;">Q2 末整體 ROAS 拉升至 <strong class="m" style="color:var(--gold);">3.5×–4.5×</strong>；有效線索轉化率提升 <strong class="m" style="color:var(--gold);">+20%</strong>。</div>
+          <div style="flex:1;padding:8px 10px;background:#fff;border-radius:5px;border:1px solid var(--gold-b);">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#27AE60;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">▲ TO-BE 目標</div>
+            <div style="font-size:12px;color:var(--txt2);line-height:1.6;">Q2 末 ROAS 拉升至 <strong class="m" style="color:var(--gold);">3.5×–4.5×</strong>；有效線索轉化率提升 <strong class="m" style="color:var(--gold);">+20%</strong>。</div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">發揮「東京總部鑑定＋全球 8 間地標店＋香港合法牌照」優勢，把廣告費集中投在 Mini Kelly、Birkin 25 等最搶手款式上。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">讓整體廣告回報率翻倍（從約 2 倍提升至 3.5–4.5 倍），有效客戶詢問率提升 20%。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">Source: Bain &amp; Company Luxury Report (Nov 2026); IMARC Group (2026); Saclab Hermès Investment Report (2026)</div></div>
 </div>
@@ -236,137 +232,172 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 <!-- ===================== S3 TIER MATRIX ===================== -->
 <div class="slide" id="s3" data-title="全球 8 大市場戰略定位與優先級矩陣">
   <div class="sh"><div class="sh-left"><div class="sh-num">03</div><div class="sh-title">1️⃣ Global Strategy — 8-Market Tier Matrix</div></div><div class="sh-brand">XIAOMA</div></div>
-  <div class="sc" style="display:flex;flex-direction:column;padding:12px 26px 8px;">
+  <div class="sc" style="display:flex;flex-direction:column;padding:11px 24px 8px;">
     <div class="con-bar" style="margin-bottom:8px;flex-shrink:0;"><div class="con-label">核心結論</div><div class="con-text">依託全球 8 大金融地標，構建「貨源收購 — 高周轉交易 — 高溢價變現」的區域聯動網絡</div></div>
     <!-- Tier 1 -->
     <div style="flex:1;min-height:0;background:rgba(166,124,82,.07);border:1px solid rgba(166,124,82,.2);border-radius:8px;padding:9px 12px;display:flex;align-items:flex-start;gap:12px;margin-bottom:7px;">
-      <div style="width:150px;flex-shrink:0;">
+      <div style="width:145px;flex-shrink:0;">
         <div style="display:inline-block;background:var(--gold);color:#fff;border-radius:4px;padding:2px 7px;font-family:Montserrat,sans-serif;font-size:8px;font-weight:900;letter-spacing:.8px;margin-bottom:4px;">TIER 1</div>
         <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:700;color:var(--gold);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">最高優先級</div>
-        <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:var(--gold);line-height:1.1;">55–60%<br><span style="font-size:8px;font-weight:600;color:var(--txt3);">全球預算</span></div>
+        <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:var(--gold);line-height:1.1;">55–60%<br><span style="font-size:9px;font-weight:600;color:var(--txt3);">全球預算</span></div>
       </div>
       <div style="flex:1;display:flex;gap:9px;">
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid var(--bdr);">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;"><span style="font-size:16px;">🇯🇵</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:900;color:var(--txt);">日本 JAPAN</div><div style="font-size:8.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">Tokyo Ginza / Osaka</div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.55;">定位為「全球鑑定權威總部與核心 C2B 貨源收購大本營」。營銷重心向回收與寄賣獲客傾斜，發揮日元匯率優勢與本地龐大藏家存量。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid var(--bdr);">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;"><span style="font-size:16px;">🇯🇵</span><div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:900;color:var(--txt);">日本 JAPAN</div><div style="font-size:10px;color:var(--txt3);">Tokyo Ginza / Osaka</div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.6;">定位為「全球鑑定權威總部與核心 C2B 貨源收購大本營」。發揮日元匯率優勢與本地龐大藏家存量，重心向回收與寄賣獲客傾斜。</div>
         </div>
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid var(--bdr);">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;"><span style="font-size:16px;">🇭🇰</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:900;color:var(--txt);">香港 HONG KONG</div><div style="font-size:8.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">Central / 太平行</div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.55;">定位為「亞洲高淨值交易中心與大灣區跨境資金樞紐」。買賣雙向並重，受惠於 2026 年奢侈品零售 <strong class="m">+22.6%</strong> 復甦，主打高周轉與過夜旅客成交。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid var(--bdr);">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;"><span style="font-size:16px;">🇭🇰</span><div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:900;color:var(--txt);">香港 HONG KONG</div><div style="font-size:10px;color:var(--txt3);">Central / 太平行</div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.6;">定位為「亞洲高淨值交易中心與大灣區跨境資金樞紐」。受惠 2026 年奢侈品零售 <strong class="m">+22.6%</strong> 復甦，主打高周轉與過夜旅客成交。</div>
         </div>
       </div>
     </div>
     <!-- Tier 2 -->
     <div style="flex:1;min-height:0;background:rgba(166,124,82,.04);border:1px solid rgba(166,124,82,.14);border-radius:8px;padding:9px 12px;display:flex;align-items:flex-start;gap:12px;margin-bottom:7px;">
-      <div style="width:150px;flex-shrink:0;">
+      <div style="width:145px;flex-shrink:0;">
         <div style="display:inline-block;background:#C4975F;color:#fff;border-radius:4px;padding:2px 7px;font-family:Montserrat,sans-serif;font-size:8px;font-weight:900;letter-spacing:.8px;margin-bottom:4px;">TIER 2</div>
         <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:700;color:#C4975F;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">第二優先級</div>
-        <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:#C4975F;line-height:1.1;">25–30%<br><span style="font-size:8px;font-weight:600;color:var(--txt3);">全球預算</span></div>
+        <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:#C4975F;line-height:1.1;">25–30%<br><span style="font-size:9px;font-weight:600;color:var(--txt3);">全球預算</span></div>
       </div>
       <div style="flex:1;display:flex;gap:9px;">
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #E8E0D8;">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;"><span style="font-size:16px;">🇸🇬</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:900;color:var(--txt);">新加坡 SINGAPORE</div><div style="font-size:8.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">Orchard Road</div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.55;">高客單稀有皮種（Exotic Skins）消化中心。以 Google Search/Shopping ＋ Instagram 英語視覺廣告為主力，不依賴小紅書，定向英語系高淨值及東南亞華人藏家，以 Private Viewing 拉升毛利率。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid #E8E0D8;">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;"><span style="font-size:16px;">🇸🇬</span><div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:900;color:var(--txt);">新加坡 SINGAPORE</div><div style="font-size:10px;color:var(--txt3);">Orchard Road</div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.6;">高客單稀有皮種（Exotic Skins）消化中心。Google Search/Shopping ＋ Instagram 英語視覺廣告為主力，以 Private Viewing 拉升毛利率，不依賴小紅書。</div>
         </div>
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid #E8E0D8;">
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;"><span style="font-size:16px;">🇦🇪</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:900;color:var(--txt);">迪拜 DUBAI</div><div style="font-size:8.5px;color:var(--txt3);font-family:Montserrat,sans-serif;">Business Bay</div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.55;">高溢價爆款消化中心。Instagram 高質感英語視覺廣告精準定向中東本地皇室/富豪圈層，推動高毛利稀有款成交，拉升集團整體利潤率。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid #E8E0D8;">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;"><span style="font-size:16px;">🇦🇪</span><div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:900;color:var(--txt);">迪拜 DUBAI</div><div style="font-size:10px;color:var(--txt3);">Business Bay</div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.6;">高溢價爆款消化中心。Instagram 高質感英語廣告精準定向中東皇室/富豪圈層，推動高毛利稀有款成交，拉升集團整體利潤率。</div>
         </div>
       </div>
     </div>
     <!-- Tier 3 -->
     <div style="flex:1;min-height:0;background:rgba(166,124,82,.02);border:1px solid rgba(166,124,82,.08);border-radius:8px;padding:9px 12px;display:flex;align-items:flex-start;gap:12px;margin-bottom:7px;">
-      <div style="width:150px;flex-shrink:0;">
+      <div style="width:145px;flex-shrink:0;">
         <div style="display:inline-block;background:#D4C0A6;color:#fff;border-radius:4px;padding:2px 7px;font-family:Montserrat,sans-serif;font-size:8px;font-weight:900;letter-spacing:.8px;margin-bottom:4px;">TIER 3</div>
         <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:700;color:#C4B090;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">第三優先級</div>
-        <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:#C4B090;line-height:1.1;">10–15%<br><span style="font-size:8px;font-weight:600;color:var(--txt3);">全球預算</span></div>
+        <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:#C4B090;line-height:1.1;">10–15%<br><span style="font-size:9px;font-weight:600;color:var(--txt3);">全球預算</span></div>
       </div>
       <div style="flex:1;display:flex;gap:9px;">
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid var(--bdr);">
-          <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><span style="font-size:14px;">🇺🇸</span><div><div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:800;color:var(--txt);">紐約 NYC <span style="font-size:8px;font-weight:400;color:var(--txt3);">/ Fifth Ave</span></div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.5;">歐美頂級時尚地標背書，側重 PR 與高淨值再營銷，開發歐美藏家寄售線索。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid var(--bdr);">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;"><span style="font-size:14px;">🇺🇸</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--txt);">紐約 NYC <span style="font-size:9px;font-weight:400;color:var(--txt3);">/ Fifth Ave</span></div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;">歐美頂級時尚地標背書，側重 PR 與高淨值再營銷，開發歐美藏家寄售線索。</div>
         </div>
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid var(--bdr);">
-          <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><span style="font-size:14px;">🇫🇷</span><div><div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:800;color:var(--txt);">巴黎 PARIS <span style="font-size:8px;font-weight:400;color:var(--txt3);">/ Rue de la Paix</span></div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.5;">品牌公關（PR）、頂級時尚地標背書，歐洲藏家寄售長線佈局。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid var(--bdr);">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;"><span style="font-size:14px;">🇫🇷</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--txt);">巴黎 PARIS <span style="font-size:9px;font-weight:400;color:var(--txt3);">/ Rue de la Paix</span></div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;">品牌公關（PR）、頂級時尚地標背書，歐洲藏家寄售長線佈局。</div>
         </div>
-        <div style="flex:1;background:#fff;border-radius:7px;padding:8px 10px;border:1px solid var(--bdr);">
-          <div style="display:flex;align-items:center;gap:4px;margin-bottom:3px;"><span style="font-size:14px;">🇨🇳</span><div><div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:800;color:var(--txt);">上海 SHANGHAI <span style="font-size:8px;font-weight:400;color:var(--txt3);">/ 淮海中路</span></div></div></div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.5;">聚光精準投流 ＋ 靜安/黃浦商圈定點曝光，不鋪重資產人力，高意向客戶直導私域池，配合赴港/赴日完成高客單成交。</div>
+        <div style="flex:1;background:#fff;border-radius:7px;padding:9px 11px;border:1px solid var(--bdr);">
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:4px;"><span style="font-size:14px;">🇨🇳</span><div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--txt);">上海 SHANGHAI <span style="font-size:9px;font-weight:400;color:var(--txt3);">/ 淮海中路</span></div></div></div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;">聚光精準投流，高意向客戶直導私域池，配合赴港/赴日完成高客單成交。</div>
         </div>
       </div>
     </div>
-    <!-- Budget Bar -->
     <div style="flex-shrink:0;background:#fff;border:1px solid var(--bdr);border-radius:7px;padding:7px 12px;">
       <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--txt3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:5px;">GLOBAL BUDGET ALLOCATION GUIDANCE</div>
-      <div style="display:flex;height:18px;border-radius:9px;overflow:hidden;">
-        <div style="flex:5.75;background:linear-gradient(90deg,#A67C52,#B88C62);display:flex;align-items:center;justify-content:center;"><span style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:#fff;">TIER 1 &nbsp;55–60%</span></div>
-        <div style="flex:2.75;background:linear-gradient(90deg,#C4975F,#D4A870);display:flex;align-items:center;justify-content:center;"><span style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:#fff;">TIER 2 &nbsp;25–30%</span></div>
-        <div style="flex:1.25;background:linear-gradient(90deg,#D4B890,#E0C8A8);display:flex;align-items:center;justify-content:center;"><span style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:#fff;">T3 10–15%</span></div>
+      <div style="display:flex;height:20px;border-radius:9px;overflow:hidden;">
+        <div style="flex:5.75;background:linear-gradient(90deg,#A67C52,#B88C62);display:flex;align-items:center;justify-content:center;"><span style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;color:#fff;">TIER 1 &nbsp;55–60%</span></div>
+        <div style="flex:2.75;background:linear-gradient(90deg,#C4975F,#D4A870);display:flex;align-items:center;justify-content:center;"><span style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;color:#fff;">TIER 2 &nbsp;25–30%</span></div>
+        <div style="flex:1.25;background:linear-gradient(90deg,#D4B890,#E0C8A8);display:flex;align-items:center;justify-content:center;"><span style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:700;color:#fff;">T3 10–15%</span></div>
       </div>
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">廣告費分三級投入：日本、香港（55–60%）主力收包和快速成交；新加坡、迪拜（25–30%）推高價稀有皮款；紐約、巴黎、上海（10–15%）做品牌宣傳，把客戶引流去港日購買。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">把錢花在刀口上，利用不同國家的匯率和消費力差價，拉高全公司的總利潤。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">Source: HKTDC Research (Q3 2026); Deloitte 2026 Hong Kong Retail Forecast</div></div>
 </div>
 
-<!-- ===================== S4 HK PLATFORMS ===================== -->
+<!-- ===================== S4 HK PLATFORMS — REDESIGNED ===================== -->
 <div class="slide" id="s4" data-title="香港市場三平台廣告策略">
   <div class="sh"><div class="sh-left"><div class="sh-num">04</div><div class="sh-title">1️⃣ HK Focus — Three-Platform Ad Strategy</div></div><div class="sh-brand">XIAOMA</div></div>
   <div class="sc" style="display:flex;flex-direction:column;">
-    <div style="padding:9px 26px 0;flex-shrink:0;"><div class="con-bar"><div class="con-label">核心結論</div><div class="con-text">構建「搜索攔截（Google）＋ 視覺收割（Meta）＋ 信任種草（小紅書）」的香港全渠道獲客閉環</div></div></div>
-    <div style="flex:1;min-height:0;display:flex;gap:10px;padding:9px 26px 10px;">
-      <!-- Google Column -->
-      <div style="flex:1;border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.2);">
-        <div style="display:flex;align-items:center;gap:7px;padding-bottom:8px;border-bottom:1px solid rgba(66,133,244,.12);">
-          <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#4285F4,#34A853);display:flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">G</div>
-          <div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--txt);">Google Ads</div><div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:600;color:#4285F4;letter-spacing:.5px;">SEARCH + SHOPPING</div></div>
+    <div style="padding:9px 24px 0;flex-shrink:0;"><div class="con-bar"><div class="con-label">核心結論</div><div class="con-text">構建「搜索攔截（Google）＋ 視覺收割（Meta）＋ 信任種草（小紅書）」的香港全渠道獲客閉環</div></div></div>
+    <div style="flex:1;min-height:0;display:flex;gap:12px;padding:10px 24px 10px;">
+
+      <!-- ── Google ── -->
+      <div class="plat-col" style="background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.2);">
+        <div class="plat-head" style="border-bottom:1px solid rgba(66,133,244,.15);">
+          <div class="plat-icon" style="background:linear-gradient(135deg,#4285F4,#34A853);">G</div>
+          <div>
+            <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:800;color:var(--txt);">Google Ads</div>
+            <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:600;color:#4285F4;letter-spacing:.5px;">SEARCH + SHOPPING</div>
+          </div>
         </div>
-        <div style="display:inline-block;background:rgba(66,133,244,.1);color:#3B6FC4;border-radius:100px;padding:2px 9px;font-size:8.5px;font-weight:600;flex-shrink:0;">🎯 核心角色：流量收割機（鎖定明確買賣意圖）</div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">Search 雙線佈局</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">拆分「愛馬仕回收/寄賣/估價」與「具體型號＋皮質＋色號（Birkin 25 Togo）」兩大廣告系列，精準攔截高意圖搜索。</div></div>
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">嚴格流量過濾</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">高強度否定關鍵詞庫（排除平替、維修、真假對比），避免預算浪費在低意向訪客。</div></div>
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">動態 Shopping 廣告</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">「一物一碼」孤品售出後分鐘級自動下架，確保零無效曝光損耗。</div></div>
+        <div class="plat-role" style="background:rgba(66,133,244,.1);color:#3B6FC4;">
+          🎯 核心角色：搜索意圖精準攔截
         </div>
-        <div style="padding:7px 9px;background:rgba(66,133,244,.08);border-radius:5px;border:1px solid rgba(66,133,244,.15);flex-shrink:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#4285F4;letter-spacing:.8px;">TARGET ROAS</div>
-          <div style="font-family:Montserrat,sans-serif;font-size:19px;font-weight:900;color:#3B6FC4;line-height:1.1;">4.0× – 5.0×</div>
+        <div class="plat-pt" style="border-color:rgba(66,133,244,.12);">
+          <div class="plat-pt-title">Search ＋ Shopping 雙線組合</div>
+          <div class="plat-pt-body">拆分「愛馬仕回收/寄賣/估價」與「具體款式型號（Birkin 25 Togo）」兩套廣告系列；動態 Shopping 廣告確保孤品售出後<strong>分鐘級自動下架</strong>，零無效曝光損耗。</div>
         </div>
-      </div>
-      <!-- Meta Column -->
-      <div style="flex:1;border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;background:rgba(123,100,220,.05);border:1px solid rgba(123,100,220,.2);">
-        <div style="display:flex;align-items:center;gap:7px;padding-bottom:8px;border-bottom:1px solid rgba(123,100,220,.12);">
-          <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#1877F2,#9B59B6);display:flex;align-items:center;justify-content:center;font-family:Montserrat,sans-serif;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">M</div>
-          <div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--txt);">Meta / Instagram</div><div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:600;color:#7B64DC;letter-spacing:.5px;">REELS + DPA + LEAD</div></div>
+        <div class="plat-pt" style="border-color:rgba(66,133,244,.12);">
+          <div class="plat-pt-title">高強度流量過濾機制</div>
+          <div class="plat-pt-body">大量否定關鍵詞庫（排除平替、維修、真假對比等低意向詞），確保每分廣告費只觸及<strong>真實買賣意圖</strong>的高客單訪客。</div>
         </div>
-        <div style="display:inline-block;background:rgba(123,100,220,.1);color:#6B55C4;border-radius:100px;padding:2px 9px;font-size:8.5px;font-weight:600;flex-shrink:0;">💎 核心角色：需求激發與高淨值再營銷助推器</div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">高淨值精準定向</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">捨棄泛奢侈品標籤，改用「中環/山頂地理圍欄 ＋ 國際商務差旅 ＋ VIP 1% Lookalike」三重定向組合。</div></div>
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">多階段再營銷（Retargeting）</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">針對瀏覽高價包款或估值頁的訪客，推送動態商品廣告（DPA）及鑑定師細節短視頻，縮短決策週期。</div></div>
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">預約到店 Lead Gen</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">平台內直接收集「私人鑑賞預約」表單，配合追蹤碼做線下歸因核算。</div></div>
-        </div>
-        <div style="padding:7px 9px;background:rgba(123,100,220,.08);border-radius:5px;border:1px solid rgba(123,100,220,.15);flex-shrink:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#7B64DC;letter-spacing:.8px;">TARGET ROAS + BOOKING</div>
-          <div style="font-family:Montserrat,sans-serif;font-size:17px;font-weight:900;color:#6B55C4;line-height:1.1;">3.0×–4.0× <span style="font-size:10px;font-weight:600;">/ +25% Bookings</span></div>
+        <div class="plat-metric" style="background:rgba(66,133,244,.08);border-color:rgba(66,133,244,.2);">
+          <div class="plat-metric-label" style="color:#4285F4;">TARGET ROAS</div>
+          <div class="plat-metric-val" style="color:#3B6FC4;">4.0× – 5.0×</div>
         </div>
       </div>
-      <!-- XHS Column -->
-      <div style="flex:1;border-radius:9px;padding:11px 13px;display:flex;flex-direction:column;gap:7px;background:rgba(255,70,70,.05);border:1px solid rgba(255,70,70,.2);">
-        <div style="display:flex;align-items:center;gap:7px;padding-bottom:8px;border-bottom:1px solid rgba(255,70,70,.12);">
-          <div style="width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#FF4040,#FF8080);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">紅</div>
-          <div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--txt);">小紅書</div><div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:600;color:#C44040;letter-spacing:.5px;">聚光投流 + 內容種草</div></div>
+
+      <!-- ── Meta ── -->
+      <div class="plat-col" style="background:rgba(123,100,220,.05);border:2px solid rgba(123,100,220,.25);">
+        <div class="plat-head" style="border-bottom:1px solid rgba(123,100,220,.15);">
+          <div class="plat-icon" style="background:linear-gradient(135deg,#1877F2,#9B59B6);">M</div>
+          <div>
+            <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:800;color:var(--txt);">Meta / Instagram</div>
+            <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:600;color:#7B64DC;letter-spacing:.5px;">REELS + DPA + LEAD</div>
+          </div>
         </div>
-        <div style="display:inline-block;background:rgba(255,70,70,.1);color:#C44040;border-radius:100px;padding:2px 9px;font-size:8.5px;font-weight:600;flex-shrink:0;">🌸 核心角色：品牌信任基建與大灣區/本地私域入口</div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">信任內容矩陣</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">實拍中環太平行店環境、東京銀座鑑定師工藝科普、展示 DPMS A類合規牌照，消除資金與真偽顧慮。</div></div>
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">聚光精準投流</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">定向香港本地及大灣區高消費受眾，透過私信/WhatsApp 導流中環門店預約鑑賞或估值。</div></div>
-          <div><div style="font-size:10.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">🆕 精準中腰部 KOC 矩陣</div><div style="font-size:9px;color:var(--txt2);line-height:1.55;">捨棄昂貴頭部明星，合作港滬真實愛馬仕藏家進行「中環店探店開箱」與「寄賣變現真實體驗」，以第三方口碑擊穿高淨值防備心。</div></div>
+        <div class="plat-role" style="background:rgba(123,100,220,.1);color:#6B55C4;">
+          💎 核心角色：高淨值人群主動觸達
         </div>
-        <div style="padding:7px 9px;background:rgba(255,70,70,.07);border-radius:5px;border:1px solid rgba(255,70,70,.15);flex-shrink:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#C44040;letter-spacing:.8px;">TARGET CPL · C2B 回收</div>
-          <div style="font-family:Montserrat,sans-serif;font-size:17px;font-weight:900;color:#C44040;line-height:1.1;">CPL ↓15–20%</div>
+        <div class="plat-pt" style="border-color:rgba(123,100,220,.15);">
+          <div class="plat-pt-title">三重高淨值精準定向</div>
+          <div class="plat-pt-body">捨棄泛奢侈品標籤，改用「中環/山頂地理圍欄 ＋ 國際商務差旅 ＋ VIP 1% Lookalike」三重組合，只把廣告推給真正的目標客群。</div>
+        </div>
+        <div class="plat-pt" style="border-color:rgba(123,100,220,.15);">
+          <div class="plat-pt-title">O2O 預約轉化閉環</div>
+          <div class="plat-pt-body">針對瀏覽高價包款訪客追投 DPA 短片；平台內直接收集「<strong>私人鑑賞預約</strong>」表單，配合追蹤碼打通線下歸因，縮短決策週期。</div>
+        </div>
+        <div class="plat-metric" style="background:rgba(123,100,220,.08);border-color:rgba(123,100,220,.2);">
+          <div class="plat-metric-label" style="color:#7B64DC;">TARGET ROAS + BOOKING</div>
+          <div class="plat-metric-val" style="color:#6B55C4;">3.0×–4.0× <span style="font-size:12px;font-weight:600;">/ +25% Bookings</span></div>
         </div>
       </div>
+
+      <!-- ── 小紅書 ── -->
+      <div class="plat-col" style="background:rgba(255,70,70,.05);border:1px solid rgba(255,70,70,.2);">
+        <div class="plat-head" style="border-bottom:1px solid rgba(255,70,70,.15);">
+          <div class="plat-icon" style="background:linear-gradient(135deg,#FF4040,#FF8080);font-size:13px;">紅</div>
+          <div>
+            <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:800;color:var(--txt);">小紅書</div>
+            <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:600;color:#C44040;letter-spacing:.5px;">聚光投流 + 內容種草</div>
+          </div>
+        </div>
+        <div class="plat-role" style="background:rgba(255,70,70,.1);color:#C44040;">
+          🌸 核心角色：信任基建 ＋ 大灣區私域入口
+        </div>
+        <div class="plat-pt" style="border-color:rgba(255,70,70,.12);">
+          <div class="plat-pt-title">信任內容矩陣建立</div>
+          <div class="plat-pt-body">實拍中環太平行店環境、東京銀座鑑定師工藝科普、展示 DPMS A類合規牌照，消除大額資金轉讓的真偽顧慮，讓客戶主動透過 WhatsApp 預約。</div>
+        </div>
+        <div class="plat-pt" style="border-color:rgba(255,70,70,.12);">
+          <div class="plat-pt-title">🆕 中腰部 KOC 口碑矩陣</div>
+          <div class="plat-pt-body">捨棄昂貴頭部明星，合作<strong>港滬真實愛馬仕藏家</strong>進行探店開箱與寄賣變現真實體驗分享，以第三方真實口碑擊穿高淨值客群的防備心。</div>
+        </div>
+        <div class="plat-metric" style="background:rgba(255,70,70,.07);border-color:rgba(255,70,70,.18);">
+          <div class="plat-metric-label" style="color:#C44040;">TARGET CPL · C2B 回收</div>
+          <div class="plat-metric-val" style="color:#C44040;">CPL ↓15–20%</div>
+        </div>
+      </div>
+
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">Google 只攔截主動搜「回收/買包」的精準客戶，包賣掉後廣告立刻自動下架；FB/IG 鎖定中環、山頂高收入人群反覆推送；小紅書找真實藏家探店，展示合法牌照，吸引本地與內地旅客加 WhatsApp 預約。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">過濾掉只看不買的普通網民，讓真正有錢的買家和賣家主動找上門。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">策略閉環：Google 攔截高意圖 → Meta 擴量追單 → 小紅書信任基建 → WhatsApp 私域成交</div></div>
 </div>
@@ -375,97 +406,97 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 <div class="slide" id="s5" data-title="香港市場 2027 預算分配模型">
   <div class="sh"><div class="sh-left"><div class="sh-num">05</div><div class="sh-title">1️⃣ HK Focus — 2027 Budget Allocation Model</div></div><div class="sh-brand">XIAOMA</div></div>
   <div class="sc" style="display:flex;flex-direction:column;">
-    <!-- Top: Donut + Table -->
     <div style="flex:1;min-height:0;display:flex;">
       <!-- Left: Donut -->
-      <div style="width:38%;border-right:1px solid var(--bdr);padding:14px 14px 10px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+      <div style="width:38%;border-right:1px solid var(--bdr);padding:12px 14px 10px 22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
         <div class="slabel" style="margin-bottom:0;text-align:center;">BUDGET ALLOCATION</div>
-        <svg viewBox="0 0 220 220" width="175" height="175">
-          <circle cx="110" cy="110" r="85" fill="none" stroke="#F0EDE8" stroke-width="28"/>
-          <!-- Google 40% -->
-          <circle cx="110" cy="110" r="85" fill="none" stroke="#4285F4" stroke-width="28" stroke-dasharray="213.6 320.4" stroke-linecap="butt" transform="rotate(-90 110 110)"/>
-          <!-- Meta 35% -->
-          <circle cx="110" cy="110" r="85" fill="none" stroke="#7B64DC" stroke-width="28" stroke-dasharray="186.9 347.1" stroke-linecap="butt" transform="rotate(54 110 110)"/>
-          <!-- XHS 25% -->
-          <circle cx="110" cy="110" r="85" fill="none" stroke="#E05C5C" stroke-width="28" stroke-dasharray="133.5 400.5" stroke-linecap="butt" transform="rotate(180 110 110)"/>
+        <svg viewBox="0 0 220 220" width="168" height="168">
+          <circle cx="110" cy="110" r="85" fill="none" stroke="#F0EDE8" stroke-width="30"/>
+          <circle cx="110" cy="110" r="85" fill="none" stroke="#4285F4" stroke-width="30" stroke-dasharray="213.6 320.4" stroke-linecap="butt" transform="rotate(-90 110 110)"/>
+          <circle cx="110" cy="110" r="85" fill="none" stroke="#7B64DC" stroke-width="30" stroke-dasharray="186.9 347.1" stroke-linecap="butt" transform="rotate(54 110 110)"/>
+          <circle cx="110" cy="110" r="85" fill="none" stroke="#E05C5C" stroke-width="30" stroke-dasharray="133.5 400.5" stroke-linecap="butt" transform="rotate(180 110 110)"/>
           <text x="110" y="105" text-anchor="middle" font-family="Montserrat" font-size="11" font-weight="700" fill="#999">HK 廣告</text>
           <text x="110" y="121" text-anchor="middle" font-family="Montserrat" font-size="11" font-weight="700" fill="#999">預算配比</text>
         </svg>
-        <div style="display:flex;flex-direction:column;gap:4px;width:160px;">
-          <div style="display:flex;align-items:center;gap:7px;"><div style="width:12px;height:12px;background:#4285F4;border-radius:3px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:var(--txt);">Google <span style="color:#4285F4;">40%</span></div></div>
-          <div style="display:flex;align-items:center;gap:7px;"><div style="width:12px;height:12px;background:#7B64DC;border-radius:3px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:var(--txt);">Meta / IG <span style="color:#7B64DC;">35%</span></div></div>
-          <div style="display:flex;align-items:center;gap:7px;"><div style="width:12px;height:12px;background:#E05C5C;border-radius:3px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:var(--txt);">小紅書 <span style="color:#E05C5C;">25%</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;width:160px;">
+          <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;background:#4285F4;border-radius:3px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:700;color:var(--txt);">Google <span style="color:#4285F4;">40%</span></div></div>
+          <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;background:#7B64DC;border-radius:3px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:700;color:var(--txt);">Meta / IG <span style="color:#7B64DC;">35%</span></div></div>
+          <div style="display:flex;align-items:center;gap:7px;"><div style="width:13px;height:13px;background:#E05C5C;border-radius:3px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:700;color:var(--txt);">小紅書 <span style="color:#E05C5C;">25%</span></div></div>
         </div>
-        <div style="padding:5px 12px;background:rgba(166,124,82,.1);border-radius:5px;border:1px solid var(--gold-b);text-align:center;">
+        <div style="padding:6px 14px;background:rgba(166,124,82,.1);border-radius:5px;border:1px solid var(--gold-b);text-align:center;">
           <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:var(--gold);letter-spacing:1px;">GOLDEN RATIO</div>
-          <div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:900;color:var(--gold);">40 : 35 : 25</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:14px;font-weight:900;color:var(--gold);">40 : 35 : 25</div>
         </div>
       </div>
       <!-- Right: Table -->
-      <div style="flex:1;padding:12px 22px 10px 18px;overflow:hidden;">
-        <div class="slabel" style="margin-bottom:7px;">PLATFORM KPI BREAKDOWN</div>
+      <div style="flex:1;padding:12px 20px 10px 16px;overflow:hidden;">
+        <div class="slabel" style="margin-bottom:8px;">PLATFORM KPI BREAKDOWN</div>
         <table style="width:100%;border-collapse:collapse;font-family:'Noto Sans TC',sans-serif;">
           <thead>
             <tr style="background:var(--bgg);">
-              <th style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:5px 7px;border-bottom:2px solid var(--bdr);text-align:left;width:17%;">平台</th>
-              <th style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:5px 7px;border-bottom:2px solid var(--bdr);text-align:center;width:11%;">預算</th>
-              <th style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:5px 7px;border-bottom:2px solid var(--bdr);text-align:left;width:22%;">商業定位</th>
-              <th style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:5px 7px;border-bottom:2px solid var(--bdr);text-align:left;width:20%;">核心 KPI</th>
-              <th style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:5px 7px;border-bottom:2px solid var(--bdr);text-align:left;width:30%;">預期目標基準</th>
+              <th style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:6px 8px;border-bottom:2px solid var(--bdr);text-align:left;width:17%;">平台</th>
+              <th style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:6px 8px;border-bottom:2px solid var(--bdr);text-align:center;width:11%;">預算</th>
+              <th style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:6px 8px;border-bottom:2px solid var(--bdr);text-align:left;width:22%;">商業定位</th>
+              <th style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:6px 8px;border-bottom:2px solid var(--bdr);text-align:left;width:20%;">核心 KPI</th>
+              <th style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--txt3);text-transform:uppercase;padding:6px 8px;border-bottom:2px solid var(--bdr);text-align:left;width:30%;">預期目標基準</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);vertical-align:top;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;background:#4285F4;border-radius:2px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:700;line-height:1.3;">Google<br><span style="font-weight:400;color:var(--txt3);font-family:'Noto Sans TC',sans-serif;font-size:8.5px;">Search/Shopping</span></div></div></td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);text-align:center;vertical-align:top;"><span style="font-family:Montserrat,sans-serif;font-size:16px;font-weight:900;color:#4285F4;">40%</span></td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;">核心收割引擎，攔截高意圖買賣搜索</td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;"><span class="m">ROAS</span> / 有效估值表單 CPL</td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;"><span class="m" style="color:#4285F4;">4.0×–5.0× ROAS</span><br>（冷啟動 30 天可達 3–4.5×）</td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);vertical-align:middle;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:9px;height:9px;background:#4285F4;border-radius:2px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:700;">Google<br><span style="font-weight:400;color:var(--txt3);font-size:10px;">Search/Shopping</span></div></div></td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);text-align:center;vertical-align:middle;"><span style="font-family:Montserrat,sans-serif;font-size:18px;font-weight:900;color:#4285F4;">40%</span></td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;">核心收割引擎，攔截高意圖買賣搜索</td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;"><span class="m">ROAS</span> / 有效估值表單 CPL</td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;"><span class="m" style="color:#4285F4;">4.0×–5.0× ROAS</span><br>（冷啟動 30 天達 3–4.5×）</td>
             </tr>
             <tr>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);vertical-align:top;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;background:#7B64DC;border-radius:2px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:700;line-height:1.3;">Meta/IG<br><span style="font-weight:400;color:var(--txt3);font-family:'Noto Sans TC',sans-serif;font-size:8.5px;">Reels/DPA/Lead</span></div></div></td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);text-align:center;vertical-align:top;"><span style="font-family:Montserrat,sans-serif;font-size:16px;font-weight:900;color:#7B64DC;">35%</span></td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;">高淨值觸達與追單，擴量再營銷收割</td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;"><span class="m">Cost per Booking</span> / ROAS</td>
-              <td style="padding:7px 7px;border-bottom:1px solid var(--bdr);font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;"><span class="m" style="color:#7B64DC;">3.0×–4.0× ROAS</span><br>中環預約客流增長 <strong class="m">+25%</strong></td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);vertical-align:middle;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:9px;height:9px;background:#7B64DC;border-radius:2px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:700;">Meta/IG<br><span style="font-weight:400;color:var(--txt3);font-size:10px;">Reels/DPA/Lead</span></div></div></td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);text-align:center;vertical-align:middle;"><span style="font-family:Montserrat,sans-serif;font-size:18px;font-weight:900;color:#7B64DC;">35%</span></td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;">高淨值觸達與追單，擴量再營銷收割</td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;"><span class="m">Cost per Booking</span> / ROAS</td>
+              <td style="padding:9px 8px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;"><span class="m" style="color:#7B64DC;">3.0×–4.0× ROAS</span><br>中環預約客流增長 <strong class="m">+25%</strong></td>
             </tr>
             <tr>
-              <td style="padding:7px 7px;vertical-align:top;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:8px;height:8px;background:#E05C5C;border-radius:2px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:700;line-height:1.3;">小紅書<br><span style="font-weight:400;color:var(--txt3);font-family:'Noto Sans TC',sans-serif;font-size:8.5px;">聚光/種草</span></div></div></td>
-              <td style="padding:7px 7px;text-align:center;vertical-align:top;"><span style="font-family:Montserrat,sans-serif;font-size:16px;font-weight:900;color:#E05C5C;">25%</span></td>
-              <td style="padding:7px 7px;font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;">信任基建，大灣區及本地高淨值獲客</td>
-              <td style="padding:7px 7px;font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;"><span class="m">CPL</span> / 到店轉化率</td>
-              <td style="padding:7px 7px;font-size:9px;color:var(--txt2);line-height:1.5;vertical-align:top;">C2B 回收獲客成本降低 <strong class="m" style="color:#E05C5C;">15–20%</strong>，大灣區訪客到店率提升</td>
+              <td style="padding:9px 8px;vertical-align:middle;"><div style="display:flex;align-items:center;gap:5px;"><div style="width:9px;height:9px;background:#E05C5C;border-radius:2px;flex-shrink:0;"></div><div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:700;">小紅書<br><span style="font-weight:400;color:var(--txt3);font-size:10px;">聚光/種草</span></div></div></td>
+              <td style="padding:9px 8px;text-align:center;vertical-align:middle;"><span style="font-family:Montserrat,sans-serif;font-size:18px;font-weight:900;color:#E05C5C;">25%</span></td>
+              <td style="padding:9px 8px;font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;">信任基建，大灣區及本地高淨值獲客</td>
+              <td style="padding:9px 8px;font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;"><span class="m">CPL</span> / 到店轉化率</td>
+              <td style="padding:9px 8px;font-size:12px;color:var(--txt2);line-height:1.5;vertical-align:middle;">C2B 回收獲客成本降低 <strong class="m" style="color:#E05C5C;">15–20%</strong>，大灣區訪客到店率提升</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <!-- Bottom: Dynamic Optimization Bar -->
-    <div style="flex-shrink:0;height:188px;background:#181818;padding:10px 24px;display:flex;flex-direction:column;gap:7px;">
+    <!-- Dark bar -->
+    <div style="flex-shrink:0;height:174px;background:#181818;padding:10px 22px;display:flex;flex-direction:column;gap:7px;">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-        <div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:rgba(166,124,82,.8);letter-spacing:1.4px;text-transform:uppercase;">⚡ DYNAMIC BUDGET &amp; BIDDING OPTIMIZATION ENGINE</div>
-        <div style="font-size:9px;color:rgba(255,255,255,.35);">動態預算賽馬與智能出價演進</div>
+        <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;color:rgba(166,124,82,.8);letter-spacing:1.4px;text-transform:uppercase;">⚡ DYNAMIC BUDGET &amp; BIDDING OPTIMIZATION ENGINE</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);">動態預算賽馬與智能出價演進</div>
       </div>
       <div style="flex:1;min-height:0;display:flex;gap:8px;align-items:stretch;">
-        <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:rgba(166,124,82,.65);letter-spacing:1.4px;text-transform:uppercase;">PHASE 1 · Day 1–30</div>
-          <div style="font-size:11px;font-weight:700;color:#fff;line-height:1.3;">數據積累與模型校準期</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.55);line-height:1.5;">執行 40:35:25 初始配比，打通 GTM/HubSpot 離線成交數據回傳，快速積累高意向轉化樣本。</div>
+        <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;padding:9px 11px;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:rgba(166,124,82,.65);letter-spacing:1.4px;text-transform:uppercase;">PHASE 1 · Day 1–30</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">數據積累與模型校準期</div>
+          <div style="font-size:11.5px;color:rgba(255,255,255,.6);line-height:1.5;">執行 40:35:25 初始配比，打通 GTM/HubSpot 離線成交數據回傳，積累高意向轉化樣本。</div>
         </div>
-        <div style="display:flex;align-items:center;color:rgba(166,124,82,.4);font-size:16px;font-weight:300;flex-shrink:0;">→</div>
-        <div style="flex:1;background:rgba(166,124,82,.08);border:1px solid rgba(166,124,82,.5);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--gold);letter-spacing:1.4px;text-transform:uppercase;">PHASE 2 · Day 31+</div>
-          <div style="font-size:11px;font-weight:700;color:#fff;line-height:1.3;">切換 tROAS 價值出價</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.55);line-height:1.5;">演算法度過學習期，切入基於真實線下成交金額的 tROAS 智能出價，自動過濾無效點擊。</div>
+        <div style="display:flex;align-items:center;color:rgba(166,124,82,.4);font-size:16px;flex-shrink:0;">→</div>
+        <div style="flex:1;background:rgba(166,124,82,.08);border:1px solid rgba(166,124,82,.5);border-radius:7px;padding:9px 11px;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:var(--gold);letter-spacing:1.4px;text-transform:uppercase;">PHASE 2 · Day 31+</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">切換 tROAS 價值出價</div>
+          <div style="font-size:11.5px;color:rgba(255,255,255,.6);line-height:1.5;">切入基於真實線下成交金額的 tROAS 智能出價，演算法自動過濾無效點擊。</div>
         </div>
-        <div style="display:flex;align-items:center;color:rgba(166,124,82,.4);font-size:16px;font-weight:300;flex-shrink:0;">→</div>
-        <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:rgba(166,124,82,.65);letter-spacing:1.4px;text-transform:uppercase;">PHASE 3 · Monthly</div>
-          <div style="font-size:11px;font-weight:700;color:#fff;line-height:1.3;">動態賽馬按月再分配</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.55);line-height:1.5;">按月復盤邊際回報，ROAS &gt;4.0× 渠道追加 15–20% 擴量預算，低效渠道及時收量止損。</div>
+        <div style="display:flex;align-items:center;color:rgba(166,124,82,.4);font-size:16px;flex-shrink:0;">→</div>
+        <div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;padding:9px 11px;display:flex;flex-direction:column;gap:4px;">
+          <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:rgba(166,124,82,.65);letter-spacing:1.4px;text-transform:uppercase;">PHASE 3 · Monthly</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;line-height:1.3;">動態賽馬按月再分配</div>
+          <div style="font-size:11.5px;color:rgba(255,255,255,.6);line-height:1.5;">ROAS &gt;4.0× 渠道追加 15–20% 擴量預算，低效渠道及時收量止損。</div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">預算按 40:35:25 分配。前 30 天先測試並記錄成交數據，第 31 天起讓系統自動把錢集中投向「真正會下單」的人群，每個月把表現最好的平台預算再增加 15–20%。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">Google 4–5 倍回報；Meta/IG 3–4 倍回報（中環店預約增加 25%）；小紅書收包廣告成本降低 15–20%。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">預算配比採用動態賽馬機制，前 30 天校準，第 30 天後切換 tROAS 智能出價</div></div>
 </div>
@@ -474,69 +505,71 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 <div class="slide" id="s6" data-title="客戶增長策略 — C2B 貨源端（回收 & 寄賣）">
   <div class="sh"><div class="sh-left"><div class="sh-num">06</div><div class="sh-title">2️⃣ Growth — C2B Supply Side (Buyout &amp; Consignment)</div></div><div class="sh-brand">XIAOMA</div></div>
   <div class="sc" style="display:flex;flex-direction:column;">
-    <div style="padding:9px 26px 0;flex-shrink:0;"><div class="con-bar"><div class="con-label">核心結論</div><div class="con-text">針對賣家「求快」與「求高價」的差異化心理，設計雙軌獲客與轉化漏斗</div></div></div>
-    <!-- Dual Funnels -->
-    <div style="flex:1;min-height:0;display:flex;gap:14px;padding:9px 26px 0;">
+    <div style="padding:9px 24px 0;flex-shrink:0;"><div class="con-bar"><div class="con-label">核心結論</div><div class="con-text">針對賣家「求快」與「求高價」的差異化心理，設計雙軌獲客與轉化漏斗</div></div></div>
+    <div style="flex:1;min-height:0;display:flex;gap:14px;padding:9px 24px 0;">
       <!-- Left: Buyout -->
       <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
-        <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
-          <div style="background:var(--gold);color:#fff;border-radius:5px;padding:3px 10px;font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;letter-spacing:.8px;">BUYOUT 現金回收</div>
-          <div style="font-size:8.5px;color:var(--txt3);">主打「極速變現與金融級安全」</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <div style="background:var(--gold);color:#fff;border-radius:5px;padding:4px 11px;font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.8px;">BUYOUT 現金回收</div>
+          <div style="font-size:11px;color:var(--txt3);">主打「極速變現與金融級安全」</div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:7px;min-height:0;">
-          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid var(--gold);border-radius:0 7px 7px 0;padding:8px 10px;flex:1;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">CLIENT PAIN POINTS</div>
-            <div style="font-size:9.5px;color:var(--txt2);line-height:1.6;">急需資金周轉、怕比價麻煩、擔心大額收款合規風險與包袋鑑定爭議。</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;">
+          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid var(--gold);border-radius:0 7px 7px 0;padding:10px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">CLIENT PAIN POINTS</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6;">急需資金周轉、怕比價麻煩、擔心大額收款合規風險與包袋鑑定爭議。</div>
           </div>
-          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #3B7DD8;border-radius:0 7px 7px 0;padding:8px 10px;flex:1;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#3B7DD8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">ACQUISITION · 獲客增量</div>
-            <div style="font-size:9.5px;color:var(--txt2);line-height:1.6;">Google Search 全面攔截「愛馬仕高價回收 / 即時現金收購」高意圖詞；小紅書強調「香港海關 DPMS A類合規牌照 ＋ 銀行即時轉賬」安全保障。</div>
+          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #3B7DD8;border-radius:0 7px 7px 0;padding:10px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#3B7DD8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">ACQUISITION · 獲客增量</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6;">Google Search 全面攔截「愛馬仕高價回收 / 即時現金收購」高意圖詞；小紅書強調「香港海關 DPMS A類合規牌照 ＋ 銀行即時轉賬」安全保障。</div>
           </div>
-          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #27AE60;border-radius:0 7px 7px 0;padding:8px 10px;flex:1;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#27AE60;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">CRO · 轉化率提升</div>
-            <div style="font-size:9.5px;color:var(--txt2);line-height:1.6;">優化「在線極速估值」落地頁，精簡表單步驟，承諾「上傳照片後 24 小時內出具透明報價」，目標提升表單提交率 <strong class="m">+20%</strong>。</div>
+          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #27AE60;border-radius:0 7px 7px 0;padding:10px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#27AE60;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">CRO · 轉化率提升</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6;">優化「在線極速估值」落地頁，精簡表單步驟，承諾「上傳照片後 24 小時內出具透明報價」，目標提升表單提交率 <strong class="m">+20%</strong>。</div>
           </div>
         </div>
       </div>
-      <!-- Divider -->
       <div style="width:1px;background:var(--bdr);"></div>
       <!-- Right: Consignment -->
       <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
-        <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
-          <div style="background:#C4975F;color:#fff;border-radius:5px;padding:3px 10px;font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;letter-spacing:.8px;">CONSIGNMENT 委託寄賣</div>
-          <div style="font-size:8.5px;color:var(--txt3);">主打「全球溢價與高周轉」</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <div style="background:#C4975F;color:#fff;border-radius:5px;padding:4px 11px;font-family:Montserrat,sans-serif;font-size:9.5px;font-weight:800;letter-spacing:.8px;">CONSIGNMENT 委託寄賣</div>
+          <div style="font-size:11px;color:var(--txt3);">主打「全球溢價與高周轉」</div>
         </div>
-        <div style="flex:1;display:flex;flex-direction:column;gap:7px;min-height:0;">
-          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #C4975F;border-radius:0 7px 7px 0;padding:8px 10px;flex:1;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#C4975F;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">CLIENT PAIN POINTS</div>
-            <div style="font-size:9.5px;color:var(--txt2);line-height:1.6;">嫌直接買斷價格不夠高、不急於一時，追求賣出最高市場價以最大化資產價值。</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:8px;min-height:0;">
+          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #C4975F;border-radius:0 7px 7px 0;padding:10px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#C4975F;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">CLIENT PAIN POINTS</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6;">嫌直接買斷價格不夠高、不急於一時，追求賣出最高市場價以最大化資產價值。</div>
           </div>
-          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #3B7DD8;border-radius:0 7px 7px 0;padding:8px 10px;flex:1;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#3B7DD8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">CORE DIFFERENTIATION · 憑什麼更高？</div>
-            <div style="font-size:9.5px;color:var(--txt2);line-height:1.6;">傳統本地小店依賴單一區域客群且壓價嚴重；XIAOMA「<strong>全球 8 店（日/港/星/美/法/迪拜）同步上架</strong>」實現跨幣種競價，疊加東京銀座鑑定書信任溢價，平均成交價比本地傳統店高 <strong class="m" style="color:var(--gold);">10%–15%</strong>。</div>
+          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #3B7DD8;border-radius:0 7px 7px 0;padding:10px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#3B7DD8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">CORE DIFFERENTIATION · 憑什麼更高？</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6;">XIAOMA「<strong>全球 8 店（日/港/星/美/法/迪拜）同步上架</strong>」實現跨幣種競價，疊加東京銀座鑑定書信任溢價，平均成交價比本地傳統店高 <strong class="m" style="color:var(--gold);">10%–15%</strong>。</div>
           </div>
-          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #27AE60;border-radius:0 7px 7px 0;padding:8px 10px;flex:1;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#27AE60;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">CRO · 轉化率提升</div>
-            <div style="font-size:9.5px;color:var(--txt2);line-height:1.6;">落地頁嵌入「預估到手淨額計算器」；建立「回收未成交 ➡️ 自動轉寄賣方案」CRM 二次跟進，預計額外挽回 <strong class="m" style="color:var(--gold);">10%–15%</strong> 流失貨源。</div>
+          <div style="background:#fff;border:1px solid var(--bdr);border-left:3px solid #27AE60;border-radius:0 7px 7px 0;padding:10px 12px;flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#27AE60;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">CRO · 轉化率提升</div>
+            <div style="font-size:13px;color:var(--txt2);line-height:1.6;">落地頁嵌入「預估到手淨額計算器」；建立「回收未成交 ➡️ 自動轉寄賣方案」CRM 二次跟進，預計額外挽回 <strong class="m" style="color:var(--gold);">10%–15%</strong> 流失貨源。</div>
           </div>
         </div>
       </div>
     </div>
     <!-- Seasonal Bar -->
-    <div style="flex-shrink:0;height:188px;background:#181818;padding:10px 26px;display:flex;gap:10px;align-items:center;">
+    <div style="flex-shrink:0;height:174px;background:#181818;padding:10px 24px;display:flex;gap:10px;align-items:center;">
       <div style="flex-shrink:0;margin-right:6px;">
-        <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:rgba(166,124,82,.75);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:2px;">📅 KEY SEASONAL WINDOWS</div>
-        <div style="font-size:8.5px;color:rgba(255,255,255,.35);">提前 3–4 週放大預算</div>
+        <div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:rgba(166,124,82,.75);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:3px;">📅 KEY SEASONAL WINDOWS</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);">提前 3–4 週放大預算</div>
       </div>
-      <div style="flex:1;padding:9px 11px;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:5px;">
-        <div style="display:flex;align-items:center;gap:7px;"><div style="background:var(--gold);color:#fff;border-radius:3px;padding:2px 7px;font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;flex-shrink:0;">Q1 農曆新年前</div><div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:rgba(166,124,82,.8);">C2B 現金回收黃金期</div></div>
-        <div style="font-size:9px;color:rgba(255,255,255,.6);line-height:1.5;">把握高淨值客戶年底資產整理與資金周轉需求，加大 Google「即時現金回收」搜索出價，衝刺全年第一波一手貨源儲備。</div>
+      <div style="flex:1;padding:9px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+        <div style="display:flex;align-items:center;gap:7px;"><div style="background:var(--gold);color:#fff;border-radius:3px;padding:3px 8px;font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;flex-shrink:0;">Q1 農曆新年前</div><div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:700;color:rgba(166,124,82,.8);">C2B 現金回收黃金期</div></div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.65);line-height:1.5;">把握高淨值客戶年底資產整理與資金周轉需求，加大 Google「即時現金回收」搜索出價，衝刺全年第一波一手貨源儲備。</div>
       </div>
-      <div style="flex:1.3;padding:9px 11px;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:5px;">
-        <div style="display:flex;align-items:center;gap:7px;"><div style="background:#C4975F;color:#fff;border-radius:3px;padding:2px 7px;font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;flex-shrink:0;">Q2 &amp; Q4 黃金周 / 旺季</div><div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:rgba(166,124,82,.8);">跨境雙向高峰</div></div>
-        <div style="font-size:9px;color:rgba(255,255,255,.6);line-height:1.5;">五一/日本黃金周/十一國慶/聖誕跨年：針對赴港、赴日高消費旅客投放小紅書與 IG 地理圍欄廣告，拉動中環店與銀座店「到店寄賣」與「高溢價零售」雙向成交高峰。</div>
+      <div style="flex:1.3;padding:9px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(166,124,82,.25);border-radius:7px;height:100%;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+        <div style="display:flex;align-items:center;gap:7px;"><div style="background:#C4975F;color:#fff;border-radius:3px;padding:3px 8px;font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;flex-shrink:0;">Q2 &amp; Q4 黃金周 / 旺季</div><div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:700;color:rgba(166,124,82,.8);">跨境雙向高峰</div></div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,.65);line-height:1.5;">五一/日本黃金周/十一國慶/聖誕跨年：針對赴港、赴日高消費旅客投放小紅書與 IG 地理圍欄廣告，拉動中環店與銀座店雙向成交高峰。</div>
       </div>
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">急著套現的客戶：簡化網上估價表格，24小時內報價＋銀行即時轉賬；想賣高價的客戶：主打「全球 8 間店同步幫你賣」能比本地小店多賣 10–15%；農曆新年前和黃金周提前加大廣告預算。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">網上估價填表率提升 20%，並從原本談不攏的賣家中額外挽回 10–15% 的貨源。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">雙軌漏斗：Buyout「求快」流量 ＋ Consignment「求高價」流量 | CRM 二次挽回機制額外捕捉 10–15% 流失貨源</div></div>
 </div>
@@ -546,69 +579,68 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
   <div class="sh"><div class="sh-left"><div class="sh-num">07</div><div class="sh-title">2️⃣ Growth — B2C Sales Conversion Flywheel</div></div><div class="sh-brand">XIAOMA</div></div>
   <div class="sc" style="display:flex;flex-direction:column;padding:12px 20px 10px;">
     <div class="con-bar" style="flex-shrink:0;margin-bottom:10px;"><div class="con-label">核心結論</div><div class="con-text">打通「線上種草 ➡️ 私域/預約到店 ➡️ 線下 VIP 成交」的 O2O 最後一公里</div></div>
-    <!-- Journey -->
     <div style="flex:1;min-height:0;display:flex;gap:0;align-items:stretch;">
       <!-- Stage 1 -->
       <div style="flex:1;display:flex;flex-direction:column;margin:0 5px;">
-        <div style="flex:1;border-radius:8px;padding:10px 11px;display:flex;flex-direction:column;gap:5px;background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.2);">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-            <div style="font-family:Montserrat,sans-serif;font-size:28px;font-weight:900;color:rgba(66,133,244,.18);line-height:1;flex-shrink:0;">01</div>
-            <div><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#4285F4;letter-spacing:1px;text-transform:uppercase;">ATTRACT</div><div style="font-size:11.5px;font-weight:700;color:var(--txt);line-height:1.3;">稀缺爆款<br>精準觸達</div></div>
+        <div style="flex:1;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;background:rgba(66,133,244,.05);border:1px solid rgba(66,133,244,.2);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="font-family:Montserrat,sans-serif;font-size:30px;font-weight:900;color:rgba(66,133,244,.18);line-height:1;flex-shrink:0;">01</div>
+            <div><div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:#4285F4;letter-spacing:1px;text-transform:uppercase;">ATTRACT</div><div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.3;">稀缺爆款<br>精準觸達</div></div>
           </div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">廣告預算向高流動性爆款傾斜（Mini Kelly II、Birkin 25 金剛色、限量特殊皮），利用 Meta 高清開箱短視頻與 Google Shopping 吸引高淨值藏家點擊。</div>
-          <div style="padding:5px 7px;background:rgba(66,133,244,.08);border-radius:4px;text-align:center;flex-shrink:0;"><div style="font-size:8.5px;color:#4285F4;font-weight:600;">Google Shopping<br>+ Meta Reels</div></div>
+          <div style="font-size:13px;color:var(--txt2);line-height:1.6;flex:1;">廣告預算向高流動性爆款傾斜（Mini Kelly II、Birkin 25 金剛色、限量特殊皮），利用 Meta 高清開箱短視頻與 Google Shopping 吸引高淨值藏家點擊。</div>
+          <div style="padding:6px 8px;background:rgba(66,133,244,.08);border-radius:4px;text-align:center;flex-shrink:0;"><div style="font-size:10px;color:#4285F4;font-weight:600;">Google Shopping<br>+ Meta Reels</div></div>
         </div>
       </div>
-      <!-- Arrow -->
-      <div style="display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:rgba(166,124,82,.5);font-size:20px;font-weight:300;">➔</div>
+      <div style="display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:rgba(166,124,82,.5);font-size:20px;">➔</div>
       <!-- Stage 2 -->
       <div style="flex:1;display:flex;flex-direction:column;margin:0 5px;">
-        <div style="flex:1;border-radius:8px;padding:10px 11px;display:flex;flex-direction:column;gap:5px;background:rgba(123,100,220,.05);border:1px solid rgba(123,100,220,.2);border-width:2px;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-            <div style="font-family:Montserrat,sans-serif;font-size:28px;font-weight:900;color:rgba(123,100,220,.18);line-height:1;flex-shrink:0;">02</div>
-            <div><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#7B64DC;letter-spacing:1px;text-transform:uppercase;">ENGAGE — 關鍵</div><div style="font-size:11.5px;font-weight:700;color:var(--txt);line-height:1.3;">O2O 無縫<br>引流轉化</div></div>
+        <div style="flex:1;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;background:rgba(123,100,220,.05);border:2px solid rgba(123,100,220,.25);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="font-family:Montserrat,sans-serif;font-size:30px;font-weight:900;color:rgba(123,100,220,.18);line-height:1;flex-shrink:0;">02</div>
+            <div><div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:#7B64DC;letter-spacing:1px;text-transform:uppercase;">ENGAGE — 關鍵</div><div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.3;">O2O 無縫<br>引流轉化</div></div>
           </div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">高客單奢侈品 <strong>&gt;80%</strong> 成交在線下門店或 1對1 私聊。商品頁增設「一鍵預約私人鑑賞（Book Private Viewing）」與帶追蹤碼的 WhatsApp 專屬顧問直連，消除轉化斷層。</div>
-          <div style="padding:5px 7px;background:rgba(123,100,220,.08);border-radius:4px;text-align:center;flex-shrink:0;"><div style="font-size:8.5px;color:#7B64DC;font-weight:600;">Book Private Viewing<br>WhatsApp Direct Link</div></div>
+          <div style="font-size:13px;color:var(--txt2);line-height:1.6;flex:1;">高客單奢侈品 <strong>&gt;80%</strong> 成交在線下門店或 1對1 私聊。商品頁增設「一鍵預約私人鑑賞」與帶追蹤碼的 WhatsApp 專屬顧問直連，消除轉化斷層。</div>
+          <div style="padding:6px 8px;background:rgba(123,100,220,.08);border-radius:4px;text-align:center;flex-shrink:0;"><div style="font-size:10px;color:#7B64DC;font-weight:600;">Book Private Viewing<br>WhatsApp Direct Link</div></div>
         </div>
       </div>
-      <!-- Arrow -->
-      <div style="display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:rgba(166,124,82,.5);font-size:20px;font-weight:300;">➔</div>
+      <div style="display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:rgba(166,124,82,.5);font-size:20px;">➔</div>
       <!-- Stage 3 -->
       <div style="flex:1;display:flex;flex-direction:column;margin:0 5px;">
-        <div style="flex:1;border-radius:8px;padding:10px 11px;display:flex;flex-direction:column;gap:5px;background:rgba(166,124,52,.05);border:1px solid rgba(166,124,52,.2);">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-            <div style="font-family:Montserrat,sans-serif;font-size:28px;font-weight:900;color:rgba(166,124,52,.18);line-height:1;flex-shrink:0;">03</div>
-            <div><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;">CONVERT</div><div style="font-size:11.5px;font-weight:700;color:var(--txt);line-height:1.3;">CRM 標籤化<br>與數據回傳</div></div>
+        <div style="flex:1;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;background:rgba(166,124,52,.05);border:1px solid rgba(166,124,52,.2);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="font-family:Montserrat,sans-serif;font-size:30px;font-weight:900;color:rgba(166,124,52,.18);line-height:1;flex-shrink:0;">03</div>
+            <div><div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;">CONVERT</div><div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.3;">CRM 標籤化<br>與數據回傳</div></div>
           </div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">GTM ＋ HubSpot CRM 記錄買家偏好型號與色號；WhatsApp/門店成交後，真實成交金額透過 Meta CAPI / Google OCT 回傳演算法，訓練系統精準尋找同類高淨值買家。</div>
-          <div style="padding:5px 7px;background:rgba(166,124,52,.08);border-radius:4px;text-align:center;flex-shrink:0;"><div style="font-size:8.5px;color:var(--gold);font-weight:600;">Meta CAPI<br>Google OCT 離線回傳</div></div>
+          <div style="font-size:13px;color:var(--txt2);line-height:1.6;flex:1;">GTM ＋ HubSpot CRM 記錄買家偏好型號與色號；WhatsApp/門店成交後，真實成交金額透過 Meta CAPI / Google OCT 回傳演算法，訓練系統精準尋找同類高淨值買家。</div>
+          <div style="padding:6px 8px;background:rgba(166,124,52,.08);border-radius:4px;text-align:center;flex-shrink:0;"><div style="font-size:10px;color:var(--gold);font-weight:600;">Meta CAPI<br>Google OCT 離線回傳</div></div>
         </div>
       </div>
-      <!-- Arrow -->
-      <div style="display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:rgba(166,124,82,.5);font-size:20px;font-weight:300;">➔</div>
+      <div style="display:flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:rgba(166,124,82,.5);font-size:20px;">➔</div>
       <!-- Stage 4 -->
       <div style="flex:1;display:flex;flex-direction:column;margin:0 5px;">
-        <div style="flex:1;border-radius:8px;padding:10px 11px;display:flex;flex-direction:column;gap:5px;background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.2);">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-            <div style="font-family:Montserrat,sans-serif;font-size:28px;font-weight:900;color:rgba(39,174,96,.18);line-height:1;flex-shrink:0;">04</div>
-            <div><div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:800;color:#27AE60;letter-spacing:1px;text-transform:uppercase;">RETAIN &amp; LTV</div><div style="font-size:11.5px;font-weight:700;color:var(--txt);line-height:1.3;">全生命週期<br>價值挖掘</div></div>
+        <div style="flex:1;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;background:rgba(39,174,96,.05);border:1px solid rgba(39,174,96,.2);">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            <div style="font-family:Montserrat,sans-serif;font-size:30px;font-weight:900;color:rgba(39,174,96,.18);line-height:1;flex-shrink:0;">04</div>
+            <div><div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:#27AE60;letter-spacing:1px;text-transform:uppercase;">RETAIN &amp; LTV</div><div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.3;">全生命週期<br>價值挖掘</div></div>
           </div>
-          <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">建立「New Arrivals VIP 優先預覽名單」，自動化 EDM ＋ WhatsApp 1對1 推播實現零廣告費復購；引導老客「以舊換新（Trade-in）」，三板塊循環增長。</div>
-          <div style="padding:6px 8px;background:rgba(39,174,96,.1);border-radius:4px;border:1px solid rgba(39,174,96,.2);flex-shrink:0;">
-            <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;color:#27AE60;letter-spacing:.8px;margin-bottom:2px;">🎯 LTV TARGET</div>
-            <div style="font-size:9px;color:var(--txt);font-weight:600;line-height:1.5;">VIP 12個月復購/Trade-in<br><span class="m" style="font-size:13px;color:#27AE60;">~10%</span> 行業均值 → <span class="m" style="font-size:13px;color:#27AE60;">18–22%</span></div>
+          <div style="font-size:13px;color:var(--txt2);line-height:1.6;flex:1;">建立「New Arrivals VIP 優先預覽名單」，自動化 EDM ＋ WhatsApp 1對1 推播實現零廣告費復購；引導老客「以舊換新（Trade-in）」，三板塊循環增長。</div>
+          <div style="padding:7px 9px;background:rgba(39,174,96,.1);border-radius:4px;border:1px solid rgba(39,174,96,.2);flex-shrink:0;">
+            <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:#27AE60;letter-spacing:.8px;margin-bottom:2px;">🎯 LTV TARGET</div>
+            <div style="font-size:11px;color:var(--txt);font-weight:600;line-height:1.5;">VIP 12個月復購率<br><span class="m" style="font-size:14px;color:#27AE60;">~10%</span> → <span class="m" style="font-size:14px;color:#27AE60;">18–22%</span></div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Bottom note -->
-    <div style="flex-shrink:0;margin-top:8px;padding:6px 10px;background:rgba(166,124,82,.06);border-radius:6px;border:1px solid rgba(166,124,82,.14);text-align:center;">
-      <div style="font-size:9.5px;color:var(--txt2);">
+    <div style="flex-shrink:0;margin-top:9px;padding:7px 11px;background:rgba(166,124,82,.06);border-radius:6px;border:1px solid rgba(166,124,82,.14);text-align:center;">
+      <div style="font-size:12px;color:var(--txt2);">
         <span class="m" style="color:var(--gold);">O2O Flywheel：</span>
         線上廣告觸達 → WhatsApp/預約引流 → 線下門店 VIP 成交 → CRM 數據回傳 → 演算法自動優化 → 復購與 Trade-in 閉環
       </div>
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">網站加上「一鍵預約看包」和「直接跳 WhatsApp 找顧問」按鈕；客戶在門店付錢後，把真實成交金額回傳給廣告系統，讓系統自動找更多同類有錢人；建立 VIP 優先看新貨名單，定期鼓勵老客以舊換新。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">打通線上看包到線下付款的最後一步，把老客戶一年內的回購／換包率從行業平均 10% 提升到 18–22%。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">高客單奢侈品成交核心在線下，O2O 最後一公里設計決定廣告效益上限 | LTV 目標：VIP 12個月復購率提升至 18–22%</div></div>
 </div>
@@ -617,85 +649,84 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 <div class="slide" id="s8" data-title="2027 落地路線圖與二面深入探討方向">
   <div class="sh"><div class="sh-left"><div class="sh-num">08</div><div class="sh-title">2027 Roadmap &amp; Strategic Next Steps</div></div><div class="sh-brand">XIAOMA</div></div>
   <div class="sc" style="display:flex;flex-direction:column;">
-    <!-- Top: Q Timeline -->
-    <div style="flex:0 0 52%;min-height:0;display:flex;gap:7px;padding:12px 26px 8px;align-items:stretch;">
+    <div style="flex:0 0 50%;min-height:0;display:flex;gap:7px;padding:11px 24px 7px;align-items:stretch;">
       <!-- Q1 -->
-      <div style="flex:1;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:rgba(166,124,82,.07);border:1px solid rgba(166,124,82,.22);">
-        <div style="font-family:Montserrat,sans-serif;font-size:26px;font-weight:900;color:var(--gold);line-height:1;">Q1</div>
-        <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;">基建校準與香港破局</div>
-        <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">完成 GTM/GA4/HubSpot 離線轉化閉環；重組 Google ＆ Meta 賬戶架構；上線網站一鍵預約與 WhatsApp 追蹤入口；啟動香港三平台測試。</div>
-        <div style="padding:5px 8px;background:rgba(166,124,82,.12);border-radius:5px;border-left:2px solid var(--gold);flex-shrink:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">🎯 Q1 MILESTONE</div>
-          <div style="font-size:8.5px;color:var(--txt);font-weight:600;line-height:1.5;">Day 30 完成 tROAS 切換；Q1 末線索轉化率 +15–20%；確立各渠道基準 CPL</div>
+      <div style="flex:1;border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:5px;background:rgba(166,124,82,.07);border:1px solid rgba(166,124,82,.22);">
+        <div style="font-family:Montserrat,sans-serif;font-size:28px;font-weight:900;color:var(--gold);line-height:1;">Q1</div>
+        <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">基建校準與香港破局</div>
+        <div style="font-size:12.5px;color:var(--txt2);line-height:1.6;flex:1;">完成 GTM/GA4/HubSpot 離線轉化閉環；重組 Google ＆ Meta 賬戶架構；上線網站一鍵預約與 WhatsApp 追蹤入口；啟動香港三平台測試。</div>
+        <div style="padding:6px 9px;background:rgba(166,124,82,.12);border-radius:5px;border-left:2px solid var(--gold);flex-shrink:0;">
+          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">🎯 Q1 MILESTONE</div>
+          <div style="font-size:11px;color:var(--txt);font-weight:600;line-height:1.5;">Day 30 完成 tROAS 切換；Q1 末線索轉化率 +15–20%；確立各渠道基準 CPL</div>
         </div>
       </div>
-      <!-- Arrow -->
       <div style="display:flex;align-items:center;justify-content:center;width:20px;flex-shrink:0;color:rgba(166,124,82,.35);font-size:14px;">→</div>
       <!-- Q2 -->
-      <div style="flex:1;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:rgba(166,124,82,.05);border:1px solid rgba(166,124,82,.16);">
-        <div style="font-family:Montserrat,sans-serif;font-size:26px;font-weight:900;color:var(--gold);line-height:1;">Q2</div>
-        <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;">模型驗證與三板塊放量</div>
-        <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">跑通「回收轉寄賣」CRM 二次再營銷漏斗；深化小紅書 KOC 矩陣與中環店 O2O 聯動效應；穩定各渠道目標 ROAS 基準。</div>
-        <div style="padding:5px 8px;background:rgba(166,124,82,.1);border-radius:5px;border-left:2px solid var(--gold);flex-shrink:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">🎯 Q2 MILESTONE</div>
-          <div style="font-size:8.5px;color:var(--txt);font-weight:600;line-height:1.5;">香港整體 ROAS 穩定突破 <strong class="m">3.5×–4.0×</strong>；挽回 10–15% 流失 C2B 貨源線索</div>
+      <div style="flex:1;border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:5px;background:rgba(166,124,82,.05);border:1px solid rgba(166,124,82,.16);">
+        <div style="font-family:Montserrat,sans-serif;font-size:28px;font-weight:900;color:var(--gold);line-height:1;">Q2</div>
+        <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">模型驗證與三板塊放量</div>
+        <div style="font-size:12.5px;color:var(--txt2);line-height:1.6;flex:1;">跑通「回收轉寄賣」CRM 二次再營銷漏斗；深化小紅書 KOC 矩陣與中環店 O2O 聯動效應；穩定各渠道目標 ROAS 基準。</div>
+        <div style="padding:6px 9px;background:rgba(166,124,82,.1);border-radius:5px;border-left:2px solid var(--gold);flex-shrink:0;">
+          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">🎯 Q2 MILESTONE</div>
+          <div style="font-size:11px;color:var(--txt);font-weight:600;line-height:1.5;">香港整體 ROAS 穩定突破 <strong class="m">3.5×–4.0×</strong>；挽回 10–15% 流失 C2B 貨源線索</div>
         </div>
       </div>
-      <!-- Arrow -->
       <div style="display:flex;align-items:center;justify-content:center;width:20px;flex-shrink:0;color:rgba(166,124,82,.35);font-size:14px;">→</div>
       <!-- Q3-Q4 -->
-      <div style="flex:1.3;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;background:rgba(166,124,82,.03);border:1px solid rgba(166,124,82,.1);">
-        <div style="font-family:Montserrat,sans-serif;font-size:22px;font-weight:900;color:var(--gold);line-height:1;">Q3–Q4</div>
-        <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;">全球區域複製與旺季衝刺</div>
-        <div style="font-size:9px;color:var(--txt2);line-height:1.6;flex:1;">將香港驗證成功的投放模型與數據看板 SOP 複製至新加坡、迪拜等 Tier 2 市場；配合聖誕跨年 ＋ 黃金周節日旺季，全面衝刺全年高峰。</div>
-        <div style="padding:5px 8px;background:rgba(166,124,82,.1);border-radius:5px;border-left:2px solid var(--gold);flex-shrink:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">🎯 Q3–Q4 MILESTONE</div>
-          <div style="font-size:8.5px;color:var(--txt);font-weight:600;line-height:1.5;">Tier 2 高溢價款成交額環比 <strong class="m">+25%+</strong>；VIP 客戶復購率提升至 <strong class="m">18–22%</strong></div>
+      <div style="flex:1.3;border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:5px;background:rgba(166,124,82,.03);border:1px solid rgba(166,124,82,.1);">
+        <div style="font-family:Montserrat,sans-serif;font-size:24px;font-weight:900;color:var(--gold);line-height:1;">Q3–Q4</div>
+        <div style="font-family:Montserrat,sans-serif;font-size:8px;font-weight:700;color:var(--txt3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;">全球區域複製與旺季衝刺</div>
+        <div style="font-size:12.5px;color:var(--txt2);line-height:1.6;flex:1;">將香港驗證成功的投放模型與數據看板 SOP 複製至新加坡、迪拜等 Tier 2 市場；配合聖誕跨年 ＋ 黃金周節日旺季，全面衝刺全年高峰。</div>
+        <div style="padding:6px 9px;background:rgba(166,124,82,.1);border-radius:5px;border-left:2px solid var(--gold);flex-shrink:0;">
+          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">🎯 Q3–Q4 MILESTONE</div>
+          <div style="font-size:11px;color:var(--txt);font-weight:600;line-height:1.5;">Tier 2 高溢價款成交額環比 <strong class="m">+25%+</strong>；VIP 客戶復購率提升至 <strong class="m">18–22%</strong></div>
         </div>
       </div>
     </div>
     <!-- Bottom: Discussion + Risk -->
     <div style="flex:1;min-height:0;display:flex;border-top:1px solid var(--bdr);">
-      <!-- Left: Discussion -->
-      <div style="flex:1;padding:10px 18px 10px 26px;display:flex;flex-direction:column;gap:4px;border-right:1px solid var(--bdr);">
-        <div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:var(--gold);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;flex-shrink:0;">💬 STRATEGIC DISCUSSION — 二面深入探討議題</div>
+      <div style="flex:1;padding:9px 18px 9px 24px;display:flex;flex-direction:column;gap:5px;border-right:1px solid var(--bdr);">
+        <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;color:var(--gold);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:3px;flex-shrink:0;">💬 STRATEGIC DISCUSSION — 二面深入探討議題</div>
         <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:5px;border-bottom:1px solid var(--bdr);flex:1;min-height:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">01</div>
-          <div style="font-size:9.5px;color:var(--txt2);line-height:1.5;"><strong>現有數據基準：</strong>貴司目前香港及全球各站在 Google/Meta 的歷史 ROAS、CPA 及在線估值表單轉化率基準？</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">01</div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;"><strong>現有數據基準：</strong>貴司目前香港及全球各站在 Google/Meta 的歷史 ROAS、CPA 及在線估值表單轉化率基準？</div>
         </div>
         <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:5px;border-bottom:1px solid var(--bdr);flex:1;min-height:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">02</div>
-          <div style="font-size:9.5px;color:var(--txt2);line-height:1.5;"><strong>三板塊利潤權重：</strong>2027 年集團在「現金買斷、委託寄賣、零售銷售」三大板塊的業績佔比目標與毛利考核重心？</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">02</div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;"><strong>三板塊利潤權重：</strong>2027 年「現金買斷、委託寄賣、零售銷售」三大板塊的業績佔比目標與毛利考核重心？</div>
         </div>
         <div style="display:flex;gap:7px;align-items:flex-start;padding-bottom:5px;border-bottom:1px solid var(--bdr);flex:1;min-height:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">03</div>
-          <div style="font-size:9.5px;color:var(--txt2);line-height:1.5;"><strong>CRM 與私域現狀：</strong>目前中環店與日本總部在 HubSpot/WhatsApp/微信的銷售跟進流程及數據回傳自動化程度？</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">03</div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;"><strong>CRM 與私域現狀：</strong>目前中環店與日本總部在 HubSpot/WhatsApp/微信的銷售跟進流程及數據回傳自動化程度？</div>
         </div>
         <div style="display:flex;gap:7px;align-items:flex-start;flex:1;min-height:0;">
-          <div style="font-family:Montserrat,sans-serif;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">04</div>
-          <div style="font-size:9.5px;color:var(--txt2);line-height:1.5;"><strong>預算與擴量天花板：</strong>香港市場 Q1–Q2 月度付費媒體預算區間，以及達到目標 ROAS 後的彈性追加機制？</div>
+          <div style="font-family:Montserrat,sans-serif;font-size:12px;font-weight:800;color:var(--gold);flex-shrink:0;min-width:16px;">04</div>
+          <div style="font-size:12px;color:var(--txt2);line-height:1.5;"><strong>預算與擴量天花板：</strong>香港市場 Q1–Q2 月度付費媒體預算區間，以及達到目標 ROAS 後的彈性追加機制？</div>
         </div>
       </div>
-      <!-- Right: Risk -->
-      <div style="flex:1;padding:10px 24px 10px 18px;display:flex;flex-direction:column;gap:5px;background:var(--bgg);">
-        <div style="font-family:Montserrat,sans-serif;font-size:8.5px;font-weight:800;color:#C4575B;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:2px;flex-shrink:0;">⚠️ RISK MITIGATION — 核心風險與應對預案</div>
-        <div style="background:#fff;border-radius:6px;border:1px solid var(--bdr);padding:7px 9px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#C4575B;margin-bottom:2px;">RISK 01 · 市場行情</div>
-          <div style="font-size:9.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">愛馬仕二級市場溢價進一步收窄</div>
-          <div style="font-size:8.5px;color:var(--txt2);line-height:1.5;">集中 80% 預算於流動性最強硬通貨（Mini Kelly/Birkin 25）；提高輕資產委託寄賣比例以降低資金佔用。</div>
+      <div style="flex:1;padding:9px 22px 9px 18px;display:flex;flex-direction:column;gap:6px;background:var(--bgg);">
+        <div style="font-family:Montserrat,sans-serif;font-size:9px;font-weight:800;color:#C4575B;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:2px;flex-shrink:0;">⚠️ RISK MITIGATION — 核心風險與應對預案</div>
+        <div style="background:#fff;border-radius:6px;border:1px solid var(--bdr);padding:8px 10px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#C4575B;margin-bottom:3px;">RISK 01 · 市場行情</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:3px;">愛馬仕二級市場溢價進一步收窄</div>
+          <div style="font-size:11.5px;color:var(--txt2);line-height:1.5;">集中 80% 預算於流動性最強硬通貨（Mini Kelly/Birkin 25）；提高輕資產委託寄賣比例以降低資金佔用。</div>
         </div>
-        <div style="background:#fff;border-radius:6px;border:1px solid var(--bdr);padding:7px 9px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#C4575B;margin-bottom:2px;">RISK 02 · 平台風控</div>
-          <div style="font-size:9.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">小紅書奢侈品回收/引流政策收緊</div>
-          <div style="font-size:8.5px;color:var(--txt2);line-height:1.5;">採用企業號藍V認證 ＋ 聚光官方私信組件 ＋ 線下預約卡券合規導流，高意向流量沉澱至自有私域池。</div>
+        <div style="background:#fff;border-radius:6px;border:1px solid var(--bdr);padding:8px 10px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#C4575B;margin-bottom:3px;">RISK 02 · 平台風控</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:3px;">小紅書奢侈品回收/引流政策收緊</div>
+          <div style="font-size:11.5px;color:var(--txt2);line-height:1.5;">採用企業號藍V認證 ＋ 聚光官方私信組件 ＋ 線下預約卡券合規導流，高意向流量沉澱至自有私域池。</div>
         </div>
-        <div style="background:#fff;border-radius:6px;border:1px solid var(--bdr);padding:7px 9px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
-          <div style="font-family:Montserrat,sans-serif;font-size:7px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#C4575B;margin-bottom:2px;">RISK 03 · 運營執行</div>
-          <div style="font-size:9.5px;font-weight:700;color:var(--txt);margin-bottom:2px;">跨國孤品庫存同步延遲導致廣告浪費</div>
-          <div style="font-size:8.5px;color:var(--txt2);line-height:1.5;">建立 Product Feed 自動化規則與人工雙重核檢，確保高單價孤品售出後分鐘級下架對應廣告系列。</div>
+        <div style="background:#fff;border-radius:6px;border:1px solid var(--bdr);padding:8px 10px;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;">
+          <div style="font-family:Montserrat,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#C4575B;margin-bottom:3px;">RISK 03 · 運營執行</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:3px;">跨國孤品庫存同步延遲導致廣告浪費</div>
+          <div style="font-size:11.5px;color:var(--txt2);line-height:1.5;">建立 Product Feed 自動化規則與人工雙重核檢，確保高單價孤品售出後分鐘級下架對應廣告系列。</div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="slide-summary">
+    <div class="sum-col"><div class="sum-label">📌 做法</div><div class="sum-text">分四季推進（Q1 打好追蹤基礎跑通香港，Q2 放大效果，Q3–Q4 複製至新加坡和迪拜）；提前準備好應對行情下跌、小紅書限流和庫存不同步的解決方案，並在現場與社長確認 4 項內部數據。</div></div>
+    <div class="sum-col"><div class="sum-label">🎯 目標</div><div class="sum-text">Q1 末客戶轉化率提升 15–20%；Q2 香港廣告回報穩超 3.5–4 倍；下半年海外高價款銷量增長 25% 以上。</div></div>
   </div>
   <div class="sf"><div class="sf-txt">分階段穩健推進：前 30 天快速跑通數據閉環，Q2–Q4 實現全球規模化複製 ｜ 彙報人：Tabris Yuen</div></div>
 </div>
@@ -703,7 +734,6 @@ html,body{width:100%;height:100%;background:#111;overflow:hidden;font-family:'No
 </div><!-- /stage -->
 </div><!-- /app -->
 
-<!-- Controls -->
 <div id="ctrl">
   <div class="ngrp">
     <button class="nbtn" id="prevBtn" onclick="go(-1)">◀ PREV</button>
@@ -754,66 +784,62 @@ function go(dir) {
 }
 
 document.addEventListener('keydown', e => {
-  if (['ArrowRight', 'ArrowDown', 'Space'].includes(e.code)) { e.preventDefault(); go(1); }
-  if (['ArrowLeft', 'ArrowUp'].includes(e.code)) { e.preventDefault(); go(-1); }
+  if (['ArrowRight','ArrowDown','Space'].includes(e.code)){e.preventDefault();go(1);}
+  if (['ArrowLeft','ArrowUp'].includes(e.code)){e.preventDefault();go(-1);}
 });
 
-// PDF Export
 async function exportPDF() {
   const btn = document.getElementById('pdfBtn');
   btn.textContent = '⏳'; btn.disabled = true;
   try {
     const { jsPDF } = window.jspdf;
-    if (!jsPDF) throw new Error('jsPDF not loaded');
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1280, 720] });
+    const pdf = new jsPDF({ orientation:'landscape', unit:'px', format:[1280,720] });
     const st = document.getElementById('stage');
-    const origT = st.style.transform, origL = st.style.left, origTop = st.style.top;
-    st.style.transform = 'none'; st.style.left = '0'; st.style.top = '0';
+    const [oT,oL,oTop] = [st.style.transform,st.style.left,st.style.top];
+    st.style.transform='none';st.style.left='0';st.style.top='0';
     const saved = cur;
-    for (let i = 0; i < TOTAL; i++) {
-      slides.forEach((s, idx) => { s.style.cssText += (idx === i ? ';opacity:1!important;transform:none!important;z-index:1' : ';opacity:0!important;z-index:0'); });
-      await new Promise(r => setTimeout(r, 250));
-      const canvas = await html2canvas(st, { scale: 1, useCORS: true, allowTaint: true, logging: false });
-      const img = canvas.toDataURL('image/jpeg', 0.92);
-      if (i > 0) pdf.addPage([1280, 720], 'landscape');
-      pdf.addImage(img, 'JPEG', 0, 0, 1280, 720);
+    for(let i=0;i<TOTAL;i++){
+      slides.forEach((s,idx)=>{s.style.cssText+=(idx===i?';opacity:1!important;transform:none!important;z-index:1':';opacity:0!important;z-index:0');});
+      await new Promise(r=>setTimeout(r,260));
+      const canvas = await html2canvas(st,{scale:1,useCORS:true,allowTaint:true,logging:false});
+      const img = canvas.toDataURL('image/jpeg',0.92);
+      if(i>0) pdf.addPage([1280,720],'landscape');
+      pdf.addImage(img,'JPEG',0,0,1280,720);
     }
-    slides.forEach((s, idx) => { s.style.cssText = s.style.cssText.replace(/;opacity[^;]*!important/g, '').replace(/;transform[^;]*!important/g, '').replace(/;z-index[^;]*/g, ''); if (idx === saved) s.classList.add('active'); else s.classList.remove('active'); });
-    st.style.transform = origT; st.style.left = origL; st.style.top = origTop;
-    cur = saved; updateUI();
+    slides.forEach((s,idx)=>{s.style.cssText=s.style.cssText.replace(/;opacity[^;]*!important/g,'').replace(/;transform[^;]*!important/g,'').replace(/;z-index[^;]*/g,'');if(idx===saved)s.classList.add('active');else s.classList.remove('active');});
+    st.style.transform=oT;st.style.left=oL;st.style.top=oTop;
+    cur=saved;updateUI();
     pdf.save('XIAOMA_2027_Marketing_Plan.pdf');
-  } catch(e) { console.error(e); window.print(); }
-  btn.textContent = '↓ PDF'; btn.disabled = false;
+  } catch(e){console.error(e);window.print();}
+  btn.textContent='↓ PDF';btn.disabled=false;
 }
 
-// PPTX Export
 async function exportPPTX() {
   const btn = document.getElementById('pptxBtn');
   btn.textContent = '⏳'; btn.disabled = true;
   try {
-    if (typeof PptxGenJS === 'undefined') throw new Error('PptxGenJS not loaded');
     const pptx = new PptxGenJS();
-    pptx.layout = 'LAYOUT_WIDE';
-    pptx.title = 'XIAOMA 2027 全球整合營銷方案';
-    pptx.author = 'Tabris Yuen';
+    pptx.layout='LAYOUT_WIDE';
+    pptx.title='XIAOMA 2027 全球整合營銷方案';
+    pptx.author='Tabris Yuen';
     const st = document.getElementById('stage');
-    const origT = st.style.transform, origL = st.style.left, origTop = st.style.top;
-    st.style.transform = 'none'; st.style.left = '0'; st.style.top = '0';
+    const [oT,oL,oTop] = [st.style.transform,st.style.left,st.style.top];
+    st.style.transform='none';st.style.left='0';st.style.top='0';
     const saved = cur;
-    for (let i = 0; i < TOTAL; i++) {
-      slides.forEach((s, idx) => { s.style.cssText += (idx === i ? ';opacity:1!important;transform:none!important;z-index:1' : ';opacity:0!important;z-index:0'); });
-      await new Promise(r => setTimeout(r, 280));
-      const canvas = await html2canvas(st, { scale: 1, useCORS: true, logging: false });
+    for(let i=0;i<TOTAL;i++){
+      slides.forEach((s,idx)=>{s.style.cssText+=(idx===i?';opacity:1!important;transform:none!important;z-index:1':';opacity:0!important;z-index:0');});
+      await new Promise(r=>setTimeout(r,290));
+      const canvas = await html2canvas(st,{scale:1,useCORS:true,logging:false});
       const img = canvas.toDataURL('image/png');
       const slide = pptx.addSlide();
-      slide.addImage({ data: img, x: 0, y: 0, w: '100%', h: '100%' });
+      slide.addImage({data:img,x:0,y:0,w:'100%',h:'100%'});
     }
-    slides.forEach((s, idx) => { s.style.cssText = s.style.cssText.replace(/;opacity[^;]*!important/g, '').replace(/;transform[^;]*!important/g, '').replace(/;z-index[^;]*/g, ''); if (idx === saved) s.classList.add('active'); else s.classList.remove('active'); });
-    st.style.transform = origT; st.style.left = origL; st.style.top = origTop;
-    cur = saved; updateUI();
-    await pptx.writeFile({ fileName: 'XIAOMA_2027_Marketing_Plan.pptx' });
-  } catch(e) { console.error(e); }
-  btn.textContent = '↓ PPTX'; btn.disabled = false;
+    slides.forEach((s,idx)=>{s.style.cssText=s.style.cssText.replace(/;opacity[^;]*!important/g,'').replace(/;transform[^;]*!important/g,'').replace(/;z-index[^;]*/g,'');if(idx===saved)s.classList.add('active');else s.classList.remove('active');});
+    st.style.transform=oT;st.style.left=oL;st.style.top=oTop;
+    cur=saved;updateUI();
+    await pptx.writeFile({fileName:'XIAOMA_2027_Marketing_Plan.pptx'});
+  } catch(e){console.error(e);}
+  btn.textContent='↓ PPTX';btn.disabled=false;
 }
 
 scaleStage();
